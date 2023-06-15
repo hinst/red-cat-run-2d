@@ -24,5 +24,6 @@ func (me *GameScene) Update(deltaTime float64) {
 }
 
 func (me *GameScene) Draw(screen *ebiten.Image) {
+	me.terrainMan.Draw(screen)
 	me.catEntity.Draw(screen)
 }

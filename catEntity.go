@@ -50,8 +50,8 @@ func (me *CatEntity) Update(deltaTime float64) {
 func (me *CatEntity) Draw(screen *ebiten.Image) {
 	var drawOptions = ebiten.DrawImageOptions{}
 	drawOptions.GeoM.Translate(me.X, me.Y)
-	var shiftX = int(me.runFrame) * int(me.Width)
-	var rect = image.Rect(shiftX, 0, shiftX+me.Width, me.Width)
+	var spriteShiftX = int(me.runFrame) * int(me.Width)
+	var rect = image.Rect(spriteShiftX, 0, spriteShiftX+me.Width, me.Width)
 	screen.DrawImage(me.runImage.SubImage(rect).(*ebiten.Image), &drawOptions)
 }
 

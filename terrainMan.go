@@ -29,11 +29,11 @@ func (me *TerrainMan) GetMaxBlockWidth() int {
 }
 
 func (me *TerrainMan) GetMinGapWidth() int {
-	return 1
+	return 2
 }
 
 func (me *TerrainMan) GetMaxGapWidth() int {
-	return 4
+	return 5
 }
 
 func (me *TerrainMan) GetTileWidth() int {
@@ -45,7 +45,7 @@ func (me *TerrainMan) GetTileHeight() int {
 }
 
 func (me *TerrainMan) Initialize() {
-	var brickBlockImage, _, brickBlockImageError = image.Decode(bytes.NewReader(catRun))
+	var brickBlockImage, _, brickBlockImageError = image.Decode(bytes.NewReader(brickBlock))
 	Assert(brickBlockImageError)
 	me.brickBlockImage = ebiten.NewImageFromImage(brickBlockImage)
 	for me.GetLastBlock() == nil || me.GetLastBlock().X+me.GetLastBlock().Width < me.AreaWidth {
@@ -56,7 +56,7 @@ func (me *TerrainMan) Initialize() {
 		} else {
 			block.Type = rand.Intn(2)
 			var gap = GetRandomNumberBetween(me.GetMinGapWidth(), me.GetMaxGapWidth())
-			block.X = me.GetLastBlock().X + gap
+			block.X = me.GetLastBlock().X + me.GetLastBlock().Width + gap
 		}
 		block.Width = GetRandomNumberBetween(me.GetMinBlockWidth(), me.GetMaxBlockWidth())
 		me.blocks = append(me.blocks, block)
@@ -74,9 +74,15 @@ func (me *TerrainMan) GetLastBlock() *TerrainBlock {
 func (me *TerrainMan) Draw(screen *ebiten.Image) {
 	for _, block := range me.blocks {
 		var drawOptions ebiten.DrawImageOptions
+		drawOptions.GeoM.Translate(float64(me.GetTileWidth())*float64(block.X), 0)
 		if block.Type == block.GetTypeFloor() {
-			drawOptions.GeoM.Translate(float64(me.GetTileWidth())*float64(block.X), 200)
+			drawOptions.GeoM.Translate(0, 200)
+		} else {
+			drawOptions.GeoM.Translate(0, 30)
 		}
-		screen.DrawImage(me.brickBlockImage, &drawOptions)
+		for i := 0; i < block.Width; i++ {
+			screen.DrawImage(me.brickBlockImage, &drawOptions)
+			drawOptions.GeoM.Translate(float64(me.GetTileWidth()), 0)
+		}
 	}
 }
