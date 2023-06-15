@@ -21,19 +21,19 @@ type TerrainMan struct {
 }
 
 func (me *TerrainMan) GetMinBlockWidth() int {
-	return 5
+	return 8
 }
 
 func (me *TerrainMan) GetMaxBlockWidth() int {
-	return 10
+	return 16
 }
 
 func (me *TerrainMan) GetMinGapWidth() int {
-	return 2
+	return 3
 }
 
 func (me *TerrainMan) GetMaxGapWidth() int {
-	return 5
+	return 6
 }
 
 func (me *TerrainMan) GetTileWidth() int {
@@ -53,12 +53,13 @@ func (me *TerrainMan) Initialize() {
 		if me.GetLastBlock() == nil {
 			block.Type = block.GetTypeFloor()
 			block.X = 0
+			block.Width = me.GetMaxBlockWidth()
 		} else {
 			block.Type = rand.Intn(2)
 			var gap = GetRandomNumberBetween(me.GetMinGapWidth(), me.GetMaxGapWidth())
 			block.X = me.GetLastBlock().X + me.GetLastBlock().Width + gap
+			block.Width = GetRandomNumberBetween(me.GetMinBlockWidth(), me.GetMaxBlockWidth())
 		}
-		block.Width = GetRandomNumberBetween(me.GetMinBlockWidth(), me.GetMaxBlockWidth())
 		me.blocks = append(me.blocks, block)
 	}
 }

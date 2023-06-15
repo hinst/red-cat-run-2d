@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	ebiten.SetWindowSize(640, 480)
+	ebiten.SetWindowSize(840, 480)
 	ebiten.SetWindowTitle("Menu demo")
 	var game = &Game{}
 	game.Initialize()

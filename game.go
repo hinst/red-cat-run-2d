@@ -79,7 +79,7 @@ func (me *Game) draw(screen *ebiten.Image) {
 }
 
 func (me *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
-	return 320, 240
+	return 420, 240
 }
 
 func (me *Game) GetModeMenu() int {
