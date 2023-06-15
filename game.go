@@ -8,16 +8,23 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
+const (
+	GAME_MODE_MENU = iota
+	GAME_MODE_GAME
+)
+
 type Game struct {
-	UpdateTime      time.Time
-	JustPressedKeys []ebiten.Key
-	Menu            MenuUserInterface
-	IsExiting       bool
+	updateTime      time.Time
+	justPressedKeys []ebiten.Key
+	menu            MenuUserInterface
+	gameScene       GameScene
+	isExiting       bool
+	mode            int
 }
 
 func (me *Game) Initialize() {
-	me.UpdateTime = time.Now()
-	me.Menu = MenuUserInterface{
+	me.updateTime = time.Now()
+	me.menu = MenuUserInterface{
 		Items: []MenuUserInterfaceItem{
 			{
 				Title: "New Game",
@@ -33,11 +40,13 @@ func (me *Game) Initialize() {
 			},
 		},
 	}
+	me.gameScene = GameScene{}
+	me.gameScene.Initialize()
 }
 
 func (me *Game) Update() error {
-	me.JustPressedKeys = inpututil.AppendJustPressedKeys(me.JustPressedKeys)
-	if me.IsExiting {
+	me.justPressedKeys = inpututil.AppendJustPressedKeys(me.justPressedKeys)
+	if me.isExiting {
 		return errors.New("exiting")
 	}
 	return nil
@@ -45,25 +54,33 @@ func (me *Game) Update() error {
 
 func (me *Game) Draw(screen *ebiten.Image) {
 	var updateTime = time.Now()
-	me.update(updateTime.Sub(me.UpdateTime).Seconds())
-	me.UpdateTime = updateTime
-	me.JustPressedKeys = me.JustPressedKeys[:0]
+	me.update(updateTime.Sub(me.updateTime).Seconds())
+	me.updateTime = updateTime
+	me.justPressedKeys = me.justPressedKeys[:0]
 	me.draw(screen)
 }
 
 func (me *Game) update(deltaTime float64) {
-	me.Menu.Update(deltaTime, me.JustPressedKeys)
-	if me.Menu.PressedItemId == 1 {
-
-	} else if me.Menu.PressedItemId == 2 {
-		ebiten.SetFullscreen(!ebiten.IsFullscreen())
-	} else if me.Menu.PressedItemId == 3 {
-		me.IsExiting = true
+	if me.mode == GAME_MODE_MENU {
+		me.menu.Update(deltaTime, me.justPressedKeys)
+		if me.menu.PressedItemId == 1 {
+			me.mode = GAME_MODE_GAME
+		} else if me.menu.PressedItemId == 2 {
+			ebiten.SetFullscreen(!ebiten.IsFullscreen())
+		} else if me.menu.PressedItemId == 3 {
+			me.isExiting = true
+		}
+	} else if me.mode == GAME_MODE_GAME {
+		me.gameScene.Update(deltaTime)
 	}
 }
 
 func (me *Game) draw(screen *ebiten.Image) {
-	me.Menu.Draw(screen)
+	if me.mode == GAME_MODE_MENU {
+		me.menu.Draw(screen)
+	} else if me.mode == GAME_MODE_GAME {
+		me.gameScene.Draw(screen)
+	}
 }
 
 func (me *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
