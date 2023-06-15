@@ -7,4 +7,6 @@ import (
 var (
 	//go:embed data/catWalk.png
 	catRun []byte
+	//go:embed data/catDie.png
+	catDie []byte
 )
