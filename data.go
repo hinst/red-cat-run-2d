@@ -9,4 +9,6 @@ var (
 	catRun []byte
 	//go:embed data/catDie.png
 	catDie []byte
+	//go:embed data/brickBlock.png
+	brickBlock []byte
 )

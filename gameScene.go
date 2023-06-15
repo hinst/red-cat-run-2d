@@ -5,10 +5,15 @@ import (
 )
 
 type GameScene struct {
-	catEntity CatEntity
+	terrainMan TerrainMan
+	catEntity  CatEntity
 }
 
 func (me *GameScene) Initialize() {
+	me.terrainMan.ViewHeight = 240
+	me.terrainMan.ViewWidth = 320
+	me.terrainMan.AreaWidth = 100
+	me.terrainMan.Initialize()
 	me.catEntity.Initialize()
 	me.catEntity.X = 10
 	me.catEntity.Y = 200 - float64(me.catEntity.Height)
