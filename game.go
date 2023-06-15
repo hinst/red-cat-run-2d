@@ -8,11 +8,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
-const (
-	GAME_MODE_MENU = iota
-	GAME_MODE_GAME
-)
-
 type Game struct {
 	updateTime      time.Time
 	justPressedKeys []ebiten.Key
@@ -61,28 +56,36 @@ func (me *Game) Draw(screen *ebiten.Image) {
 }
 
 func (me *Game) update(deltaTime float64) {
-	if me.mode == GAME_MODE_MENU {
+	if me.mode == me.GetModeMenu() {
 		me.menu.Update(deltaTime, me.justPressedKeys)
 		if me.menu.PressedItemId == 1 {
-			me.mode = GAME_MODE_GAME
+			me.mode = me.GetModeGame()
 		} else if me.menu.PressedItemId == 2 {
 			ebiten.SetFullscreen(!ebiten.IsFullscreen())
 		} else if me.menu.PressedItemId == 3 {
 			me.isExiting = true
 		}
-	} else if me.mode == GAME_MODE_GAME {
+	} else if me.mode == me.GetModeGame() {
 		me.gameScene.Update(deltaTime)
 	}
 }
 
 func (me *Game) draw(screen *ebiten.Image) {
-	if me.mode == GAME_MODE_MENU {
+	if me.mode == me.GetModeMenu() {
 		me.menu.Draw(screen)
-	} else if me.mode == GAME_MODE_GAME {
+	} else if me.mode == me.GetModeGame() {
 		me.gameScene.Draw(screen)
 	}
 }
 
 func (me *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
 	return 320, 240
+}
+
+func (me *Game) GetModeMenu() int {
+	return 0
+}
+
+func (me *Game) GetModeGame() int {
+	return 1
 }

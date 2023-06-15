@@ -21,6 +21,7 @@ type CatEntity struct {
 
 	Width  int
 	Height int
+	Status int
 }
 
 func (me *CatEntity) Initialize() {
@@ -52,4 +53,20 @@ func (me *CatEntity) Draw(screen *ebiten.Image) {
 	var shiftX = int(me.runFrame) * int(me.Width)
 	var rect = image.Rect(shiftX, 0, shiftX+me.Width, me.Width)
 	screen.DrawImage(me.runImage.SubImage(rect).(*ebiten.Image), &drawOptions)
+}
+
+func (me *CatEntity) GetStatusFloor() int {
+	return 0
+}
+
+func (me *CatEntity) GetStatusCeiling() int {
+	return 1
+}
+
+func (me *CatEntity) GetStatusFly() int {
+	return 2
+}
+
+func (me *CatEntity) GetStatusDead() int {
+	return 3
 }
