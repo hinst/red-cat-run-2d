@@ -1,0 +1,1 @@
+go build && red-cat-run-2d.exe
