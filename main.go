@@ -8,7 +8,8 @@ import (
 
 func main() {
 	ebiten.SetWindowSize(840, 480)
-	ebiten.SetWindowTitle("Menu demo")
+	ebiten.SetWindowTitle("RED CAT RUN 2D")
+	ebiten.SetVsyncEnabled(true)
 	var game = &Game{}
 	game.Initialize()
 	if err := ebiten.RunGame(game); err != nil {
