@@ -12,9 +12,9 @@ type TerrainMan struct {
 	brickBlockImage *ebiten.Image
 	blocks          []*TerrainBlock
 	// Initialization parameter, pixels
-	ViewWidth int
+	ViewWidth float64
 	// Initialization parameter, pixels
-	ViewHeight int
+	ViewHeight float64
 	// Initialization parameter, tiles
 	AreaWidth int
 	// Input parameter for every draw
@@ -77,17 +77,26 @@ func (me *TerrainMan) GetLastBlock() *TerrainBlock {
 
 func (me *TerrainMan) Draw(screen *ebiten.Image) {
 	for _, block := range me.blocks {
-		var drawOptions ebiten.DrawImageOptions
-		drawOptions.GeoM.Translate(-me.CameraX, -me.CameraY)
-		drawOptions.GeoM.Translate(float64(me.GetTileWidth())*float64(block.X), 0)
-		if block.Type == block.GetTypeFloor() {
-			drawOptions.GeoM.Translate(0, 200)
+		if me.CheckBlockVisible(block) {
+			var drawOptions ebiten.DrawImageOptions
+			drawOptions.GeoM.Translate(-me.CameraX, -me.CameraY)
+			drawOptions.GeoM.Translate(float64(me.GetTileWidth())*float64(block.X), 0)
+			if block.Type == block.GetTypeFloor() {
+				drawOptions.GeoM.Translate(0, 200)
+			} else {
+				drawOptions.GeoM.Translate(0, 30)
+			}
+			for i := 0; i < block.Width; i++ {
+				screen.DrawImage(me.brickBlockImage, &drawOptions)
+				drawOptions.GeoM.Translate(float64(me.GetTileWidth()), 0)
+			}
 		} else {
-			drawOptions.GeoM.Translate(0, 30)
-		}
-		for i := 0; i < block.Width; i++ {
-			screen.DrawImage(me.brickBlockImage, &drawOptions)
-			drawOptions.GeoM.Translate(float64(me.GetTileWidth()), 0)
+			println("skip")
 		}
 	}
+}
+
+func (me *TerrainMan) CheckBlockVisible(terrainBlock *TerrainBlock) bool {
+	return me.CameraX <= float64(me.GetTileWidth()*(terrainBlock.X+terrainBlock.Width)) ||
+		float64(me.GetTileWidth()*terrainBlock.X) <= me.CameraX+me.ViewWidth
 }

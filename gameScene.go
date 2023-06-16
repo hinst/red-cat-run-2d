@@ -7,13 +7,17 @@ import (
 type GameScene struct {
 	terrainMan TerrainMan
 	catEntity  CatEntity
-	CameraX    float64
-	CameraY    float64
+	// Initialization input parameter
+	ViewHeight float64
+	// Initialization input parameter
+	ViewWidth float64
+	CameraX   float64
+	CameraY   float64
 }
 
 func (me *GameScene) Initialize() {
-	me.terrainMan.ViewHeight = 240
-	me.terrainMan.ViewWidth = 320
+	me.terrainMan.ViewHeight = me.ViewHeight
+	me.terrainMan.ViewWidth = me.ViewWidth
 	me.terrainMan.AreaWidth = 100
 	me.terrainMan.Initialize()
 	me.catEntity.Initialize()
@@ -41,4 +45,7 @@ func (me *GameScene) GetCatY() float64 {
 
 func (me *GameScene) GetCatViewX() float64 {
 	return 10
+}
+
+func (me *GameScene) CheckCatFall() {
 }

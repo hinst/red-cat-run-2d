@@ -15,9 +15,13 @@ type Game struct {
 	gameScene       GameScene
 	isExiting       bool
 	mode            int
+	viewWidth       float64
+	viewHeight      float64
 }
 
 func (me *Game) Initialize() {
+	me.viewWidth = 420
+	me.viewHeight = 240
 	me.updateTime = time.Now()
 	me.menu = MenuUserInterface{
 		Items: []MenuUserInterfaceItem{
@@ -36,6 +40,8 @@ func (me *Game) Initialize() {
 		},
 	}
 	me.gameScene = GameScene{}
+	me.gameScene.ViewWidth = me.viewWidth
+	me.gameScene.ViewHeight = me.viewHeight
 	me.gameScene.Initialize()
 }
 
@@ -79,7 +85,7 @@ func (me *Game) draw(screen *ebiten.Image) {
 }
 
 func (me *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
-	return 420, 240
+	return int(me.viewWidth), int(me.viewHeight)
 }
 
 func (me *Game) GetModeMenu() int {
