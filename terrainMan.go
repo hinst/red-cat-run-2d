@@ -17,7 +17,10 @@ type TerrainMan struct {
 	ViewHeight int
 	// Initialization parameter, tiles
 	AreaWidth int
-	CameraX   float64
+	// Input parameter for every draw
+	CameraX float64
+	// Input parameter for every draw
+	CameraY float64
 }
 
 func (me *TerrainMan) GetMinBlockWidth() int {
@@ -75,6 +78,7 @@ func (me *TerrainMan) GetLastBlock() *TerrainBlock {
 func (me *TerrainMan) Draw(screen *ebiten.Image) {
 	for _, block := range me.blocks {
 		var drawOptions ebiten.DrawImageOptions
+		drawOptions.GeoM.Translate(-me.CameraX, -me.CameraY)
 		drawOptions.GeoM.Translate(float64(me.GetTileWidth())*float64(block.X), 0)
 		if block.Type == block.GetTypeFloor() {
 			drawOptions.GeoM.Translate(0, 200)

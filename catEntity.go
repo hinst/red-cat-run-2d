@@ -8,8 +8,9 @@ import (
 )
 
 type CatEntity struct {
-	X float64
-	Y float64
+	X     float64
+	Y     float64
+	Speed float64
 
 	runImage          *ebiten.Image
 	runFrame          float64
@@ -22,6 +23,10 @@ type CatEntity struct {
 	Width  int
 	Height int
 	Status int
+	// Input parameter for every draw
+	CameraX float64
+	// Input parameter for every draw
+	CameraY float64
 }
 
 func (me *CatEntity) Initialize() {
@@ -29,6 +34,7 @@ func (me *CatEntity) Initialize() {
 	Assert(catWalkImageError)
 	me.runImage = ebiten.NewImageFromImage(catWalkImage)
 	me.runFrameCount = 6
+	me.runFramePerSecond = 6
 
 	var catDieImage, _, catDieImageError = image.Decode(bytes.NewReader(catDie))
 	Assert(catDieImageError)
@@ -37,7 +43,7 @@ func (me *CatEntity) Initialize() {
 
 	me.Width = 48
 	me.Height = 25
-	me.runFramePerSecond = 6
+	me.Speed = 40
 }
 
 func (me *CatEntity) Update(deltaTime float64) {
@@ -45,11 +51,13 @@ func (me *CatEntity) Update(deltaTime float64) {
 	if me.runFrame >= me.runFrameCount {
 		me.runFrame = 0
 	}
+	me.X += deltaTime * me.Speed
 }
 
 func (me *CatEntity) Draw(screen *ebiten.Image) {
 	var drawOptions = ebiten.DrawImageOptions{}
 	drawOptions.GeoM.Translate(me.X, me.Y)
+	drawOptions.GeoM.Translate(-me.CameraX, -me.CameraY)
 	var spriteShiftX = int(me.runFrame) * int(me.Width)
 	var rect = image.Rect(spriteShiftX, 0, spriteShiftX+me.Width, me.Width)
 	screen.DrawImage(me.runImage.SubImage(rect).(*ebiten.Image), &drawOptions)
