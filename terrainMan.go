@@ -90,13 +90,15 @@ func (me *TerrainMan) Draw(screen *ebiten.Image) {
 				screen.DrawImage(me.brickBlockImage, &drawOptions)
 				drawOptions.GeoM.Translate(float64(me.GetTileWidth()), 0)
 			}
-		} else {
-			println("skip")
 		}
 	}
 }
 
 func (me *TerrainMan) CheckBlockVisible(terrainBlock *TerrainBlock) bool {
-	return me.CameraX <= float64(me.GetTileWidth()*(terrainBlock.X+terrainBlock.Width)) ||
-		float64(me.GetTileWidth()*terrainBlock.X) <= me.CameraX+me.ViewWidth
+	return Check4Intersect(
+		float64(me.GetTileWidth()*terrainBlock.X),
+		float64(me.GetTileWidth()*(terrainBlock.X+terrainBlock.Width)),
+		me.CameraX,
+		me.CameraX+me.ViewWidth,
+	)
 }
