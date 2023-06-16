@@ -26,6 +26,9 @@ func (me *GameScene) Initialize() {
 }
 
 func (me *GameScene) Update(deltaTime float64) {
+	if !me.CheckCatHold() {
+		me.catEntity.Status = me.catEntity.GetStatusDead()
+	}
 	me.catEntity.Update(deltaTime)
 	me.CameraX = me.catEntity.X - me.GetCatViewX()
 }
@@ -47,5 +50,18 @@ func (me *GameScene) GetCatViewX() float64 {
 	return 10
 }
 
-func (me *GameScene) CheckCatFall() {
+func (me *GameScene) CheckCatHold() bool {
+	for _, block := range me.terrainMan.GetBlocks() {
+		if me.catEntity.Status == me.catEntity.GetStatusFloor() && block.Type == block.GetTypeFloor() {
+			if CheckDualIntersect(
+				me.catEntity.X,
+				me.catEntity.X+me.catEntity.Width,
+				float64(block.X)*float64(me.terrainMan.GetTileWidth()),
+				float64(block.X+block.Width)*float64(me.terrainMan.GetTileWidth()),
+			) {
+				return true
+			}
+		}
+	}
+	return false
 }

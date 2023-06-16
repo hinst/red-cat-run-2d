@@ -95,10 +95,14 @@ func (me *TerrainMan) Draw(screen *ebiten.Image) {
 }
 
 func (me *TerrainMan) CheckBlockVisible(terrainBlock *TerrainBlock) bool {
-	return Check4Intersect(
-		float64(me.GetTileWidth()*terrainBlock.X),
-		float64(me.GetTileWidth()*(terrainBlock.X+terrainBlock.Width)),
+	return CheckDualIntersect(
+		float64(me.GetTileWidth())*float64(terrainBlock.X),
+		float64(me.GetTileWidth())*float64(terrainBlock.X+terrainBlock.Width),
 		me.CameraX,
 		me.CameraX+me.ViewWidth,
 	)
+}
+
+func (me *TerrainMan) GetBlocks() []*TerrainBlock {
+	return me.blocks
 }
