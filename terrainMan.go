@@ -9,18 +9,23 @@ import (
 )
 
 type TerrainMan struct {
-	brickBlockImage *ebiten.Image
-	blocks          []*TerrainBlock
-	// Initialization parameter, pixels
+	// Input parameter for initialization. Measurement unit: pixels
 	ViewWidth float64
-	// Initialization parameter, pixels
+	// Input parameter for initialization. Measurement unit: pixels
 	ViewHeight float64
-	// Initialization parameter, tiles
+	// Input parameter for initialization. Measurement unit: tiles
 	AreaWidth int
+	// Input parameter for initialization. Measurement unit: pixels
+	FloorY float64
+	// Input parameter for initialization. Measurement unit: pixels
+	CeilingY float64
 	// Input parameter for every draw
 	CameraX float64
 	// Input parameter for every draw
 	CameraY float64
+
+	brickBlockImage *ebiten.Image
+	blocks          []*TerrainBlock
 }
 
 func (me *TerrainMan) GetMinBlockWidth() int {
@@ -82,9 +87,9 @@ func (me *TerrainMan) Draw(screen *ebiten.Image) {
 			drawOptions.GeoM.Translate(-me.CameraX, -me.CameraY)
 			drawOptions.GeoM.Translate(float64(me.GetTileWidth())*float64(block.X), 0)
 			if block.Type == block.GetTypeFloor() {
-				drawOptions.GeoM.Translate(0, 200)
+				drawOptions.GeoM.Translate(0, me.FloorY)
 			} else {
-				drawOptions.GeoM.Translate(0, 30)
+				drawOptions.GeoM.Translate(0, me.CeilingY)
 			}
 			for i := 0; i < block.Width; i++ {
 				screen.DrawImage(me.brickBlockImage, &drawOptions)

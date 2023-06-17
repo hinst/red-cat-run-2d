@@ -10,22 +10,30 @@ import (
 )
 
 type CatEntity struct {
-	X          float64
-	Y          float64
-	Speed      float64
-	Width      float64
-	FrameWidth float64
-	Height     float64
-	Location   int
-	Status     int
 	// Input parameter for initialization
 	ViewWidth float64
 	// Input parameter for initialization
 	ViewHeight float64
+	// Input parameter for initialization
+	FloorY float64
+	// Input parameter for initialization
+	CeilingY float64
+	// Input parameter for update
+	JustPressedKeys []ebiten.Key
 	// Input parameter for every draw
 	CameraX float64
 	// Input parameter for every draw
-	CameraY          float64
+	CameraY float64
+
+	X                float64
+	Y                float64
+	Speed            float64
+	JumpSpeed        float64
+	Width            float64
+	FrameWidth       float64
+	Height           float64
+	Location         int
+	Status           int
 	DebugModeEnabled bool
 
 	runImage          *ebiten.Image
@@ -56,6 +64,7 @@ func (me *CatEntity) Initialize() {
 	me.FrameWidth = 48
 	me.Height = 25
 	me.Speed = 40
+	me.JumpSpeed = 60
 }
 
 func (me *CatEntity) Update(deltaTime float64) {
@@ -64,6 +73,21 @@ func (me *CatEntity) Update(deltaTime float64) {
 		if me.runFrame >= me.runFrameCount {
 			me.runFrame -= me.runFrameCount
 		}
+		for _, key := range me.JustPressedKeys {
+			if key == ebiten.KeySpace {
+				me.Status = me.GetStatusJump()
+			}
+		}
+	} else if me.Status == me.GetStatusJump() {
+		me.runFrame += deltaTime * me.runFramePerSecond / 2
+		if me.runFrame >= me.runFrameCount {
+			me.runFrame -= me.runFrameCount
+		}
+		if me.Location == me.GetLocationFloor() {
+			me.Y -= deltaTime * me.JumpSpeed
+			if me.Y <= me.CeilingY {
+			}
+		}
 	} else if me.Status == me.GetStatusDead() {
 		me.dieFrame += deltaTime * me.dieFramePerSecond
 		if me.dieFrame >= me.dieFrameCount {
@@ -71,7 +95,7 @@ func (me *CatEntity) Update(deltaTime float64) {
 		}
 		if me.Location == me.GetLocationFloor() {
 			if me.Y < me.ViewHeight {
-				me.Y += deltaTime * me.Speed;
+				me.Y += deltaTime * me.Speed
 			}
 		}
 	}
@@ -86,7 +110,7 @@ func (me *CatEntity) Draw(screen *ebiten.Image) {
 	var drawOptions = ebiten.DrawImageOptions{}
 	drawOptions.GeoM.Translate(me.X, me.Y)
 	drawOptions.GeoM.Translate(-me.CameraX, -me.CameraY)
-	if me.Status == me.GetStatusRun() {
+	if me.Status == me.GetStatusRun() || me.Status == me.GetStatusJump() {
 		var spriteShiftX = float64(int(me.runFrame)) * me.FrameWidth
 		var rect = image.Rect(
 			RoundFloat64ToInt(spriteShiftX), 0,
