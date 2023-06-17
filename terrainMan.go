@@ -49,7 +49,7 @@ func (me *TerrainMan) GetTileHeight() int {
 
 func (me *TerrainMan) Initialize() {
 	var brickBlockImage, _, brickBlockImageError = image.Decode(bytes.NewReader(brickBlock))
-	Assert(brickBlockImageError)
+	AssertError(brickBlockImageError)
 	me.brickBlockImage = ebiten.NewImageFromImage(brickBlockImage)
 	for me.GetLastBlock() == nil || me.GetLastBlock().X+me.GetLastBlock().Width < me.AreaWidth {
 		var block = &TerrainBlock{}

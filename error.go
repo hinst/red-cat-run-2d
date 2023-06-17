@@ -1,6 +1,6 @@
 package main
 
-func Assert(err error) {
+func AssertError(err error) {
 	if err != nil {
 		panic(err)
 	}

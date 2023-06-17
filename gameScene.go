@@ -20,6 +20,8 @@ func (me *GameScene) Initialize() {
 	me.terrainMan.ViewWidth = me.ViewWidth
 	me.terrainMan.AreaWidth = 100
 	me.terrainMan.Initialize()
+	me.catEntity.ViewHeight = me.ViewHeight
+	me.catEntity.ViewWidth = me.ViewWidth
 	me.catEntity.Initialize()
 	me.catEntity.X = me.GetCatViewX()
 	me.catEntity.Y = me.GetCatY() - float64(me.catEntity.Height)
@@ -52,7 +54,9 @@ func (me *GameScene) GetCatViewX() float64 {
 
 func (me *GameScene) CheckCatHold() bool {
 	for _, block := range me.terrainMan.GetBlocks() {
-		if me.catEntity.Status == me.catEntity.GetStatusFloor() && block.Type == block.GetTypeFloor() {
+		if me.catEntity.Status == me.catEntity.GetStatusRun() &&
+			me.catEntity.Location == me.catEntity.GetLocationFloor() &&
+			block.Type == block.GetTypeFloor() {
 			if CheckDualIntersect(
 				me.catEntity.X,
 				me.catEntity.X+me.catEntity.Width,
