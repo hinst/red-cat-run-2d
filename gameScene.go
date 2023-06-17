@@ -1,7 +1,10 @@
 package main
 
 import (
+	"image/color"
+
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 type GameScene struct {
@@ -44,6 +47,23 @@ func (me *GameScene) Draw(screen *ebiten.Image) {
 	me.terrainMan.CameraX = me.CameraX
 	me.terrainMan.CameraY = me.CameraY
 	me.terrainMan.Draw(screen)
+
+	if me.catEntity.Status == me.catEntity.GetStatusRun() {
+		for _, key := range me.PressedKeys {
+			if key == ebiten.KeyUp {
+				vector.StrokeLine(screen,
+					float32(me.catEntity.X+me.catEntity.Width/2-me.CameraX),
+					float32(me.catEntity.Y+me.catEntity.Height/2-me.CameraY),
+					float32(me.catEntity.X+me.catEntity.Width/2+30-me.CameraX),
+					float32(me.catEntity.Y+me.catEntity.Height/2-60-me.CameraY),
+					1,
+					color.RGBA{R: 150, G: 100, B: 100, A: 255},
+					false,
+				)
+			}
+		}
+	}
+
 	me.catEntity.CameraX = me.CameraX
 	me.catEntity.CameraY = me.CameraY
 	me.catEntity.Draw(screen)
