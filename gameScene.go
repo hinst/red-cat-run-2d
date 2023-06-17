@@ -5,14 +5,19 @@ import (
 )
 
 type GameScene struct {
-	terrainMan TerrainMan
-	catEntity  CatEntity
 	// Initialization input parameter
 	ViewHeight float64
 	// Initialization input parameter
 	ViewWidth float64
-	CameraX   float64
-	CameraY   float64
+	// Input parameter for every update
+	JustPressedKeys []ebiten.Key
+	// Input parameter for every update
+	PressedKeys []ebiten.Key
+
+	terrainMan TerrainMan
+	catEntity  CatEntity
+	CameraX    float64
+	CameraY    float64
 }
 
 func (me *GameScene) Initialize() {

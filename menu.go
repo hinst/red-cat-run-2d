@@ -14,6 +14,8 @@ type MenuUserInterface struct {
 	Items                 []MenuUserInterfaceItem
 	SelectedItemIndex     int
 	PressedItemId         int
+	// Input parameter for every update
+	JustPressedKeys []ebiten.Key
 }
 
 type MenuUserInterfaceItem struct {
@@ -21,10 +23,10 @@ type MenuUserInterfaceItem struct {
 	Id    int
 }
 
-func (me *MenuUserInterface) Update(deltaTime float64, justPressedKeys []ebiten.Key) {
+func (me *MenuUserInterface) Update(deltaTime float64) {
 	me.PressedItemId = -1
 	if len(me.Items) > 0 {
-		for _, key := range justPressedKeys {
+		for _, key := range me.JustPressedKeys {
 			if key == ebiten.KeyUp {
 				me.SelectedItemIndex -= 1
 				if me.SelectedItemIndex < 0 {

@@ -4,6 +4,7 @@
         "Fullscreen",
         "github",
         "hajimehoshi",
+        "inpututil",
         "Vsync"
     ]
 }

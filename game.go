@@ -11,6 +11,7 @@ import (
 type Game struct {
 	updateTime      time.Time
 	justPressedKeys []ebiten.Key
+	pressedKeys     []ebiten.Key
 	menu            MenuUserInterface
 	gameScene       GameScene
 	isExiting       bool
@@ -46,7 +47,10 @@ func (me *Game) Initialize() {
 }
 
 func (me *Game) Update() error {
+	me.justPressedKeys = me.justPressedKeys[:0]
 	me.justPressedKeys = inpututil.AppendJustPressedKeys(me.justPressedKeys)
+	me.pressedKeys = me.pressedKeys[:0]
+	me.pressedKeys = inpututil.AppendPressedKeys(me.pressedKeys)
 	if me.isExiting {
 		return errors.New("exiting")
 	}
@@ -63,7 +67,8 @@ func (me *Game) Draw(screen *ebiten.Image) {
 
 func (me *Game) update(deltaTime float64) {
 	if me.mode == me.GetModeMenu() {
-		me.menu.Update(deltaTime, me.justPressedKeys)
+		me.menu.JustPressedKeys = me.justPressedKeys
+		me.menu.Update(deltaTime)
 		if me.menu.PressedItemId == 1 {
 			me.mode = me.GetModeGame()
 		} else if me.menu.PressedItemId == 2 {
@@ -72,6 +77,8 @@ func (me *Game) update(deltaTime float64) {
 			me.isExiting = true
 		}
 	} else if me.mode == me.GetModeGame() {
+		me.gameScene.PressedKeys = me.pressedKeys
+		me.gameScene.JustPressedKeys = me.justPressedKeys
 		me.gameScene.Update(deltaTime)
 	}
 }
