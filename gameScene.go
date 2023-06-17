@@ -89,9 +89,8 @@ func (me *GameScene) GetCatViewX() float64 {
 
 func (me *GameScene) CheckCatHold() bool {
 	for _, block := range me.terrainMan.GetBlocks() {
-		if me.catEntity.Status == me.catEntity.GetStatusRun() &&
-			me.catEntity.Location == me.catEntity.GetLocationFloor() &&
-			block.Type == block.GetTypeFloor() {
+		var isFittingBlock = me.catEntity.Location == block.Location
+		if isFittingBlock {
 			if CheckDualIntersect(
 				me.catEntity.X,
 				me.catEntity.X+me.catEntity.Width,

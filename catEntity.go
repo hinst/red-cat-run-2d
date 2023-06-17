@@ -100,7 +100,11 @@ func (me *CatEntity) Update(deltaTime float64) {
 		}
 		if me.Location == me.GetLocationFloor() {
 			if me.Y < me.ViewHeight {
-				me.Y += deltaTime * me.Speed
+				me.Y += deltaTime * me.GetFallSpeed()
+			}
+		} else if me.Location == me.GetLocationCeiling() {
+			if me.Y > -me.Height {
+				me.Y -= deltaTime * me.GetFallSpeed()
 			}
 		}
 	}
@@ -133,6 +137,10 @@ func (me *CatEntity) Draw(screen *ebiten.Image) {
 		)
 		screen.DrawImage(me.dieImage.SubImage(rect).(*ebiten.Image), &drawOptions)
 	}
+}
+
+func (me *CatEntity) GetFallSpeed() float64 {
+	return 50
 }
 
 func (me *CatEntity) GetStatusRun() int {

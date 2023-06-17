@@ -59,11 +59,11 @@ func (me *TerrainMan) Initialize() {
 	for me.GetLastBlock() == nil || me.GetLastBlock().X+me.GetLastBlock().Width < me.AreaWidth {
 		var block = &TerrainBlock{}
 		if me.GetLastBlock() == nil {
-			block.Type = block.GetTypeFloor()
+			block.Location = block.GetLocationFloor()
 			block.X = 0
 			block.Width = me.GetMaxBlockWidth()
 		} else {
-			block.Type = rand.Intn(2)
+			block.Location = rand.Intn(2)
 			var gap = GetRandomNumberBetween(me.GetMinGapWidth(), me.GetMaxGapWidth())
 			block.X = me.GetLastBlock().X + me.GetLastBlock().Width + gap
 			block.Width = GetRandomNumberBetween(me.GetMinBlockWidth(), me.GetMaxBlockWidth())
@@ -86,7 +86,7 @@ func (me *TerrainMan) Draw(screen *ebiten.Image) {
 			var drawOptions ebiten.DrawImageOptions
 			drawOptions.GeoM.Translate(-me.CameraX, -me.CameraY)
 			drawOptions.GeoM.Translate(float64(me.GetTileWidth())*float64(block.X), 0)
-			if block.Type == block.GetTypeFloor() {
+			if block.Location == block.GetLocationFloor() {
 				drawOptions.GeoM.Translate(0, me.FloorY)
 			} else {
 				drawOptions.GeoM.Translate(0, me.CeilingY-float64(me.GetTileHeight()))
