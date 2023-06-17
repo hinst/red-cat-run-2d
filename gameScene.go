@@ -44,6 +44,7 @@ func (me *GameScene) Update(deltaTime float64) {
 		me.catEntity.Status = CAT_ENTITY_STATUS_DEAD
 	}
 	me.catEntity.JustPressedKeys = me.JustPressedKeys
+	me.catEntity.PressedKeys = me.PressedKeys
 	me.catEntity.Update(deltaTime)
 	me.cameraX = me.catEntity.X - me.GetCatViewX()
 }
@@ -54,13 +55,13 @@ func (me *GameScene) Draw(screen *ebiten.Image) {
 	me.terrainMan.Draw(screen)
 
 	if me.catEntity.Status == CAT_ENTITY_STATUS_RUN {
-		if me.catEntity.Location == me.catEntity.GetLocationFloor() {
+		if me.catEntity.Location == TERRAIN_LOCATION_FLOOR {
 			for _, key := range me.PressedKeys {
 				if key == ebiten.KeyUp {
 					me.drawAimLine(screen, true)
 				}
 			}
-		} else if me.catEntity.Location == me.catEntity.GetLocationCeiling() {
+		} else if me.catEntity.Location == TERRAIN_LOCATION_CEILING {
 			for _, key := range me.PressedKeys {
 				if key == ebiten.KeyDown {
 					me.drawAimLine(screen, false)
@@ -75,7 +76,7 @@ func (me *GameScene) Draw(screen *ebiten.Image) {
 }
 
 func (me *GameScene) drawAimLine(screen *ebiten.Image, up bool) {
-	var y1 = me.catEntity.Y+me.catEntity.Height/2-me.cameraY
+	var y1 = me.catEntity.Y + me.catEntity.Height/2 - me.cameraY
 	if up {
 		y1 -= me.catEntity.GetJumpSpeed()
 	} else {

@@ -13,7 +13,8 @@ type CatEntityStatus int
 
 const (
 	CAT_ENTITY_STATUS_RUN CatEntityStatus = iota
-	CAT_ENTITY_STATUS_JUMP
+	CAT_ENTITY_STATUS_JUMP_SWITCH
+	CAT_ENTITY_STATUS_JUMP_FORWARD
 	CAT_ENTITY_STATUS_DEAD
 )
 
@@ -28,6 +29,8 @@ type CatEntity struct {
 	CeilingY float64
 	// Input parameter for update
 	JustPressedKeys []ebiten.Key
+	// Input parameter for update
+	PressedKeys []ebiten.Key
 	// Input parameter for every draw
 	CameraX float64
 	// Input parameter for every draw
@@ -39,7 +42,7 @@ type CatEntity struct {
 	Width            float64
 	FrameWidth       float64
 	Height           float64
-	Location         int
+	Location         TerrainLocation
 	Status           CatEntityStatus
 	DebugModeEnabled bool
 
@@ -83,19 +86,23 @@ func (me *CatEntity) Update(deltaTime float64) {
 		}
 		for _, key := range me.JustPressedKeys {
 			if key == ebiten.KeySpace {
-				me.Status = CAT_ENTITY_STATUS_JUMP
+				for _, key := range me.PressedKeys {
+					if key == ebiten.KeyUp && me.Location == TERRAIN_LOCATION_FLOOR {
+						me.Status = CAT_ENTITY_STATUS_JUMP_SWITCH
+					}
+				}
 			}
 		}
-	} else if me.Status == CAT_ENTITY_STATUS_JUMP {
+	} else if me.Status == CAT_ENTITY_STATUS_JUMP_SWITCH {
 		me.runFrame += deltaTime * me.runFramePerSecond / 2
 		if me.runFrame >= me.runFrameCount {
 			me.runFrame -= me.runFrameCount
 		}
-		if me.Location == me.GetLocationFloor() {
+		if me.Location == TERRAIN_LOCATION_FLOOR {
 			me.Y -= deltaTime * me.GetJumpSpeed()
 			if me.Y <= me.CeilingY {
 				me.Status = CAT_ENTITY_STATUS_RUN
-				me.Location = me.GetLocationCeiling()
+				me.Location = TERRAIN_LOCATION_CEILING
 				me.Y = me.CeilingY
 			}
 		}
@@ -104,11 +111,11 @@ func (me *CatEntity) Update(deltaTime float64) {
 		if me.dieFrame >= me.dieFrameCount {
 			me.dieFrame = me.dieFrameCount - 1
 		}
-		if me.Location == me.GetLocationFloor() {
+		if me.Location == TERRAIN_LOCATION_FLOOR {
 			if me.Y < me.ViewHeight {
 				me.Y += deltaTime * me.GetFallSpeed()
 			}
-		} else if me.Location == me.GetLocationCeiling() {
+		} else if me.Location == TERRAIN_LOCATION_CEILING {
 			if me.Y > -me.Height {
 				me.Y -= deltaTime * me.GetFallSpeed()
 			}
@@ -123,12 +130,12 @@ func (me *CatEntity) Draw(screen *ebiten.Image) {
 			float32(me.Width), float32(me.Height), color.RGBA{R: 100, G: 100, B: 100}, false)
 	}
 	var drawOptions = ebiten.DrawImageOptions{}
-	if me.Location == me.GetLocationCeiling() {
+	if me.Location == TERRAIN_LOCATION_CEILING {
 		ScaleCentered(&drawOptions, me.Width, me.Height, 1, -1)
 	}
 	drawOptions.GeoM.Translate(me.X, me.Y)
 	drawOptions.GeoM.Translate(-me.CameraX, -me.CameraY)
-	if me.Status == CAT_ENTITY_STATUS_RUN || me.Status == CAT_ENTITY_STATUS_JUMP {
+	if me.Status == CAT_ENTITY_STATUS_RUN || me.Status == CAT_ENTITY_STATUS_JUMP_SWITCH {
 		var spriteShiftX = float64(int(me.runFrame)) * me.FrameWidth
 		var rect = image.Rect(
 			RoundFloat64ToInt(spriteShiftX), 0,
@@ -151,12 +158,4 @@ func (me *CatEntity) GetFallSpeed() float64 {
 
 func (me *CatEntity) GetJumpSpeed() float64 {
 	return 70
-}
-
-func (me *CatEntity) GetLocationFloor() int {
-	return 0
-}
-
-func (me *CatEntity) GetLocationCeiling() int {
-	return 1
 }
