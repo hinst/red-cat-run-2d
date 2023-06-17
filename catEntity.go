@@ -137,17 +137,11 @@ func (me *CatEntity) Draw(screen *ebiten.Image) {
 	drawOptions.GeoM.Translate(-me.CameraX, -me.CameraY)
 	if me.Status == CAT_ENTITY_STATUS_RUN || me.Status == CAT_ENTITY_STATUS_JUMP_SWITCH {
 		var spriteShiftX = float64(int(me.runFrame)) * me.FrameWidth
-		var rect = image.Rect(
-			RoundFloat64ToInt(spriteShiftX), 0,
-			RoundFloat64ToInt(spriteShiftX+me.FrameWidth), RoundFloat64ToInt(me.FrameWidth),
-		)
+		var rect = GetShiftedRectangle(spriteShiftX, me.FrameWidth)
 		screen.DrawImage(me.runImage.SubImage(rect).(*ebiten.Image), &drawOptions)
 	} else if me.Status == CAT_ENTITY_STATUS_DEAD {
 		var spriteShiftX = float64(int(me.dieFrame)) * me.FrameWidth
-		var rect = image.Rect(
-			RoundFloat64ToInt(spriteShiftX), 0,
-			RoundFloat64ToInt(spriteShiftX+me.FrameWidth), RoundFloat64ToInt(me.FrameWidth),
-		)
+		var rect = GetShiftedRectangle(spriteShiftX, me.FrameWidth)
 		screen.DrawImage(me.dieImage.SubImage(rect).(*ebiten.Image), &drawOptions)
 	}
 }
