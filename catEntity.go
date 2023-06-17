@@ -151,6 +151,7 @@ func (me *CatEntity) Draw(screen *ebiten.Image) {
 		vector.DrawFilledRect(screen, float32(me.X-me.CameraX), float32(me.Y-me.CameraY),
 			float32(me.Width), float32(me.Height), color.RGBA{R: 100, G: 100, B: 100}, false)
 	}
+	me.drawAimLine(screen)
 	var drawOptions = ebiten.DrawImageOptions{}
 	if me.Location == TERRAIN_LOCATION_CEILING {
 		ScaleCentered(&drawOptions, me.Width, me.Height, 1, -1)
@@ -166,6 +167,44 @@ func (me *CatEntity) Draw(screen *ebiten.Image) {
 		var rect = GetShiftedRectangle(spriteShiftX, me.FrameWidth)
 		screen.DrawImage(me.dieImage.SubImage(rect).(*ebiten.Image), &drawOptions)
 	}
+}
+
+func (me *CatEntity) drawAimLine(screen *ebiten.Image) {
+	if me.Status == CAT_ENTITY_STATUS_RUN {
+		if me.Location == TERRAIN_LOCATION_FLOOR {
+			for _, key := range me.PressedKeys {
+				if key == ebiten.KeyUp {
+					me.drawVerticalAimLine(screen, true)
+				}
+				if key == ebiten.KeyLeft {
+				}
+			}
+		} else if me.Location == TERRAIN_LOCATION_CEILING {
+			for _, key := range me.PressedKeys {
+				if key == ebiten.KeyDown {
+					me.drawVerticalAimLine(screen, false)
+				}
+			}
+		}
+	}
+}
+
+func (me *CatEntity) drawVerticalAimLine(screen *ebiten.Image, up bool) {
+	var y1 = me.Y + me.Height/2 - me.CameraY
+	if up {
+		y1 -= me.GetJumpSpeed()
+	} else {
+		y1 += me.GetJumpSpeed()
+	}
+	vector.StrokeLine(screen,
+		float32(me.X+me.Width/2-me.CameraX),
+		float32(me.Y+me.Height/2-me.CameraY),
+		float32(me.X+me.Width/2+me.Speed-me.CameraX),
+		float32(y1),
+		1,
+		color.RGBA{R: 150, G: 100, B: 100, A: 255},
+		false,
+	)
 }
 
 func (me *CatEntity) GetFallSpeed() float64 {

@@ -1,10 +1,7 @@
 package main
 
 import (
-	"image/color"
-
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 type GameScene struct {
@@ -54,43 +51,9 @@ func (me *GameScene) Draw(screen *ebiten.Image) {
 	me.terrainMan.CameraY = me.cameraY
 	me.terrainMan.Draw(screen)
 
-	if me.catEntity.Status == CAT_ENTITY_STATUS_RUN {
-		if me.catEntity.Location == TERRAIN_LOCATION_FLOOR {
-			for _, key := range me.PressedKeys {
-				if key == ebiten.KeyUp {
-					me.drawAimLine(screen, true)
-				}
-			}
-		} else if me.catEntity.Location == TERRAIN_LOCATION_CEILING {
-			for _, key := range me.PressedKeys {
-				if key == ebiten.KeyDown {
-					me.drawAimLine(screen, false)
-				}
-			}
-		}
-	}
-
 	me.catEntity.CameraX = me.cameraX
 	me.catEntity.CameraY = me.cameraY
 	me.catEntity.Draw(screen)
-}
-
-func (me *GameScene) drawAimLine(screen *ebiten.Image, up bool) {
-	var y1 = me.catEntity.Y + me.catEntity.Height/2 - me.cameraY
-	if up {
-		y1 -= me.catEntity.GetJumpSpeed()
-	} else {
-		y1 += me.catEntity.GetJumpSpeed()
-	}
-	vector.StrokeLine(screen,
-		float32(me.catEntity.X+me.catEntity.Width/2-me.cameraX),
-		float32(me.catEntity.Y+me.catEntity.Height/2-me.cameraY),
-		float32(me.catEntity.X+me.catEntity.Width/2+me.catEntity.Speed-me.cameraX),
-		float32(y1),
-		1,
-		color.RGBA{R: 150, G: 100, B: 100, A: 255},
-		false,
-	)
 }
 
 func (me *GameScene) GetFloorY() float64 {
