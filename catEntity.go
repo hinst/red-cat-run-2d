@@ -80,48 +80,70 @@ func (me *CatEntity) Initialize() {
 
 func (me *CatEntity) Update(deltaTime float64) {
 	if me.Status == CAT_ENTITY_STATUS_RUN {
-		me.runFrame += deltaTime * me.runFramePerSecond
-		if me.runFrame >= me.runFrameCount {
-			me.runFrame -= me.runFrameCount
-		}
-		for _, key := range me.JustPressedKeys {
-			if key == ebiten.KeySpace {
-				for _, key := range me.PressedKeys {
-					if key == ebiten.KeyUp && me.Location == TERRAIN_LOCATION_FLOOR {
-						me.Status = CAT_ENTITY_STATUS_JUMP_SWITCH
-					}
+		me.updateRun(deltaTime)
+	} else if me.Status == CAT_ENTITY_STATUS_JUMP_SWITCH {
+		me.updateJumpSwitch(deltaTime)
+	} else if me.Status == CAT_ENTITY_STATUS_DEAD {
+		me.updateDead(deltaTime)
+	}
+	me.X += deltaTime * me.Speed
+}
+
+func (me *CatEntity) updateRun(deltaTime float64) {
+	me.runFrame += deltaTime * me.runFramePerSecond
+	if me.runFrame >= me.runFrameCount {
+		me.runFrame -= me.runFrameCount
+	}
+	for _, key := range me.JustPressedKeys {
+		if key == ebiten.KeySpace {
+			for _, key := range me.PressedKeys {
+				if key == ebiten.KeyUp && me.Location == TERRAIN_LOCATION_FLOOR {
+					me.Status = CAT_ENTITY_STATUS_JUMP_SWITCH
+				}
+				if key == ebiten.KeyDown && me.Location == TERRAIN_LOCATION_CEILING {
+					me.Status = CAT_ENTITY_STATUS_JUMP_SWITCH
 				}
 			}
 		}
-	} else if me.Status == CAT_ENTITY_STATUS_JUMP_SWITCH {
-		me.runFrame += deltaTime * me.runFramePerSecond / 2
-		if me.runFrame >= me.runFrameCount {
-			me.runFrame -= me.runFrameCount
+	}
+}
+
+func (me *CatEntity) updateJumpSwitch(deltaTime float64) {
+	me.runFrame += deltaTime * me.runFramePerSecond / 2
+	if me.runFrame >= me.runFrameCount {
+		me.runFrame -= me.runFrameCount
+	}
+	if me.Location == TERRAIN_LOCATION_FLOOR {
+		me.Y -= deltaTime * me.GetJumpSpeed()
+		if me.Y <= me.CeilingY {
+			me.Status = CAT_ENTITY_STATUS_RUN
+			me.Location = TERRAIN_LOCATION_CEILING
+			me.Y = me.CeilingY
 		}
-		if me.Location == TERRAIN_LOCATION_FLOOR {
-			me.Y -= deltaTime * me.GetJumpSpeed()
-			if me.Y <= me.CeilingY {
-				me.Status = CAT_ENTITY_STATUS_RUN
-				me.Location = TERRAIN_LOCATION_CEILING
-				me.Y = me.CeilingY
-			}
-		}
-	} else if me.Status == CAT_ENTITY_STATUS_DEAD {
-		me.dieFrame += deltaTime * me.dieFramePerSecond
-		if me.dieFrame >= me.dieFrameCount {
-			me.dieFrame = me.dieFrameCount - 1
-		}
-		if me.Location == TERRAIN_LOCATION_FLOOR {
-			if me.Y < me.ViewHeight {
-				me.Y += deltaTime * me.GetFallSpeed()
-			}
-		} else if me.Location == TERRAIN_LOCATION_CEILING {
-			if me.Y > -me.Height {
-				me.Y -= deltaTime * me.GetFallSpeed()
-			}
+	} else if me.Location == TERRAIN_LOCATION_CEILING {
+		me.Y += deltaTime * me.GetJumpSpeed()
+		if me.Y+me.Height >= me.FloorY {
+			me.Status = CAT_ENTITY_STATUS_RUN
+			me.Location = TERRAIN_LOCATION_FLOOR
+			me.Y = me.FloorY - me.Height
 		}
 	}
-	me.X += deltaTime * me.Speed
+}
+
+func (me *CatEntity) updateDead(deltaTime float64) {
+	me.dieFrame += deltaTime * me.dieFramePerSecond
+	if me.dieFrame >= me.dieFrameCount {
+		me.dieFrame = me.dieFrameCount - 1
+	}
+	if me.Location == TERRAIN_LOCATION_FLOOR {
+		if me.Y < me.ViewHeight {
+			me.Y += deltaTime * me.GetFallSpeed()
+		}
+	} else if me.Location == TERRAIN_LOCATION_CEILING {
+		if me.Y > -me.Height {
+			me.Y -= deltaTime * me.GetFallSpeed()
+		}
+	}
 }
 
 func (me *CatEntity) Draw(screen *ebiten.Image) {
