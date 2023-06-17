@@ -9,6 +9,14 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
+type CatEntityStatus int
+
+const (
+	CAT_ENTITY_STATUS_RUN CatEntityStatus = iota
+	CAT_ENTITY_STATUS_JUMP
+	CAT_ENTITY_STATUS_DEAD
+)
+
 type CatEntity struct {
 	// Input parameter for initialization
 	ViewWidth float64
@@ -28,12 +36,11 @@ type CatEntity struct {
 	X                float64
 	Y                float64
 	Speed            float64
-	JumpSpeed        float64
 	Width            float64
 	FrameWidth       float64
 	Height           float64
 	Location         int
-	Status           int
+	Status           CatEntityStatus
 	DebugModeEnabled bool
 
 	runImage          *ebiten.Image
@@ -64,36 +71,35 @@ func (me *CatEntity) Initialize() {
 	me.FrameWidth = 48
 	me.Height = 25
 	me.Speed = 40
-	me.JumpSpeed = 60
 
 	me.Y = me.FloorY - me.Height
 }
 
 func (me *CatEntity) Update(deltaTime float64) {
-	if me.Status == me.GetStatusRun() {
+	if me.Status == CAT_ENTITY_STATUS_RUN {
 		me.runFrame += deltaTime * me.runFramePerSecond
 		if me.runFrame >= me.runFrameCount {
 			me.runFrame -= me.runFrameCount
 		}
 		for _, key := range me.JustPressedKeys {
 			if key == ebiten.KeySpace {
-				me.Status = me.GetStatusJump()
+				me.Status = CAT_ENTITY_STATUS_JUMP
 			}
 		}
-	} else if me.Status == me.GetStatusJump() {
+	} else if me.Status == CAT_ENTITY_STATUS_JUMP {
 		me.runFrame += deltaTime * me.runFramePerSecond / 2
 		if me.runFrame >= me.runFrameCount {
 			me.runFrame -= me.runFrameCount
 		}
 		if me.Location == me.GetLocationFloor() {
-			me.Y -= deltaTime * me.JumpSpeed
+			me.Y -= deltaTime * me.GetJumpSpeed()
 			if me.Y <= me.CeilingY {
-				me.Status = me.GetStatusRun()
+				me.Status = CAT_ENTITY_STATUS_RUN
 				me.Location = me.GetLocationCeiling()
 				me.Y = me.CeilingY
 			}
 		}
-	} else if me.Status == me.GetStatusDead() {
+	} else if me.Status == CAT_ENTITY_STATUS_DEAD {
 		me.dieFrame += deltaTime * me.dieFramePerSecond
 		if me.dieFrame >= me.dieFrameCount {
 			me.dieFrame = me.dieFrameCount - 1
@@ -122,14 +128,14 @@ func (me *CatEntity) Draw(screen *ebiten.Image) {
 	}
 	drawOptions.GeoM.Translate(me.X, me.Y)
 	drawOptions.GeoM.Translate(-me.CameraX, -me.CameraY)
-	if me.Status == me.GetStatusRun() || me.Status == me.GetStatusJump() {
+	if me.Status == CAT_ENTITY_STATUS_RUN || me.Status == CAT_ENTITY_STATUS_JUMP {
 		var spriteShiftX = float64(int(me.runFrame)) * me.FrameWidth
 		var rect = image.Rect(
 			RoundFloat64ToInt(spriteShiftX), 0,
 			RoundFloat64ToInt(spriteShiftX+me.FrameWidth), RoundFloat64ToInt(me.FrameWidth),
 		)
 		screen.DrawImage(me.runImage.SubImage(rect).(*ebiten.Image), &drawOptions)
-	} else if me.Status == me.GetStatusDead() {
+	} else if me.Status == CAT_ENTITY_STATUS_DEAD {
 		var spriteShiftX = float64(int(me.dieFrame)) * me.FrameWidth
 		var rect = image.Rect(
 			RoundFloat64ToInt(spriteShiftX), 0,
@@ -143,16 +149,8 @@ func (me *CatEntity) GetFallSpeed() float64 {
 	return 50
 }
 
-func (me *CatEntity) GetStatusRun() int {
-	return 0
-}
-
-func (me *CatEntity) GetStatusJump() int {
-	return 1
-}
-
-func (me *CatEntity) GetStatusDead() int {
-	return 2
+func (me *CatEntity) GetJumpSpeed() float64 {
+	return 70
 }
 
 func (me *CatEntity) GetLocationFloor() int {

@@ -40,8 +40,8 @@ func (me *GameScene) Initialize() {
 }
 
 func (me *GameScene) Update(deltaTime float64) {
-	if me.catEntity.Status == me.catEntity.GetStatusRun() && !me.CheckCatHold() {
-		me.catEntity.Status = me.catEntity.GetStatusDead()
+	if me.catEntity.Status == CAT_ENTITY_STATUS_RUN && !me.CheckCatHold() {
+		me.catEntity.Status = CAT_ENTITY_STATUS_DEAD
 	}
 	me.catEntity.JustPressedKeys = me.JustPressedKeys
 	me.catEntity.Update(deltaTime)
@@ -53,7 +53,7 @@ func (me *GameScene) Draw(screen *ebiten.Image) {
 	me.terrainMan.CameraY = me.cameraY
 	me.terrainMan.Draw(screen)
 
-	if me.catEntity.Status == me.catEntity.GetStatusRun() {
+	if me.catEntity.Status == CAT_ENTITY_STATUS_RUN {
 		if me.catEntity.Location == me.catEntity.GetLocationFloor() {
 			for _, key := range me.PressedKeys {
 				if key == ebiten.KeyUp {
@@ -77,9 +77,9 @@ func (me *GameScene) Draw(screen *ebiten.Image) {
 func (me *GameScene) drawAimLine(screen *ebiten.Image, up bool) {
 	var y1 = me.catEntity.Y+me.catEntity.Height/2-me.cameraY
 	if up {
-		y1 -= me.catEntity.JumpSpeed
+		y1 -= me.catEntity.GetJumpSpeed()
 	} else {
-		y1 += me.catEntity.JumpSpeed
+		y1 += me.catEntity.GetJumpSpeed()
 	}
 	vector.StrokeLine(screen,
 		float32(me.catEntity.X+me.catEntity.Width/2-me.cameraX),
