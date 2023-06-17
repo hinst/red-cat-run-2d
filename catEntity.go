@@ -65,6 +65,8 @@ func (me *CatEntity) Initialize() {
 	me.Height = 25
 	me.Speed = 40
 	me.JumpSpeed = 60
+
+	me.Y = me.FloorY - me.Height
 }
 
 func (me *CatEntity) Update(deltaTime float64) {
@@ -86,6 +88,9 @@ func (me *CatEntity) Update(deltaTime float64) {
 		if me.Location == me.GetLocationFloor() {
 			me.Y -= deltaTime * me.JumpSpeed
 			if me.Y <= me.CeilingY {
+				me.Status = me.GetStatusRun()
+				me.Location = me.GetLocationCeiling()
+				me.Y = me.CeilingY
 			}
 		}
 	} else if me.Status == me.GetStatusDead() {
@@ -108,6 +113,9 @@ func (me *CatEntity) Draw(screen *ebiten.Image) {
 			float32(me.Width), float32(me.Height), color.RGBA{R: 100, G: 100, B: 100}, false)
 	}
 	var drawOptions = ebiten.DrawImageOptions{}
+	if me.Location == me.GetLocationCeiling() {
+		ScaleCentered(&drawOptions, me.Width, me.Height, 1, -1)
+	}
 	drawOptions.GeoM.Translate(me.X, me.Y)
 	drawOptions.GeoM.Translate(-me.CameraX, -me.CameraY)
 	if me.Status == me.GetStatusRun() || me.Status == me.GetStatusJump() {

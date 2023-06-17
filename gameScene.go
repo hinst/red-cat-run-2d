@@ -30,11 +30,13 @@ func (me *GameScene) Initialize() {
 	me.terrainMan.FloorY = me.GetFloorY()
 	me.terrainMan.CeilingY = me.GetCeilingY()
 	me.terrainMan.Initialize()
+
 	me.catEntity.ViewHeight = me.ViewHeight
 	me.catEntity.ViewWidth = me.ViewWidth
-	me.catEntity.Initialize()
 	me.catEntity.X = me.GetCatViewX()
-	me.catEntity.Y = me.GetFloorY() - float64(me.catEntity.Height)
+	me.catEntity.FloorY = me.GetFloorY()
+	me.catEntity.CeilingY = me.GetCeilingY()
+	me.catEntity.Initialize()
 }
 
 func (me *GameScene) Update(deltaTime float64) {
@@ -77,7 +79,7 @@ func (me *GameScene) GetFloorY() float64 {
 }
 
 func (me *GameScene) GetCeilingY() float64 {
-	return 30
+	return 40
 }
 
 // The distance from left view border to the cat

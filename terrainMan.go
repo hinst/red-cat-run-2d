@@ -89,7 +89,7 @@ func (me *TerrainMan) Draw(screen *ebiten.Image) {
 			if block.Type == block.GetTypeFloor() {
 				drawOptions.GeoM.Translate(0, me.FloorY)
 			} else {
-				drawOptions.GeoM.Translate(0, me.CeilingY)
+				drawOptions.GeoM.Translate(0, me.CeilingY-float64(me.GetTileHeight()))
 			}
 			for i := 0; i < block.Width; i++ {
 				screen.DrawImage(me.brickBlockImage, &drawOptions)
