@@ -177,6 +177,7 @@ func (me *CatEntity) drawAimLine(screen *ebiten.Image) {
 					me.drawVerticalAimLine(screen, true)
 				}
 				if key == ebiten.KeyLeft {
+					me.drawHorizontalAimLine(screen, true)
 				}
 			}
 		} else if me.Location == TERRAIN_LOCATION_CEILING {
@@ -205,6 +206,10 @@ func (me *CatEntity) drawVerticalAimLine(screen *ebiten.Image, up bool) {
 		color.RGBA{R: 150, G: 100, B: 100, A: 255},
 		false,
 	)
+}
+
+// isFloor == false means ceiling
+func (me *CatEntity) drawHorizontalAimLine(screen *ebiten.Image, isFloor bool) {
 }
 
 func (me *CatEntity) GetFallSpeed() float64 {
