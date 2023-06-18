@@ -18,6 +18,8 @@ const (
 	CAT_ENTITY_STATUS_DEAD
 )
 
+const CAT_ENTITY_HORIZONTAL_JUMP_TIME = 2
+
 type CatEntity struct {
 	// Input parameter for initialization
 	ViewWidth float64
@@ -36,14 +38,15 @@ type CatEntity struct {
 	// Input parameter for every draw
 	CameraY float64
 
-	X                float64
-	Y                float64
-	Width            float64
-	FrameWidth       float64
-	Height           float64
-	Location         TerrainLocation
-	Status           CatEntityStatus
-	DebugModeEnabled bool
+	X                      float64
+	Y                      float64
+	Width                  float64
+	FrameWidth             float64
+	Height                 float64
+	Location               TerrainLocation
+	Status                 CatEntityStatus
+	DebugModeEnabled       bool
+	horizontalJumpTimeLeft float64
 
 	runImage          *ebiten.Image
 	runFrame          float64
@@ -81,6 +84,8 @@ func (me *CatEntity) Update(deltaTime float64) {
 		me.updateRun(deltaTime)
 	} else if me.Status == CAT_ENTITY_STATUS_JUMP_SWITCH {
 		me.updateJumpSwitch(deltaTime)
+	} else if me.Status == CAT_ENTITY_STATUS_JUMP_FORWARD {
+		me.updateJumpForward(deltaTime)
 	} else if me.Status == CAT_ENTITY_STATUS_DEAD {
 		me.updateDead(deltaTime)
 	}
@@ -95,11 +100,15 @@ func (me *CatEntity) updateRun(deltaTime float64) {
 	for _, key := range me.JustPressedKeys {
 		if key == ebiten.KeySpace {
 			for _, key := range me.PressedKeys {
-				if key == ebiten.KeyUp && me.Location == TERRAIN_LOCATION_FLOOR {
+				if key == ebiten.KeyUp && me.Status == CAT_ENTITY_STATUS_RUN && me.Location == TERRAIN_LOCATION_FLOOR {
 					me.Status = CAT_ENTITY_STATUS_JUMP_SWITCH
 				}
-				if key == ebiten.KeyDown && me.Location == TERRAIN_LOCATION_CEILING {
+				if key == ebiten.KeyDown && me.Status == CAT_ENTITY_STATUS_RUN && me.Location == TERRAIN_LOCATION_CEILING {
 					me.Status = CAT_ENTITY_STATUS_JUMP_SWITCH
+				}
+				if key == ebiten.KeyRight && me.Status == CAT_ENTITY_STATUS_RUN {
+					me.Status = CAT_ENTITY_STATUS_JUMP_FORWARD
+					me.horizontalJumpTimeLeft = CAT_ENTITY_HORIZONTAL_JUMP_TIME
 				}
 			}
 		}
@@ -124,6 +133,34 @@ func (me *CatEntity) updateJumpSwitch(deltaTime float64) {
 			me.Status = CAT_ENTITY_STATUS_RUN
 			me.Location = TERRAIN_LOCATION_FLOOR
 			me.Y = me.FloorY - me.Height
+		}
+	}
+}
+
+func (me *CatEntity) updateJumpForward(deltaTime float64) {
+	me.runFrame += deltaTime * me.runFramePerSecond / 2
+	if me.runFrame >= me.runFrameCount {
+		me.runFrame -= me.runFrameCount
+	}
+	me.horizontalJumpTimeLeft -= deltaTime
+	var elevation float64
+	if me.horizontalJumpTimeLeft > CAT_ENTITY_HORIZONTAL_JUMP_TIME/2 {
+		var horizontalJumpTimePassed = CAT_ENTITY_HORIZONTAL_JUMP_TIME - me.horizontalJumpTimeLeft
+		elevation = me.GetForwardJumpSpeedY() * horizontalJumpTimePassed
+	} else {
+		elevation = me.GetForwardJumpSpeedY() * me.horizontalJumpTimeLeft
+	}
+	if me.Location == TERRAIN_LOCATION_FLOOR {
+		me.Y = me.FloorY - me.Height - elevation
+	} else if me.Location == TERRAIN_LOCATION_CEILING {
+		me.Y = me.CeilingY + elevation
+	}
+	if me.horizontalJumpTimeLeft <= 0 {
+		me.Status = CAT_ENTITY_STATUS_RUN
+		if me.Location == TERRAIN_LOCATION_FLOOR {
+			me.Y = me.FloorY - me.Height
+		} else {
+			me.Y = me.CeilingY
 		}
 	}
 }
@@ -156,7 +193,10 @@ func (me *CatEntity) Draw(screen *ebiten.Image) {
 	}
 	drawOptions.GeoM.Translate(me.X, me.Y)
 	drawOptions.GeoM.Translate(-me.CameraX, -me.CameraY)
-	if me.Status == CAT_ENTITY_STATUS_RUN || me.Status == CAT_ENTITY_STATUS_JUMP_SWITCH {
+	var isRunDrawMode = me.Status == CAT_ENTITY_STATUS_RUN ||
+		me.Status == CAT_ENTITY_STATUS_JUMP_SWITCH ||
+		me.Status == CAT_ENTITY_STATUS_JUMP_FORWARD
+	if isRunDrawMode {
 		var spriteShiftX = float64(int(me.runFrame)) * me.FrameWidth
 		var rect = GetShiftedRectangle(spriteShiftX, me.FrameWidth)
 		screen.DrawImage(me.runImage.SubImage(rect).(*ebiten.Image), &drawOptions)
@@ -255,5 +295,5 @@ func (me *CatEntity) GetForwardJumpSpeedY() float64 {
 }
 
 func (me *CatEntity) GetAimLineColor() color.Color {
-	return color.RGBA{R: 150, G: 100, B: 100, A: 255}
+	return color.RGBA{R: 168, G: 111, B: 50, A: 255}
 }
