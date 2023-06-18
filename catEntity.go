@@ -38,7 +38,6 @@ type CatEntity struct {
 
 	X                float64
 	Y                float64
-	Speed            float64
 	Width            float64
 	FrameWidth       float64
 	Height           float64
@@ -73,7 +72,6 @@ func (me *CatEntity) Initialize() {
 	me.Width = 40
 	me.FrameWidth = 48
 	me.Height = 25
-	me.Speed = 40
 
 	me.Y = me.FloorY - me.Height
 }
@@ -86,7 +84,7 @@ func (me *CatEntity) Update(deltaTime float64) {
 	} else if me.Status == CAT_ENTITY_STATUS_DEAD {
 		me.updateDead(deltaTime)
 	}
-	me.X += deltaTime * me.Speed
+	me.X += deltaTime * me.GetSpeedX()
 }
 
 func (me *CatEntity) updateRun(deltaTime float64) {
@@ -114,14 +112,14 @@ func (me *CatEntity) updateJumpSwitch(deltaTime float64) {
 		me.runFrame -= me.runFrameCount
 	}
 	if me.Location == TERRAIN_LOCATION_FLOOR {
-		me.Y -= deltaTime * me.GetJumpSpeed()
+		me.Y -= deltaTime * me.GetSwitchJumpSpeedY()
 		if me.Y <= me.CeilingY {
 			me.Status = CAT_ENTITY_STATUS_RUN
 			me.Location = TERRAIN_LOCATION_CEILING
 			me.Y = me.CeilingY
 		}
 	} else if me.Location == TERRAIN_LOCATION_CEILING {
-		me.Y += deltaTime * me.GetJumpSpeed()
+		me.Y += deltaTime * me.GetSwitchJumpSpeedY()
 		if me.Y+me.Height >= me.FloorY {
 			me.Status = CAT_ENTITY_STATUS_RUN
 			me.Location = TERRAIN_LOCATION_FLOOR
@@ -175,15 +173,18 @@ func (me *CatEntity) drawAimLine(screen *ebiten.Image) {
 			for _, key := range me.PressedKeys {
 				if key == ebiten.KeyUp {
 					me.drawVerticalAimLine(screen, true)
-				}
-				if key == ebiten.KeyLeft {
+					break
+				} else if key == ebiten.KeyRight {
 					me.drawHorizontalAimLine(screen, true)
+					break
 				}
 			}
 		} else if me.Location == TERRAIN_LOCATION_CEILING {
 			for _, key := range me.PressedKeys {
 				if key == ebiten.KeyDown {
 					me.drawVerticalAimLine(screen, false)
+				} else if key == ebiten.KeyRight {
+					me.drawHorizontalAimLine(screen, false)
 				}
 			}
 		}
@@ -191,31 +192,68 @@ func (me *CatEntity) drawAimLine(screen *ebiten.Image) {
 }
 
 func (me *CatEntity) drawVerticalAimLine(screen *ebiten.Image, up bool) {
+	const multiplier = 1.66
 	var y1 = me.Y + me.Height/2 - me.CameraY
 	if up {
-		y1 -= me.GetJumpSpeed()
+		y1 -= me.GetSwitchJumpSpeedY() * multiplier
 	} else {
-		y1 += me.GetJumpSpeed()
+		y1 += me.GetSwitchJumpSpeedY() * multiplier
 	}
 	vector.StrokeLine(screen,
 		float32(me.X+me.Width/2-me.CameraX),
 		float32(me.Y+me.Height/2-me.CameraY),
-		float32(me.X+me.Width/2+me.Speed-me.CameraX),
+		float32(me.X+me.Width/2+me.GetSpeedX()*multiplier-me.CameraX),
 		float32(y1),
 		1,
-		color.RGBA{R: 150, G: 100, B: 100, A: 255},
+		me.GetAimLineColor(),
 		false,
 	)
 }
 
 // isFloor == false means ceiling
 func (me *CatEntity) drawHorizontalAimLine(screen *ebiten.Image, isFloor bool) {
+	var y1 = me.Y + me.Height/2 - me.CameraY
+	if isFloor {
+		y1 -= me.GetForwardJumpSpeedY()
+	} else {
+		y1 += me.GetForwardJumpSpeedY()
+	}
+	vector.StrokeLine(screen,
+		float32(me.X+me.Width/2-me.CameraX),
+		float32(me.Y+me.Height/2-me.CameraY),
+		float32(me.X+me.Width/2+me.GetSpeedX()-me.CameraX),
+		float32(y1),
+		1,
+		me.GetAimLineColor(),
+		false,
+	)
+	vector.StrokeLine(screen,
+		float32(me.X+me.Width/2+me.GetSpeedX()-me.CameraX),
+		float32(y1),
+		float32(me.X+me.Width/2+me.GetSpeedX()*2-me.CameraX),
+		float32(me.Y+me.Height/2-me.CameraY),
+		1,
+		me.GetAimLineColor(),
+		false,
+	)
+}
+
+func (me *CatEntity) GetSpeedX() float64 {
+	return 50
 }
 
 func (me *CatEntity) GetFallSpeed() float64 {
 	return 50
 }
 
-func (me *CatEntity) GetJumpSpeed() float64 {
+func (me *CatEntity) GetSwitchJumpSpeedY() float64 {
 	return 70
+}
+
+func (me *CatEntity) GetForwardJumpSpeedY() float64 {
+	return 50
+}
+
+func (me *CatEntity) GetAimLineColor() color.Color {
+	return color.RGBA{R: 150, G: 100, B: 100, A: 255}
 }
