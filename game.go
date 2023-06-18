@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"errors"
+	"image"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -9,18 +11,22 @@ import (
 )
 
 type Game struct {
-	updateTime      time.Time
-	justPressedKeys []ebiten.Key
-	pressedKeys     []ebiten.Key
-	menu            MenuUserInterface
-	gameScene       GameScene
-	isExiting       bool
-	mode            int
-	viewWidth       float64
-	viewHeight      float64
+	updateTime             time.Time
+	justPressedKeys        []ebiten.Key
+	pressedKeys            []ebiten.Key
+	menu                   MenuUserInterface
+	gameScene              GameScene
+	isExiting              bool
+	mode                   int
+	viewWidth              float64
+	viewHeight             float64
+	ebitengineReverseImage *ebiten.Image
 }
 
 func (me *Game) Initialize() {
+	var ebitengineReverseImage, _, ebitengineReverseImageError = image.Decode(bytes.NewReader(ebitengineReverse))
+	AssertError(ebitengineReverseImageError)
+	me.ebitengineReverseImage = ebiten.NewImageFromImage(ebitengineReverseImage)
 	me.viewWidth = 420
 	me.viewHeight = 240
 	me.updateTime = time.Now()
@@ -85,6 +91,10 @@ func (me *Game) update(deltaTime float64) {
 
 func (me *Game) draw(screen *ebiten.Image) {
 	if me.mode == me.GetModeMenu() {
+		var drawOptions = ebiten.DrawImageOptions{}
+		drawOptions.GeoM.Scale(0.25, 0.25)
+		drawOptions.GeoM.Translate(200, 50)
+		screen.DrawImage(me.ebitengineReverseImage, &drawOptions)
 		me.menu.Draw(screen)
 	} else if me.mode == me.GetModeGame() {
 		me.gameScene.Draw(screen)

@@ -11,4 +11,6 @@ var (
 	catDie []byte
 	//go:embed data/brickBlock.png
 	brickBlock []byte
+	//go:embed data/ebitengine-reverse.png
+	ebitengineReverse []byte
 )

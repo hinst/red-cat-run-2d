@@ -29,25 +29,27 @@ type TerrainMan struct {
 }
 
 func (me *TerrainMan) GetMinBlockWidth() int {
-	return 8
+	return 5
 }
 
 func (me *TerrainMan) GetMaxBlockWidth() int {
-	return 16
+	return 10
 }
 
 func (me *TerrainMan) GetMinGapWidth() int {
-	return 3
+	return 5
 }
 
 func (me *TerrainMan) GetMaxGapWidth() int {
-	return 6
+	return 10
 }
 
+// Measurement unit: pixels
 func (me *TerrainMan) GetTileWidth() int {
 	return 10
 }
 
+// Measurement unit: pixels
 func (me *TerrainMan) GetTileHeight() int {
 	return 10
 }
