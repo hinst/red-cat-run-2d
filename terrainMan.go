@@ -19,9 +19,9 @@ type TerrainMan struct {
 	FloorY float64
 	// Input parameter for initialization. Measurement unit: pixels
 	CeilingY float64
-	// Input parameter for every draw
+	// Input parameter for every draw. Measurement unit: pixels
 	CameraX float64
-	// Input parameter for every draw
+	// Input parameter for every draw. Measurement unit: pixels
 	CameraY float64
 
 	brickBlockImage *ebiten.Image
