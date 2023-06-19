@@ -41,7 +41,6 @@ type CatEntity struct {
 	X                      float64
 	Y                      float64
 	Width                  float64
-	FrameWidth             float64
 	Height                 float64
 	Location               TerrainLocation
 	Status                 CatEntityStatus
@@ -50,8 +49,6 @@ type CatEntity struct {
 
 	runImage          *ebiten.Image
 	runFrame          float64
-	runFramePerSecond float64
-	runFrameCount     float64
 
 	dieImage          *ebiten.Image
 	dieFrame          float64
@@ -63,8 +60,6 @@ func (me *CatEntity) Initialize() {
 	var catWalkImage, _, catWalkImageError = image.Decode(bytes.NewReader(catRun))
 	AssertError(catWalkImageError)
 	me.runImage = ebiten.NewImageFromImage(catWalkImage)
-	me.runFramePerSecond = 6
-	me.runFrameCount = 6
 
 	var catDieImage, _, catDieImageError = image.Decode(bytes.NewReader(catDie))
 	AssertError(catDieImageError)
@@ -73,7 +68,6 @@ func (me *CatEntity) Initialize() {
 	me.dieFrameCount = 4
 
 	me.Width = 40
-	me.FrameWidth = 48
 	me.Height = 25
 
 	me.Y = me.FloorY - me.Height
@@ -93,9 +87,9 @@ func (me *CatEntity) Update(deltaTime float64) {
 }
 
 func (me *CatEntity) updateRun(deltaTime float64) {
-	me.runFrame += deltaTime * me.runFramePerSecond
-	if me.runFrame >= me.runFrameCount {
-		me.runFrame -= me.runFrameCount
+	me.runFrame += deltaTime * me.GetRunFramePerSecond()
+	if me.runFrame >= CAT_RUN_ANIMATION_FRAME_COUNT {
+		me.runFrame -= CAT_RUN_ANIMATION_FRAME_COUNT
 	}
 	for _, key := range me.JustPressedKeys {
 		if key == ebiten.KeySpace {
@@ -116,9 +110,9 @@ func (me *CatEntity) updateRun(deltaTime float64) {
 }
 
 func (me *CatEntity) updateJumpSwitch(deltaTime float64) {
-	me.runFrame += deltaTime * me.runFramePerSecond / 2
-	if me.runFrame >= me.runFrameCount {
-		me.runFrame -= me.runFrameCount
+	me.runFrame += deltaTime * me.GetRunFramePerSecond() / 2
+	if me.runFrame >= CAT_RUN_ANIMATION_FRAME_COUNT {
+		me.runFrame -= CAT_RUN_ANIMATION_FRAME_COUNT
 	}
 	if me.Location == TERRAIN_LOCATION_FLOOR {
 		me.Y -= deltaTime * me.GetSwitchJumpSpeedY()
@@ -138,9 +132,9 @@ func (me *CatEntity) updateJumpSwitch(deltaTime float64) {
 }
 
 func (me *CatEntity) updateJumpForward(deltaTime float64) {
-	me.runFrame += deltaTime * me.runFramePerSecond / 2
-	if me.runFrame >= me.runFrameCount {
-		me.runFrame -= me.runFrameCount
+	me.runFrame += deltaTime * me.GetRunFramePerSecond() / 2
+	if me.runFrame >= CAT_RUN_ANIMATION_FRAME_COUNT {
+		me.runFrame -= CAT_RUN_ANIMATION_FRAME_COUNT
 	}
 	me.horizontalJumpTimeLeft -= deltaTime
 	var elevation float64
@@ -197,12 +191,12 @@ func (me *CatEntity) Draw(screen *ebiten.Image) {
 		me.Status == CAT_ENTITY_STATUS_JUMP_SWITCH ||
 		me.Status == CAT_ENTITY_STATUS_JUMP_FORWARD
 	if isRunDrawMode {
-		var spriteShiftX = float64(int(me.runFrame)) * me.FrameWidth
-		var rect = GetShiftedRectangle(spriteShiftX, me.FrameWidth)
+		var spriteShiftX = float64(int(me.runFrame)) * CAT_RUN_ANIMATION_FRAME_WIDTH
+		var rect = GetShiftedRectangle(spriteShiftX, CAT_RUN_ANIMATION_FRAME_WIDTH)
 		screen.DrawImage(me.runImage.SubImage(rect).(*ebiten.Image), &drawOptions)
 	} else if me.Status == CAT_ENTITY_STATUS_DEAD {
-		var spriteShiftX = float64(int(me.dieFrame)) * me.FrameWidth
-		var rect = GetShiftedRectangle(spriteShiftX, me.FrameWidth)
+		var spriteShiftX = float64(int(me.dieFrame)) * CAT_RUN_ANIMATION_FRAME_WIDTH
+		var rect = GetShiftedRectangle(spriteShiftX, CAT_RUN_ANIMATION_FRAME_WIDTH)
 		screen.DrawImage(me.dieImage.SubImage(rect).(*ebiten.Image), &drawOptions)
 	}
 }
@@ -296,4 +290,8 @@ func (me *CatEntity) GetForwardJumpSpeedY() float64 {
 
 func (me *CatEntity) GetAimLineColor() color.Color {
 	return color.RGBA{R: 168, G: 111, B: 50, A: 255}
+}
+
+func (me *CatEntity) GetRunFramePerSecond() float64 {
+	return 6
 }

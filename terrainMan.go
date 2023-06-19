@@ -63,7 +63,7 @@ func (me *TerrainMan) Initialize() {
 		if me.GetLastBlock() == nil {
 			block.Location = TERRAIN_LOCATION_FLOOR
 			block.X = 0
-			block.Width = me.GetMaxBlockWidth()
+			block.Width = me.GetMaxBlockWidth() * 2
 		} else {
 			block.Location = TerrainLocation(rand.Intn(2))
 			var gap = GetRandomNumberBetween(me.GetMinGapWidth(), me.GetMaxGapWidth())
