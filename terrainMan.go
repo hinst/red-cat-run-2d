@@ -26,6 +26,7 @@ type TerrainMan struct {
 
 	brickBlockImage *ebiten.Image
 	blocks          []*TerrainBlock
+	dirtBlockImage  *ebiten.Image
 }
 
 func (me *TerrainMan) GetMinBlockWidth() int {
@@ -58,6 +59,9 @@ func (me *TerrainMan) Initialize() {
 	var brickBlockImage, _, brickBlockImageError = image.Decode(bytes.NewReader(brickBlock))
 	AssertError(brickBlockImageError)
 	me.brickBlockImage = ebiten.NewImageFromImage(brickBlockImage)
+	var dirtBlockImage, _, dirtBlockImageError = image.Decode(bytes.NewReader(dirtBlock))
+	AssertError(dirtBlockImageError)
+	me.dirtBlockImage = ebiten.NewImageFromImage(dirtBlockImage)
 	for me.GetLastBlock() == nil || me.GetLastBlock().X+me.GetLastBlock().Width < me.AreaWidth {
 		var block = &TerrainBlock{}
 		if me.GetLastBlock() == nil {
@@ -95,6 +99,16 @@ func (me *TerrainMan) Draw(screen *ebiten.Image) {
 			}
 			for i := 0; i < block.Width; i++ {
 				screen.DrawImage(me.brickBlockImage, &drawOptions)
+				const underFloorHeight = 3
+				var direction = 1.0
+				if block.Location == TERRAIN_LOCATION_CEILING {
+					direction = -1.0
+				}
+				for i := 0; i < underFloorHeight; i++ {
+					drawOptions.GeoM.Translate(0, float64(me.GetTileWidth())*direction)
+					screen.DrawImage(me.dirtBlockImage, &drawOptions)
+				}
+				drawOptions.GeoM.Translate(0, -float64(me.GetTileWidth())*underFloorHeight*direction)
 				drawOptions.GeoM.Translate(float64(me.GetTileWidth()), 0)
 			}
 		}
