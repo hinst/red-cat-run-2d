@@ -47,13 +47,11 @@ type CatEntity struct {
 	DebugModeEnabled       bool
 	horizontalJumpTimeLeft float64
 
-	runImage          *ebiten.Image
-	runFrame          float64
+	runImage *ebiten.Image
+	runFrame float64
 
 	dieImage          *ebiten.Image
 	dieFrame          float64
-	dieFramePerSecond float64
-	dieFrameCount     float64
 }
 
 func (me *CatEntity) Initialize() {
@@ -64,8 +62,6 @@ func (me *CatEntity) Initialize() {
 	var catDieImage, _, catDieImageError = image.Decode(bytes.NewReader(catDie))
 	AssertError(catDieImageError)
 	me.dieImage = ebiten.NewImageFromImage(catDieImage)
-	me.dieFramePerSecond = 6
-	me.dieFrameCount = 4
 
 	me.Width = 40
 	me.Height = 25
@@ -160,9 +156,9 @@ func (me *CatEntity) updateJumpForward(deltaTime float64) {
 }
 
 func (me *CatEntity) updateDead(deltaTime float64) {
-	me.dieFrame += deltaTime * me.dieFramePerSecond
-	if me.dieFrame >= me.dieFrameCount {
-		me.dieFrame = me.dieFrameCount - 1
+	me.dieFrame += deltaTime * me.GetDieFramePerSecond()
+	if me.dieFrame >= CAT_DIE_ANIMATION_FRAME_COUNT {
+		me.dieFrame = CAT_DIE_ANIMATION_FRAME_COUNT - 1
 	}
 	if me.Location == TERRAIN_LOCATION_FLOOR {
 		if me.Y < me.ViewHeight {
@@ -293,5 +289,9 @@ func (me *CatEntity) GetAimLineColor() color.Color {
 }
 
 func (me *CatEntity) GetRunFramePerSecond() float64 {
+	return 6
+}
+
+func (me *CatEntity) GetDieFramePerSecond() float64 {
 	return 6
 }
