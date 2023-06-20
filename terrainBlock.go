@@ -2,6 +2,8 @@ package main
 
 type TerrainBlock struct {
 	Location TerrainLocation
-	X        int
-	Width    int
+	// Measurement unit: tiles
+	X int
+	// Measurement unit: tiles
+	Width int
 }

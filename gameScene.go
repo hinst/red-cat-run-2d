@@ -14,10 +14,11 @@ type GameScene struct {
 	// Input parameter for every update
 	PressedKeys []ebiten.Key
 
-	terrainMan TerrainMan
-	catEntity  CatEntity
-	cameraX    float64
-	cameraY    float64
+	terrainMan              TerrainMan
+	catEntity               CatEntity
+	cameraX                 float64
+	cameraY                 float64
+	transitionTimeRemaining float64
 }
 
 func (me *GameScene) Initialize() {
@@ -40,10 +41,19 @@ func (me *GameScene) Update(deltaTime float64) {
 	if me.catEntity.Status == CAT_ENTITY_STATUS_RUN && !me.CheckCatHold() {
 		me.catEntity.Status = CAT_ENTITY_STATUS_DEAD
 	}
+	if me.CheckCatAtRightEndOfTerrain() {
+		me.catEntity.direction = DIRECTION_LEFT
+	}
 	me.catEntity.JustPressedKeys = me.JustPressedKeys
 	me.catEntity.PressedKeys = me.PressedKeys
 	me.catEntity.Update(deltaTime)
-	me.cameraX = me.catEntity.X - me.GetCatViewX()
+	if me.catEntity.Status != CAT_ENTITY_STATUS_DEAD {
+		if me.catEntity.direction == DIRECTION_RIGHT {
+			me.cameraX = me.catEntity.X - me.GetCatViewX()
+		} else {
+			me.cameraX = me.catEntity.X + me.catEntity.Width - me.ViewWidth + me.GetCatViewX()
+		}
+	}
 }
 
 func (me *GameScene) Draw(screen *ebiten.Image) {
@@ -84,4 +94,10 @@ func (me *GameScene) CheckCatHold() bool {
 		}
 	}
 	return false
+}
+
+func (me *GameScene) CheckCatAtRightEndOfTerrain() bool {
+	var catRight = me.catEntity.X + me.catEntity.Width
+	var terrainRight = float64(me.terrainMan.AreaWidth) * float64(me.terrainMan.GetTileWidth())
+	return catRight >= terrainRight
 }

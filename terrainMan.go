@@ -37,6 +37,11 @@ func (me *TerrainMan) GetMaxBlockWidth() int {
 	return 10
 }
 
+// For first and last block
+func (me *TerrainMan) GetExtendedBlockWidth() int {
+	return me.GetMaxBlockWidth() * 2
+}
+
 func (me *TerrainMan) GetMinGapWidth() int {
 	return 5
 }
@@ -67,7 +72,7 @@ func (me *TerrainMan) Initialize() {
 		if me.GetLastBlock() == nil {
 			block.Location = TERRAIN_LOCATION_FLOOR
 			block.X = 0
-			block.Width = me.GetMaxBlockWidth() * 2
+			block.Width = me.GetExtendedBlockWidth()
 		} else {
 			block.Location = TerrainLocation(rand.Intn(2))
 			var gap = GetRandomNumberBetween(me.GetMinGapWidth(), me.GetMaxGapWidth())
@@ -76,6 +81,10 @@ func (me *TerrainMan) Initialize() {
 		}
 		me.blocks = append(me.blocks, block)
 	}
+	if me.GetLastBlock() != nil {
+		me.GetLastBlock().Width = me.GetExtendedBlockWidth()
+	}
+	me.AreaWidth = me.GetLastBlock().X + me.GetLastBlock().Width
 }
 
 func (me *TerrainMan) GetLastBlock() *TerrainBlock {

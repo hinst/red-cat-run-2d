@@ -38,20 +38,21 @@ type CatEntity struct {
 	// Input parameter for every draw
 	CameraY float64
 
-	X                      float64
-	Y                      float64
-	Width                  float64
-	Height                 float64
-	Location               TerrainLocation
-	Status                 CatEntityStatus
-	DebugModeEnabled       bool
-	horizontalJumpTimeLeft float64
+	X                           float64
+	Y                           float64
+	Width                       float64
+	Height                      float64
+	Location                    TerrainLocation
+	Status                      CatEntityStatus
+	DebugModeEnabled            bool
+	direction                   Direction
+	horizontalJumpTimeRemaining float64
 
 	runImage *ebiten.Image
 	runFrame float64
 
-	dieImage          *ebiten.Image
-	dieFrame          float64
+	dieImage *ebiten.Image
+	dieFrame float64
 }
 
 func (me *CatEntity) Initialize() {
@@ -67,6 +68,7 @@ func (me *CatEntity) Initialize() {
 	me.Height = 25
 
 	me.Y = me.FloorY - me.Height
+	me.direction = DIRECTION_RIGHT
 }
 
 func (me *CatEntity) Update(deltaTime float64) {
@@ -79,7 +81,18 @@ func (me *CatEntity) Update(deltaTime float64) {
 	} else if me.Status == CAT_ENTITY_STATUS_DEAD {
 		me.updateDead(deltaTime)
 	}
-	me.X += deltaTime * me.GetSpeedX()
+	me.X += deltaTime * me.GetSpeedX() * me.getSpeedDirection()
+}
+
+func (me *CatEntity) getSpeedDirection() (speedDirection float64) {
+	if me.direction == DIRECTION_LEFT {
+		speedDirection = -1
+	} else if me.direction == DIRECTION_RIGHT {
+		speedDirection = 1
+	} else {
+		speedDirection = 0
+	}
+	return
 }
 
 func (me *CatEntity) updateRun(deltaTime float64) {
@@ -98,7 +111,7 @@ func (me *CatEntity) updateRun(deltaTime float64) {
 				}
 				if key == ebiten.KeyRight && me.Status == CAT_ENTITY_STATUS_RUN {
 					me.Status = CAT_ENTITY_STATUS_JUMP_FORWARD
-					me.horizontalJumpTimeLeft = CAT_ENTITY_HORIZONTAL_JUMP_TIME
+					me.horizontalJumpTimeRemaining = CAT_ENTITY_HORIZONTAL_JUMP_TIME
 				}
 			}
 		}
@@ -132,20 +145,20 @@ func (me *CatEntity) updateJumpForward(deltaTime float64) {
 	if me.runFrame >= CAT_RUN_ANIMATION_FRAME_COUNT {
 		me.runFrame -= CAT_RUN_ANIMATION_FRAME_COUNT
 	}
-	me.horizontalJumpTimeLeft -= deltaTime
+	me.horizontalJumpTimeRemaining -= deltaTime
 	var elevation float64
-	if me.horizontalJumpTimeLeft > CAT_ENTITY_HORIZONTAL_JUMP_TIME/2 {
-		var horizontalJumpTimePassed = CAT_ENTITY_HORIZONTAL_JUMP_TIME - me.horizontalJumpTimeLeft
+	if me.horizontalJumpTimeRemaining > CAT_ENTITY_HORIZONTAL_JUMP_TIME/2 {
+		var horizontalJumpTimePassed = CAT_ENTITY_HORIZONTAL_JUMP_TIME - me.horizontalJumpTimeRemaining
 		elevation = me.GetForwardJumpSpeedY() * horizontalJumpTimePassed
 	} else {
-		elevation = me.GetForwardJumpSpeedY() * me.horizontalJumpTimeLeft
+		elevation = me.GetForwardJumpSpeedY() * me.horizontalJumpTimeRemaining
 	}
 	if me.Location == TERRAIN_LOCATION_FLOOR {
 		me.Y = me.FloorY - me.Height - elevation
 	} else if me.Location == TERRAIN_LOCATION_CEILING {
 		me.Y = me.CeilingY + elevation
 	}
-	if me.horizontalJumpTimeLeft <= 0 {
+	if me.horizontalJumpTimeRemaining <= 0 {
 		me.Status = CAT_ENTITY_STATUS_RUN
 		if me.Location == TERRAIN_LOCATION_FLOOR {
 			me.Y = me.FloorY - me.Height
@@ -198,27 +211,33 @@ func (me *CatEntity) Draw(screen *ebiten.Image) {
 }
 
 func (me *CatEntity) drawAimLine(screen *ebiten.Image) {
-	if me.Status == CAT_ENTITY_STATUS_RUN {
-		if me.Location == TERRAIN_LOCATION_FLOOR {
-			for _, key := range me.PressedKeys {
-				if key == ebiten.KeyUp {
-					me.drawVerticalAimLine(screen, true)
-					break
-				} else if key == ebiten.KeyRight {
-					me.drawHorizontalAimLine(screen, true)
-					break
-				}
-			}
-		} else if me.Location == TERRAIN_LOCATION_CEILING {
-			for _, key := range me.PressedKeys {
-				if key == ebiten.KeyDown {
-					me.drawVerticalAimLine(screen, false)
-				} else if key == ebiten.KeyRight {
-					me.drawHorizontalAimLine(screen, false)
-				}
-			}
+	for _, key := range me.PressedKeys {
+		if me.isAimUp(key) {
+			me.drawVerticalAimLine(screen, true)
+		} else if me.isAimRightFromFloor(key) {
+			me.drawHorizontalAimLine(screen, true)
+		} else if me.isAimDown(key) {
+			me.drawVerticalAimLine(screen, false)
+		} else if me.isAimRightFromCeiling(key) {
+			me.drawHorizontalAimLine(screen, false)
 		}
 	}
+}
+
+func (me *CatEntity) isAimUp(key ebiten.Key) bool {
+	return key == ebiten.KeyUp && me.Status == CAT_ENTITY_STATUS_RUN && me.Location == TERRAIN_LOCATION_FLOOR
+}
+
+func (me *CatEntity) isAimRightFromFloor(key ebiten.Key) bool {
+	return key == ebiten.KeyRight && me.Status == CAT_ENTITY_STATUS_RUN && me.Location == TERRAIN_LOCATION_FLOOR
+}
+
+func (me *CatEntity) isAimDown(key ebiten.Key) bool {
+	return key == ebiten.KeyDown && me.Status == CAT_ENTITY_STATUS_RUN && me.Location == TERRAIN_LOCATION_CEILING
+}
+
+func (me *CatEntity) isAimRightFromCeiling(key ebiten.Key) bool {
+	return key == ebiten.KeyRight && me.Status == CAT_ENTITY_STATUS_RUN && me.Location == TERRAIN_LOCATION_CEILING
 }
 
 func (me *CatEntity) drawVerticalAimLine(screen *ebiten.Image, up bool) {
