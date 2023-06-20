@@ -73,7 +73,8 @@ func (me *Game) Update() error {
 
 func (me *Game) Draw(screen *ebiten.Image) {
 	var updateTime = time.Now()
-	me.update(updateTime.Sub(me.updateTime).Seconds())
+	var deltaTime = math.Min(1, updateTime.Sub(me.updateTime).Seconds())
+	me.update(deltaTime)
 	me.updateTime = updateTime
 	me.justPressedKeys = me.justPressedKeys[:0]
 	me.draw(screen)

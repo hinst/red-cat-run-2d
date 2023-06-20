@@ -21,6 +21,8 @@ type GameScene struct {
 	transitionTimeRemaining float64
 }
 
+const GAME_SCENE_TRANSITION_TIME = 2
+
 func (me *GameScene) Initialize() {
 	me.terrainMan.ViewHeight = me.ViewHeight
 	me.terrainMan.ViewWidth = me.ViewWidth
@@ -38,21 +40,30 @@ func (me *GameScene) Initialize() {
 }
 
 func (me *GameScene) Update(deltaTime float64) {
-	if me.catEntity.Status == CAT_ENTITY_STATUS_RUN && !me.CheckCatHold() {
-		me.catEntity.Status = CAT_ENTITY_STATUS_DEAD
-	}
-	if me.CheckCatAtRightEndOfTerrain() {
-		me.catEntity.direction = DIRECTION_LEFT
-	}
-	me.catEntity.JustPressedKeys = me.JustPressedKeys
-	me.catEntity.PressedKeys = me.PressedKeys
-	me.catEntity.Update(deltaTime)
-	if me.catEntity.Status != CAT_ENTITY_STATUS_DEAD {
-		if me.catEntity.direction == DIRECTION_RIGHT {
-			me.cameraX = me.catEntity.X - me.GetCatViewX()
-		} else {
-			me.cameraX = me.catEntity.X + me.catEntity.Width - me.ViewWidth + me.GetCatViewX()
+	if me.transitionTimeRemaining == 0 {
+		if me.catEntity.Status == CAT_ENTITY_STATUS_RUN && !me.CheckCatHold() {
+			me.catEntity.Status = CAT_ENTITY_STATUS_DEAD
 		}
+		me.catEntity.JustPressedKeys = me.JustPressedKeys
+		me.catEntity.PressedKeys = me.PressedKeys
+		me.catEntity.Update(deltaTime)
+		if me.catEntity.Status != CAT_ENTITY_STATUS_DEAD {
+			if me.catEntity.Direction == DIRECTION_RIGHT {
+				me.cameraX = me.getCameraXGoingRight()
+			} else {
+				me.cameraX = me.getCameraXGoingLeft()
+			}
+		}
+		if me.CheckCatAtRightEndOfTerrain() && me.catEntity.Direction == DIRECTION_RIGHT {
+			me.transitionTimeRemaining = GAME_SCENE_TRANSITION_TIME
+			me.catEntity.Direction = DIRECTION_LEFT
+		}
+	} else {
+		me.transitionTimeRemaining -= deltaTime
+		if me.transitionTimeRemaining <= 0 {
+			me.transitionTimeRemaining = 0
+		}
+		me.cameraX = me.getCameraXGoingLeft() + me.transitionTimeRemaining*(me.getCameraXGoingRight()-me.getCameraXGoingLeft())/2
 	}
 }
 
@@ -100,4 +111,12 @@ func (me *GameScene) CheckCatAtRightEndOfTerrain() bool {
 	var catRight = me.catEntity.X + me.catEntity.Width
 	var terrainRight = float64(me.terrainMan.AreaWidth) * float64(me.terrainMan.GetTileWidth())
 	return catRight >= terrainRight
+}
+
+func (me *GameScene) getCameraXGoingRight() float64 {
+	return me.catEntity.X - me.GetCatViewX()
+}
+
+func (me *GameScene) getCameraXGoingLeft() float64 {
+	return me.catEntity.X + me.catEntity.Width - me.ViewWidth + me.GetCatViewX()
 }

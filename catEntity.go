@@ -45,7 +45,7 @@ type CatEntity struct {
 	Location                    TerrainLocation
 	Status                      CatEntityStatus
 	DebugModeEnabled            bool
-	direction                   Direction
+	Direction                   Direction
 	horizontalJumpTimeRemaining float64
 
 	runImage *ebiten.Image
@@ -68,7 +68,7 @@ func (me *CatEntity) Initialize() {
 	me.Height = 25
 
 	me.Y = me.FloorY - me.Height
-	me.direction = DIRECTION_RIGHT
+	me.Direction = DIRECTION_RIGHT
 }
 
 func (me *CatEntity) Update(deltaTime float64) {
@@ -85,9 +85,9 @@ func (me *CatEntity) Update(deltaTime float64) {
 }
 
 func (me *CatEntity) getSpeedDirection() (speedDirection float64) {
-	if me.direction == DIRECTION_LEFT {
+	if me.Direction == DIRECTION_LEFT {
 		speedDirection = -1
-	} else if me.direction == DIRECTION_RIGHT {
+	} else if me.Direction == DIRECTION_RIGHT {
 		speedDirection = 1
 	} else {
 		speedDirection = 0
@@ -109,7 +109,10 @@ func (me *CatEntity) updateRun(deltaTime float64) {
 				if key == ebiten.KeyDown && me.Status == CAT_ENTITY_STATUS_RUN && me.Location == TERRAIN_LOCATION_CEILING {
 					me.Status = CAT_ENTITY_STATUS_JUMP_SWITCH
 				}
-				if key == ebiten.KeyRight && me.Status == CAT_ENTITY_STATUS_RUN {
+				var isJumpForward = me.Status == CAT_ENTITY_STATUS_RUN &&
+					(key == ebiten.KeyRight && me.Direction == DIRECTION_RIGHT ||
+						key == ebiten.KeyLeft && me.Direction == DIRECTION_LEFT)
+				if isJumpForward {
 					me.Status = CAT_ENTITY_STATUS_JUMP_FORWARD
 					me.horizontalJumpTimeRemaining = CAT_ENTITY_HORIZONTAL_JUMP_TIME
 				}
@@ -194,6 +197,9 @@ func (me *CatEntity) Draw(screen *ebiten.Image) {
 	if me.Location == TERRAIN_LOCATION_CEILING {
 		ScaleCentered(&drawOptions, me.Width, me.Height, 1, -1)
 	}
+	if me.Direction == DIRECTION_LEFT {
+		ScaleCentered(&drawOptions, me.Width, me.Height, -1, 1)
+	}
 	drawOptions.GeoM.Translate(me.X, me.Y)
 	drawOptions.GeoM.Translate(-me.CameraX, -me.CameraY)
 	var isRunDrawMode = me.Status == CAT_ENTITY_STATUS_RUN ||
@@ -214,11 +220,11 @@ func (me *CatEntity) drawAimLine(screen *ebiten.Image) {
 	for _, key := range me.PressedKeys {
 		if me.isAimUp(key) {
 			me.drawVerticalAimLine(screen, true)
-		} else if me.isAimRightFromFloor(key) {
+		} else if me.isAimForwardFromFloor(key) {
 			me.drawHorizontalAimLine(screen, true)
 		} else if me.isAimDown(key) {
 			me.drawVerticalAimLine(screen, false)
-		} else if me.isAimRightFromCeiling(key) {
+		} else if me.isAimForwardFromCeiling(key) {
 			me.drawHorizontalAimLine(screen, false)
 		}
 	}
@@ -228,16 +234,21 @@ func (me *CatEntity) isAimUp(key ebiten.Key) bool {
 	return key == ebiten.KeyUp && me.Status == CAT_ENTITY_STATUS_RUN && me.Location == TERRAIN_LOCATION_FLOOR
 }
 
-func (me *CatEntity) isAimRightFromFloor(key ebiten.Key) bool {
-	return key == ebiten.KeyRight && me.Status == CAT_ENTITY_STATUS_RUN && me.Location == TERRAIN_LOCATION_FLOOR
+func (me *CatEntity) isAimForward(key ebiten.Key) bool {
+	return key == ebiten.KeyRight && me.Direction == DIRECTION_RIGHT ||
+		key == ebiten.KeyLeft && me.Direction == DIRECTION_LEFT
+}
+
+func (me *CatEntity) isAimForwardFromFloor(key ebiten.Key) bool {
+	return me.isAimForward(key) && me.Status == CAT_ENTITY_STATUS_RUN && me.Location == TERRAIN_LOCATION_FLOOR
 }
 
 func (me *CatEntity) isAimDown(key ebiten.Key) bool {
 	return key == ebiten.KeyDown && me.Status == CAT_ENTITY_STATUS_RUN && me.Location == TERRAIN_LOCATION_CEILING
 }
 
-func (me *CatEntity) isAimRightFromCeiling(key ebiten.Key) bool {
-	return key == ebiten.KeyRight && me.Status == CAT_ENTITY_STATUS_RUN && me.Location == TERRAIN_LOCATION_CEILING
+func (me *CatEntity) isAimForwardFromCeiling(key ebiten.Key) bool {
+	return me.isAimForward(key) && me.Status == CAT_ENTITY_STATUS_RUN && me.Location == TERRAIN_LOCATION_CEILING
 }
 
 func (me *CatEntity) drawVerticalAimLine(screen *ebiten.Image, up bool) {
@@ -251,7 +262,7 @@ func (me *CatEntity) drawVerticalAimLine(screen *ebiten.Image, up bool) {
 	vector.StrokeLine(screen,
 		float32(me.X+me.Width/2-me.CameraX),
 		float32(me.Y+me.Height/2-me.CameraY),
-		float32(me.X+me.Width/2+me.GetSpeedX()*multiplier-me.CameraX),
+		float32(me.X+me.Width/2+me.GetSpeedX()*me.getSpeedDirection()*multiplier-me.CameraX),
 		float32(y1),
 		1,
 		me.GetAimLineColor(),
@@ -270,16 +281,16 @@ func (me *CatEntity) drawHorizontalAimLine(screen *ebiten.Image, isFloor bool) {
 	vector.StrokeLine(screen,
 		float32(me.X+me.Width/2-me.CameraX),
 		float32(me.Y+me.Height/2-me.CameraY),
-		float32(me.X+me.Width/2+me.GetSpeedX()-me.CameraX),
+		float32(me.X+me.Width/2+me.GetSpeedX()*me.getSpeedDirection()-me.CameraX),
 		float32(y1),
 		1,
 		me.GetAimLineColor(),
 		false,
 	)
 	vector.StrokeLine(screen,
-		float32(me.X+me.Width/2+me.GetSpeedX()-me.CameraX),
+		float32(me.X+me.Width/2+me.GetSpeedX()*me.getSpeedDirection()-me.CameraX),
 		float32(y1),
-		float32(me.X+me.Width/2+me.GetSpeedX()*2-me.CameraX),
+		float32(me.X+me.Width/2+me.GetSpeedX()*me.getSpeedDirection()*2-me.CameraX),
 		float32(me.Y+me.Height/2-me.CameraY),
 		1,
 		me.GetAimLineColor(),
