@@ -112,7 +112,7 @@ func (me *Game) updateGameScene(deltaTime float64) {
 func (me *Game) draw(screen *ebiten.Image) {
 	if me.mode == me.GetModeMenu() {
 		me.drawEbitenReverse(screen)
-		me.drawCatAnimation(screen)
+		me.drawCatAnimationTop(screen)
 		me.menu.Draw(screen)
 	} else if me.mode == me.GetModeGame() {
 		me.gameScene.Draw(screen)
@@ -126,11 +126,21 @@ func (me *Game) drawEbitenReverse(screen *ebiten.Image) {
 	screen.DrawImage(me.ebitengineReverseImage, &drawOptions)
 }
 
-func (me *Game) drawCatAnimation(screen *ebiten.Image) {
+func (me *Game) drawCatAnimationBottom(screen *ebiten.Image) {
 	var drawOptions = ebiten.DrawImageOptions{}
 	drawOptions.GeoM.Scale(-1, 1)
 	drawOptions.GeoM.Rotate(math.Pi)
 	drawOptions.GeoM.Translate(285, 229)
+
+	var spriteShiftX = float64(int(me.catRunFrame)) * CAT_RUN_ANIMATION_FRAME_WIDTH
+	var rect = GetShiftedRectangle(spriteShiftX, CAT_RUN_ANIMATION_FRAME_WIDTH)
+	screen.DrawImage(me.catWalkImage.SubImage(rect).(*ebiten.Image), &drawOptions)
+}
+
+func (me *Game) drawCatAnimationTop(screen *ebiten.Image) {
+	var drawOptions = ebiten.DrawImageOptions{}
+	drawOptions.GeoM.Scale(-1, 1)
+	drawOptions.GeoM.Translate(320, 25)
 
 	var spriteShiftX = float64(int(me.catRunFrame)) * CAT_RUN_ANIMATION_FRAME_WIDTH
 	var rect = GetShiftedRectangle(spriteShiftX, CAT_RUN_ANIMATION_FRAME_WIDTH)
