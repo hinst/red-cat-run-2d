@@ -4,7 +4,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-type GameScene struct {
+type GameSceneHorizontal struct {
 	// Initialization input parameter
 	ViewHeight float64
 	// Initialization input parameter
@@ -24,7 +24,7 @@ type GameScene struct {
 
 const GAME_SCENE_TRANSITION_TIME = 2
 
-func (me *GameScene) Initialize() {
+func (me *GameSceneHorizontal) Initialize() {
 	me.terrainMan.ViewWidth = me.ViewWidth
 	me.terrainMan.ViewHeight = me.ViewHeight
 	me.terrainMan.AreaWidth = 100
@@ -45,7 +45,7 @@ func (me *GameScene) Initialize() {
 	me.dustMan.Initialize()
 }
 
-func (me *GameScene) Update(deltaTime float64) {
+func (me *GameSceneHorizontal) Update(deltaTime float64) {
 	me.terrainMan.Update(deltaTime)
 	if me.transitionTimeRemaining == 0 {
 		if me.catEntity.Status == CAT_ENTITY_STATUS_RUN && !me.CheckCatHold() {
@@ -75,7 +75,7 @@ func (me *GameScene) Update(deltaTime float64) {
 	me.dustMan.Update(deltaTime)
 }
 
-func (me *GameScene) Draw(screen *ebiten.Image) {
+func (me *GameSceneHorizontal) Draw(screen *ebiten.Image) {
 	me.dustMan.Draw(screen)
 
 	me.catEntity.CameraX = me.cameraX
@@ -87,20 +87,20 @@ func (me *GameScene) Draw(screen *ebiten.Image) {
 	me.terrainMan.Draw(screen)
 }
 
-func (me *GameScene) GetFloorY() float64 {
+func (me *GameSceneHorizontal) GetFloorY() float64 {
 	return 200
 }
 
-func (me *GameScene) GetCeilingY() float64 {
+func (me *GameSceneHorizontal) GetCeilingY() float64 {
 	return 40
 }
 
 // The distance from left view border to the cat
-func (me *GameScene) GetCatViewX() float64 {
+func (me *GameSceneHorizontal) GetCatViewX() float64 {
 	return 10
 }
 
-func (me *GameScene) CheckCatHold() bool {
+func (me *GameSceneHorizontal) CheckCatHold() bool {
 	for _, block := range me.terrainMan.GetBlocks() {
 		var isFittingBlock = me.catEntity.Location == block.Location
 		if isFittingBlock {
@@ -117,25 +117,25 @@ func (me *GameScene) CheckCatHold() bool {
 	return false
 }
 
-func (me *GameScene) CheckCatAtRightEndOfTerrain() bool {
+func (me *GameSceneHorizontal) CheckCatAtRightEndOfTerrain() bool {
 	var catRight = me.catEntity.X + me.catEntity.Width
 	return catRight >= me.GetAreaWidth()
 }
 
 // Measurement unit: pixels
-func (me *GameScene) GetAreaWidth() float64 {
+func (me *GameSceneHorizontal) GetAreaWidth() float64 {
 	return float64(me.terrainMan.AreaWidth) * float64(me.terrainMan.GetTileWidth())
 }
 
-func (me *GameScene) getCameraXGoingRight() float64 {
+func (me *GameSceneHorizontal) getCameraXGoingRight() float64 {
 	return me.catEntity.X - me.GetCatViewX()
 }
 
-func (me *GameScene) getCameraXGoingLeft() float64 {
+func (me *GameSceneHorizontal) getCameraXGoingLeft() float64 {
 	return me.catEntity.X + me.catEntity.Width - me.ViewWidth + me.GetCatViewX()
 }
 
-func (me *GameScene) switchDirection() {
+func (me *GameSceneHorizontal) switchDirection() {
 	me.transitionTimeRemaining = GAME_SCENE_TRANSITION_TIME
 	me.catEntity.Direction = DIRECTION_LEFT
 	me.terrainMan.Shuffle()

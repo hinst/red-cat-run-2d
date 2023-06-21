@@ -24,7 +24,7 @@ type Game struct {
 	justPressedKeys []ebiten.Key
 	pressedKeys     []ebiten.Key
 	menu            MenuUserInterface
-	gameScene       GameScene
+	gameScene       GameSceneHorizontal
 	gameInfoScene   GameInfoScene
 	isExiting       bool
 	mode            GameMode
@@ -74,7 +74,7 @@ func (me *Game) Initialize() {
 			},
 		},
 	}
-	me.gameScene = GameScene{}
+	me.gameScene = GameSceneHorizontal{}
 	me.gameScene.ViewWidth = me.viewWidth
 	me.gameScene.ViewHeight = me.viewHeight
 	me.gameScene.Initialize()
