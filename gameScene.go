@@ -69,13 +69,13 @@ func (me *GameScene) Update(deltaTime float64) {
 }
 
 func (me *GameScene) Draw(screen *ebiten.Image) {
-	me.terrainMan.CameraX = me.cameraX
-	me.terrainMan.CameraY = me.cameraY
-	me.terrainMan.Draw(screen)
-
 	me.catEntity.CameraX = me.cameraX
 	me.catEntity.CameraY = me.cameraY
 	me.catEntity.Draw(screen)
+
+	me.terrainMan.CameraX = me.cameraX
+	me.terrainMan.CameraY = me.cameraY
+	me.terrainMan.Draw(screen)
 }
 
 func (me *GameScene) GetFloorY() float64 {
