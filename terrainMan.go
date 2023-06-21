@@ -107,11 +107,11 @@ func (me *TerrainMan) Draw(screen *ebiten.Image) {
 		if int(me.waterBlockAnimationTime) == 1 {
 			ScaleCentered(&drawOptions, float64(me.GetTileWidth()), float64(me.GetTileHeight()), -1, 1)
 		}
-		drawOptions.GeoM.Translate(x, me.FloorY)
+		drawOptions.GeoM.Translate(x, me.FloorY+2*float64(me.GetTileWidth()))
 		screen.DrawImage(me.waterBlockImageTop, &drawOptions)
-		for yIndex := 0; yIndex < 3; yIndex++ {
+		for yIndex := 0; yIndex < 1; yIndex++ {
 			var drawOptions ebiten.DrawImageOptions
-			drawOptions.GeoM.Translate(x, me.FloorY+float64(yIndex+1)*float64(me.GetTileHeight()))
+			drawOptions.GeoM.Translate(x, me.FloorY+float64(yIndex+3)*float64(me.GetTileHeight()))
 			screen.DrawImage(me.waterBlockImage, &drawOptions)
 		}
 	}
