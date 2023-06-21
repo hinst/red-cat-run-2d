@@ -16,6 +16,7 @@ type GameScene struct {
 
 	terrainMan              TerrainMan
 	catEntity               CatEntity
+	dustMan                 DustMan
 	cameraX                 float64
 	cameraY                 float64
 	transitionTimeRemaining float64
@@ -24,19 +25,24 @@ type GameScene struct {
 const GAME_SCENE_TRANSITION_TIME = 2
 
 func (me *GameScene) Initialize() {
-	me.terrainMan.ViewHeight = me.ViewHeight
 	me.terrainMan.ViewWidth = me.ViewWidth
+	me.terrainMan.ViewHeight = me.ViewHeight
 	me.terrainMan.AreaWidth = 100
 	me.terrainMan.FloorY = me.GetFloorY()
 	me.terrainMan.CeilingY = me.GetCeilingY()
 	me.terrainMan.Initialize()
 
-	me.catEntity.ViewHeight = me.ViewHeight
 	me.catEntity.ViewWidth = me.ViewWidth
+	me.catEntity.ViewHeight = me.ViewHeight
 	me.catEntity.X = me.GetCatViewX()
 	me.catEntity.FloorY = me.GetFloorY()
 	me.catEntity.CeilingY = me.GetCeilingY()
 	me.catEntity.Initialize()
+
+	me.dustMan.ViewWidth = me.ViewWidth
+	me.dustMan.ViewHeight = me.ViewHeight
+	me.dustMan.AreaWidth = me.GetAreaWidth()
+	me.dustMan.Initialize()
 }
 
 func (me *GameScene) Update(deltaTime float64) {
@@ -66,9 +72,13 @@ func (me *GameScene) Update(deltaTime float64) {
 		}
 		me.cameraX = me.getCameraXGoingLeft() + me.transitionTimeRemaining*(me.getCameraXGoingRight()-me.getCameraXGoingLeft())/2
 	}
+	me.dustMan.CameraX = me.cameraX
+	me.dustMan.Update(deltaTime)
 }
 
 func (me *GameScene) Draw(screen *ebiten.Image) {
+	me.dustMan.Draw(screen)
+
 	me.catEntity.CameraX = me.cameraX
 	me.catEntity.CameraY = me.cameraY
 	me.catEntity.Draw(screen)
@@ -110,8 +120,12 @@ func (me *GameScene) CheckCatHold() bool {
 
 func (me *GameScene) CheckCatAtRightEndOfTerrain() bool {
 	var catRight = me.catEntity.X + me.catEntity.Width
-	var terrainRight = float64(me.terrainMan.AreaWidth) * float64(me.terrainMan.GetTileWidth())
-	return catRight >= terrainRight
+	return catRight >= me.GetAreaWidth()
+}
+
+// Measurement unit: pixels
+func (me *GameScene) GetAreaWidth() float64 {
+	return float64(me.terrainMan.AreaWidth) * float64(me.terrainMan.GetTileWidth())
 }
 
 func (me *GameScene) getCameraXGoingRight() float64 {
