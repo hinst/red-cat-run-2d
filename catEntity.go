@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"image"
 	"image/color"
+	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
@@ -47,6 +48,7 @@ type CatEntity struct {
 	DebugModeEnabled            bool
 	Direction                   Direction
 	horizontalJumpTimeRemaining float64
+	aimLineAnimationTime        float64
 
 	runImage *ebiten.Image
 	runFrame float64
@@ -82,6 +84,10 @@ func (me *CatEntity) Update(deltaTime float64) {
 		me.updateDead(deltaTime)
 	}
 	me.X += deltaTime * me.GetSpeedX() * me.getSpeedDirection()
+	me.aimLineAnimationTime += deltaTime * math.Pi
+	for me.aimLineAnimationTime > math.Pi {
+		me.aimLineAnimationTime -= math.Pi
+	}
 }
 
 func (me *CatEntity) getSpeedDirection() (speedDirection float64) {
@@ -315,7 +321,7 @@ func (me *CatEntity) GetForwardJumpSpeedY() float64 {
 }
 
 func (me *CatEntity) GetAimLineColor() color.Color {
-	return color.RGBA{R: 168, G: 111, B: 50, A: 255}
+	return color.NRGBA{R: 168, G: 111, B: 50, A: 100 + uint8(155*math.Sin(me.aimLineAnimationTime))}
 }
 
 func (me *CatEntity) GetRunFramePerSecond() float64 {
