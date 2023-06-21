@@ -24,7 +24,7 @@ type DustMan struct {
 const DUST_MAN_DISTANCE_BETWEEN_PARTICLES = 50
 
 func (me *DustMan) Initialize() {
-	for i := float64(0); i < me.AreaWidth; i += DUST_MAN_DISTANCE_BETWEEN_PARTICLES {
+	for i := -me.ViewWidth; i < me.AreaWidth+me.ViewWidth; i += DUST_MAN_DISTANCE_BETWEEN_PARTICLES {
 		var y = rand.Intn(RoundFloat64ToInt(me.ViewHeight))
 		var x = i - 5 + float64(rand.Intn(10))
 		var particle = FloatPoint{X: x, Y: float64(y)}

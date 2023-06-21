@@ -62,8 +62,7 @@ func (me *GameScene) Update(deltaTime float64) {
 			}
 		}
 		if me.CheckCatAtRightEndOfTerrain() && me.catEntity.Direction == DIRECTION_RIGHT {
-			me.transitionTimeRemaining = GAME_SCENE_TRANSITION_TIME
-			me.catEntity.Direction = DIRECTION_LEFT
+			me.switchDirection()
 		}
 	} else {
 		me.transitionTimeRemaining -= deltaTime
@@ -134,4 +133,10 @@ func (me *GameScene) getCameraXGoingRight() float64 {
 
 func (me *GameScene) getCameraXGoingLeft() float64 {
 	return me.catEntity.X + me.catEntity.Width - me.ViewWidth + me.GetCatViewX()
+}
+
+func (me *GameScene) switchDirection() {
+	me.transitionTimeRemaining = GAME_SCENE_TRANSITION_TIME
+	me.catEntity.Direction = DIRECTION_LEFT
+	me.terrainMan.Shuffle()
 }
