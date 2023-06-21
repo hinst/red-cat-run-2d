@@ -99,11 +99,14 @@ func (me *TerrainMan) Draw(screen *ebiten.Image) {
 	for _, block := range me.blocks {
 		if me.CheckBlockVisible(block) {
 			var drawOptions ebiten.DrawImageOptions
+			if block.Location == TERRAIN_LOCATION_CEILING {
+				ScaleCentered(&drawOptions, float64(me.GetTileWidth()), float64(me.GetTileHeight()), 1, -1)
+			}
 			drawOptions.GeoM.Translate(-me.CameraX, -me.CameraY)
 			drawOptions.GeoM.Translate(float64(me.GetTileWidth())*float64(block.X), 0)
 			if block.Location == TERRAIN_LOCATION_FLOOR {
 				drawOptions.GeoM.Translate(0, me.FloorY)
-			} else {
+			} else if block.Location == TERRAIN_LOCATION_CEILING {
 				drawOptions.GeoM.Translate(0, me.CeilingY-float64(me.GetTileHeight()))
 			}
 			for i := 0; i < block.Width; i++ {
