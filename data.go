@@ -17,4 +17,8 @@ var (
 	DIRT_BLOCK_IMAGE_BYTES []byte
 	//go:embed data/ebitengine-reverse.png
 	EBITENGINE_REVERSE_IMAGE_BYTES []byte
+	//go:embed data/waterBlockTop.png
+	WATER_BLOCK_TOP_IMAGE_BYTES []byte
+	//go:embed data/waterBlock.png
+	WATER_BLOCK_IMAGE_BYTES []byte
 )

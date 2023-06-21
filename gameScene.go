@@ -40,6 +40,7 @@ func (me *GameScene) Initialize() {
 }
 
 func (me *GameScene) Update(deltaTime float64) {
+	me.terrainMan.Update(deltaTime)
 	if me.transitionTimeRemaining == 0 {
 		if me.catEntity.Status == CAT_ENTITY_STATUS_RUN && !me.CheckCatHold() {
 			me.catEntity.Status = CAT_ENTITY_STATUS_DEAD

@@ -1,8 +1,6 @@
 package main
 
 import (
-	"bytes"
-	"image"
 	"math/rand"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -24,9 +22,12 @@ type TerrainMan struct {
 	// Input parameter for every draw. Measurement unit: pixels
 	CameraY float64
 
-	brickBlockImage *ebiten.Image
-	blocks          []*TerrainBlock
-	dirtBlockImage  *ebiten.Image
+	brickBlockImage         *ebiten.Image
+	blocks                  []*TerrainBlock
+	dirtBlockImage          *ebiten.Image
+	waterBlockImageTop      *ebiten.Image
+	waterBlockImage         *ebiten.Image
+	waterBlockAnimationTime float64
 }
 
 func (me *TerrainMan) GetMinBlockWidth() int {
@@ -61,12 +62,10 @@ func (me *TerrainMan) GetTileHeight() int {
 }
 
 func (me *TerrainMan) Initialize() {
-	var brickBlockImage, _, brickBlockImageError = image.Decode(bytes.NewReader(BRICK_BLOCK_IMAGE_BYTES))
-	AssertError(brickBlockImageError)
-	me.brickBlockImage = ebiten.NewImageFromImage(brickBlockImage)
-	var dirtBlockImage, _, dirtBlockImageError = image.Decode(bytes.NewReader(DIRT_BLOCK_IMAGE_BYTES))
-	AssertError(dirtBlockImageError)
-	me.dirtBlockImage = ebiten.NewImageFromImage(dirtBlockImage)
+	me.brickBlockImage = LoadImage(BRICK_BLOCK_IMAGE_BYTES)
+	me.dirtBlockImage = LoadImage(DIRT_BLOCK_IMAGE_BYTES)
+	me.waterBlockImageTop = LoadImage(WATER_BLOCK_TOP_IMAGE_BYTES)
+	me.waterBlockImage = LoadImage(WATER_BLOCK_IMAGE_BYTES)
 	for me.GetLastBlock() == nil || me.GetLastBlock().X+me.GetLastBlock().Width < me.AreaWidth {
 		var block = &TerrainBlock{}
 		if me.GetLastBlock() == nil {
@@ -95,7 +94,27 @@ func (me *TerrainMan) GetLastBlock() *TerrainBlock {
 	}
 }
 
+func (me *TerrainMan) Update(deltaTime float64) {
+	me.waterBlockAnimationTime += deltaTime * 2
+	if me.waterBlockAnimationTime >= 2 {
+		me.waterBlockAnimationTime = 0
+	}
+}
+
 func (me *TerrainMan) Draw(screen *ebiten.Image) {
+	for x := -float64(RoundFloat64ToInt(me.CameraX)%me.GetTileWidth()) - float64(me.GetTileWidth()); x < me.ViewWidth; x += float64(me.GetTileWidth()) {
+		var drawOptions ebiten.DrawImageOptions
+		if int(me.waterBlockAnimationTime) == 1 {
+			ScaleCentered(&drawOptions, float64(me.GetTileWidth()), float64(me.GetTileHeight()), -1, 1)
+		}
+		drawOptions.GeoM.Translate(x, me.FloorY)
+		screen.DrawImage(me.waterBlockImageTop, &drawOptions)
+		for yIndex := 0; yIndex < 3; yIndex++ {
+			var drawOptions ebiten.DrawImageOptions
+			drawOptions.GeoM.Translate(x, me.FloorY+float64(yIndex+1)*float64(me.GetTileHeight()))
+			screen.DrawImage(me.waterBlockImage, &drawOptions)
+		}
+	}
 	for _, block := range me.blocks {
 		if me.CheckBlockVisible(block) {
 			var drawOptions ebiten.DrawImageOptions
