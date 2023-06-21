@@ -20,6 +20,7 @@ type GameSceneHorizontal struct {
 	cameraX                 float64
 	cameraY                 float64
 	transitionTimeRemaining float64
+	fishImage               *ebiten.Image
 }
 
 const GAME_SCENE_TRANSITION_TIME = 2
@@ -27,7 +28,7 @@ const GAME_SCENE_TRANSITION_TIME = 2
 func (me *GameSceneHorizontal) Initialize() {
 	me.terrainMan.ViewWidth = me.ViewWidth
 	me.terrainMan.ViewHeight = me.ViewHeight
-	me.terrainMan.AreaWidth = 100
+	me.terrainMan.AreaWidth = 50
 	me.terrainMan.FloorY = me.GetFloorY()
 	me.terrainMan.CeilingY = me.GetCeilingY()
 	me.terrainMan.Initialize()
@@ -43,6 +44,8 @@ func (me *GameSceneHorizontal) Initialize() {
 	me.dustMan.ViewHeight = me.ViewHeight
 	me.dustMan.AreaWidth = me.GetAreaWidth()
 	me.dustMan.Initialize()
+
+	me.fishImage = LoadImage(FISH_IMAGE_BYTES)
 }
 
 func (me *GameSceneHorizontal) Update(deltaTime float64) {
@@ -77,6 +80,7 @@ func (me *GameSceneHorizontal) Update(deltaTime float64) {
 
 func (me *GameSceneHorizontal) Draw(screen *ebiten.Image) {
 	me.dustMan.Draw(screen)
+	me.drawFish(screen)
 
 	me.catEntity.CameraX = me.cameraX
 	me.catEntity.CameraY = me.cameraY
@@ -139,4 +143,20 @@ func (me *GameSceneHorizontal) switchDirection() {
 	me.transitionTimeRemaining = GAME_SCENE_TRANSITION_TIME
 	me.catEntity.Direction = DIRECTION_LEFT
 	me.terrainMan.Shuffle()
+}
+
+func (me *GameSceneHorizontal) drawFish(screen *ebiten.Image) {
+	if me.catEntity.Direction == DIRECTION_RIGHT {
+		var drawOptions ebiten.DrawImageOptions
+		var y float64
+		if me.terrainMan.GetLastBlock().Location == TERRAIN_LOCATION_FLOOR {
+			y = me.GetFloorY() - float64(me.fishImage.Bounds().Dy())
+		} else if me.terrainMan.GetLastBlock().Location == TERRAIN_LOCATION_CEILING {
+			ScaleCentered(&drawOptions, float64(me.fishImage.Bounds().Dx()), float64(me.fishImage.Bounds().Dy()), 1, -1)
+			y = me.GetCeilingY()
+		}
+		var x = me.GetAreaWidth() - float64(me.fishImage.Bounds().Dx()) + 10
+		drawOptions.GeoM.Translate(x-me.cameraX, y)
+		screen.DrawImage(me.fishImage, &drawOptions)
+	}
 }
