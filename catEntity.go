@@ -56,11 +56,11 @@ type CatEntity struct {
 }
 
 func (me *CatEntity) Initialize() {
-	var catWalkImage, _, catWalkImageError = image.Decode(bytes.NewReader(catRun))
+	var catWalkImage, _, catWalkImageError = image.Decode(bytes.NewReader(CAT_RUN_IMAGE_BYTES))
 	AssertError(catWalkImageError)
 	me.runImage = ebiten.NewImageFromImage(catWalkImage)
 
-	var catDieImage, _, catDieImageError = image.Decode(bytes.NewReader(catDie))
+	var catDieImage, _, catDieImageError = image.Decode(bytes.NewReader(CAT_DIE_IMAGE_BYTES))
 	AssertError(catDieImageError)
 	me.dieImage = ebiten.NewImageFromImage(catDieImage)
 

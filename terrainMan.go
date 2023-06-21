@@ -61,10 +61,10 @@ func (me *TerrainMan) GetTileHeight() int {
 }
 
 func (me *TerrainMan) Initialize() {
-	var brickBlockImage, _, brickBlockImageError = image.Decode(bytes.NewReader(brickBlock))
+	var brickBlockImage, _, brickBlockImageError = image.Decode(bytes.NewReader(BRICK_BLOCK_IMAGE_BYTES))
 	AssertError(brickBlockImageError)
 	me.brickBlockImage = ebiten.NewImageFromImage(brickBlockImage)
-	var dirtBlockImage, _, dirtBlockImageError = image.Decode(bytes.NewReader(dirtBlock))
+	var dirtBlockImage, _, dirtBlockImageError = image.Decode(bytes.NewReader(DIRT_BLOCK_IMAGE_BYTES))
 	AssertError(dirtBlockImageError)
 	me.dirtBlockImage = ebiten.NewImageFromImage(dirtBlockImage)
 	for me.GetLastBlock() == nil || me.GetLastBlock().X+me.GetLastBlock().Width < me.AreaWidth {

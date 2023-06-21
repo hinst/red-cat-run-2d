@@ -5,14 +5,16 @@ import (
 )
 
 var (
+	//go:embed data/title.png
+	TITLE_IMAGE_BYTES []byte
 	//go:embed data/catWalk.png
-	catRun []byte
+	CAT_RUN_IMAGE_BYTES []byte
 	//go:embed data/catDie.png
-	catDie []byte
+	CAT_DIE_IMAGE_BYTES []byte
 	//go:embed data/brickBlock.png
-	brickBlock []byte
+	BRICK_BLOCK_IMAGE_BYTES []byte
 	//go:embed data/dirtBlock.png
-	dirtBlock []byte
+	DIRT_BLOCK_IMAGE_BYTES []byte
 	//go:embed data/ebitengine-reverse.png
-	ebitengineReverse []byte
+	EBITENGINE_REVERSE_IMAGE_BYTES []byte
 )

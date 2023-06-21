@@ -11,24 +11,44 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
+type GameMode int
+
+const (
+	GAME_MODE_MENU = iota
+	GAME_MODE_GAME
+	GAME_MODE_INFORMATION
+)
+
 type Game struct {
 	updateTime      time.Time
 	justPressedKeys []ebiten.Key
 	pressedKeys     []ebiten.Key
 	menu            MenuUserInterface
 	gameScene       GameScene
+	gameInfoScene   GameInfoScene
 	isExiting       bool
-	mode            int
+	mode            GameMode
 	viewWidth       float64
 	viewHeight      float64
 
+	titleImage             *ebiten.Image
 	ebitengineReverseImage *ebiten.Image
 	catWalkImage           *ebiten.Image
 	catRunFrame            float64
 }
 
+const (
+	GAME_MENU_ITEM_ID_NEW_GAME = iota
+	GAME_MENU_ITEM_ID_TOGGLE_FULL_SCREEN
+	GAME_MENU_ITEM_ID_INFORMATION
+	GAME_MENU_ITEM_ID_EXIT
+)
+
 func (me *Game) Initialize() {
-	var ebitengineReverseImage, _, ebitengineReverseImageError = image.Decode(bytes.NewReader(ebitengineReverse))
+	var titleImage, _, titleImageError = image.Decode(bytes.NewReader(TITLE_IMAGE_BYTES))
+	AssertError(titleImageError)
+	me.titleImage = ebiten.NewImageFromImage(titleImage)
+	var ebitengineReverseImage, _, ebitengineReverseImageError = image.Decode(bytes.NewReader(EBITENGINE_REVERSE_IMAGE_BYTES))
 	AssertError(ebitengineReverseImageError)
 	me.ebitengineReverseImage = ebiten.NewImageFromImage(ebitengineReverseImage)
 	me.viewWidth = 420
@@ -38,15 +58,19 @@ func (me *Game) Initialize() {
 		Items: []MenuUserInterfaceItem{
 			{
 				Title: "New Game",
-				Id:    1,
+				Id:    GAME_MENU_ITEM_ID_NEW_GAME,
 			},
 			{
 				Title: "Toggle Full Screen",
-				Id:    2,
+				Id:    GAME_MENU_ITEM_ID_TOGGLE_FULL_SCREEN,
+			},
+			{
+				Title: "Information",
+				Id:    GAME_MENU_ITEM_ID_INFORMATION,
 			},
 			{
 				Title: "Exit",
-				Id:    3,
+				Id:    GAME_MENU_ITEM_ID_EXIT,
 			},
 		},
 	}
@@ -55,7 +79,7 @@ func (me *Game) Initialize() {
 	me.gameScene.ViewHeight = me.viewHeight
 	me.gameScene.Initialize()
 
-	var catWalkImage, _, catImageError = image.Decode(bytes.NewReader(catRun))
+	var catWalkImage, _, catImageError = image.Decode(bytes.NewReader(CAT_RUN_IMAGE_BYTES))
 	AssertError(catImageError)
 	me.catWalkImage = ebiten.NewImageFromImage(catWalkImage)
 }
@@ -81,21 +105,42 @@ func (me *Game) Draw(screen *ebiten.Image) {
 }
 
 func (me *Game) update(deltaTime float64) {
-	if me.mode == me.GetModeMenu() {
+	if me.mode == GAME_MODE_MENU {
 		me.updateMenu(deltaTime)
-	} else if me.mode == me.GetModeGame() {
+	} else if me.mode == GAME_MODE_GAME {
 		me.updateGameScene(deltaTime)
+	} else if me.mode == GAME_MODE_INFORMATION {
+		if len(me.justPressedKeys) > 0 {
+			me.mode = GAME_MODE_MENU
+		}
+	}
+}
+
+func (me *Game) draw(screen *ebiten.Image) {
+	if me.mode == GAME_MODE_MENU {
+		if false {
+			me.drawTitle(screen)
+		}
+		me.drawEbitenReverse(screen)
+		me.drawCatAnimationTop(screen)
+		me.menu.Draw(screen)
+	} else if me.mode == GAME_MODE_GAME {
+		me.gameScene.Draw(screen)
+	} else if me.mode == GAME_MODE_INFORMATION {
+		me.gameInfoScene.Draw(screen)
 	}
 }
 
 func (me *Game) updateMenu(deltaTime float64) {
 	me.menu.JustPressedKeys = me.justPressedKeys
 	me.menu.Update(deltaTime)
-	if me.menu.PressedItemId == 1 {
-		me.mode = me.GetModeGame()
-	} else if me.menu.PressedItemId == 2 {
+	if me.menu.PressedItemId == GAME_MENU_ITEM_ID_NEW_GAME {
+		me.mode = GAME_MODE_GAME
+	} else if me.menu.PressedItemId == GAME_MENU_ITEM_ID_TOGGLE_FULL_SCREEN {
 		ebiten.SetFullscreen(!ebiten.IsFullscreen())
-	} else if me.menu.PressedItemId == 3 {
+	} else if me.menu.PressedItemId == GAME_MENU_ITEM_ID_INFORMATION {
+		me.mode = GAME_MODE_INFORMATION
+	} else if me.menu.PressedItemId == GAME_MENU_ITEM_ID_EXIT {
 		me.isExiting = true
 	}
 	me.catRunFrame += deltaTime * CAT_RUN_ANIMATION_FRAME_PER_SECOND
@@ -108,16 +153,6 @@ func (me *Game) updateGameScene(deltaTime float64) {
 	me.gameScene.PressedKeys = me.pressedKeys
 	me.gameScene.JustPressedKeys = me.justPressedKeys
 	me.gameScene.Update(deltaTime)
-}
-
-func (me *Game) draw(screen *ebiten.Image) {
-	if me.mode == me.GetModeMenu() {
-		me.drawEbitenReverse(screen)
-		me.drawCatAnimationTop(screen)
-		me.menu.Draw(screen)
-	} else if me.mode == me.GetModeGame() {
-		me.gameScene.Draw(screen)
-	}
 }
 
 func (me *Game) drawEbitenReverse(screen *ebiten.Image) {
@@ -152,10 +187,11 @@ func (me *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeig
 	return int(me.viewWidth), int(me.viewHeight)
 }
 
-func (me *Game) GetModeMenu() int {
-	return 0
-}
-
-func (me *Game) GetModeGame() int {
-	return 1
+func (me *Game) drawTitle(screen *ebiten.Image) {
+	var drawOptions = ebiten.DrawImageOptions{}
+	drawOptions.GeoM.Scale(0.6, 0.6)
+	drawOptions.GeoM.Translate(230, 210)
+	drawOptions.ColorScale.Scale(0.6, 0.6, 0.6, 1)
+	drawOptions.Filter = ebiten.FilterLinear
+	screen.DrawImage(me.titleImage, &drawOptions)
 }
