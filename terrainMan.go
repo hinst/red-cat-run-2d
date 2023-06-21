@@ -74,6 +74,10 @@ func (me *TerrainMan) Initialize() {
 			block.Width = me.GetExtendedBlockWidth()
 		} else {
 			block.Location = TerrainLocation(rand.Intn(2))
+			if me.getOngoingCountOfSameLocationBlocks() >= 3 {
+				block.Location = me.GetLastBlock().Location.GetOpposite()
+				println("Switch triggered")
+			}
 			var gap = GetRandomNumberBetween(me.GetMinGapWidth(), me.GetMaxGapWidth())
 			block.X = me.GetLastBlock().X + me.GetLastBlock().Width + gap
 			block.Width = GetRandomNumberBetween(me.GetMinBlockWidth(), me.GetMaxBlockWidth())
@@ -102,6 +106,35 @@ func (me *TerrainMan) Update(deltaTime float64) {
 }
 
 func (me *TerrainMan) Draw(screen *ebiten.Image) {
+	me.drawWater(screen)
+	me.drawBlocks(screen)
+}
+
+func (me *TerrainMan) CheckBlockVisible(terrainBlock *TerrainBlock) bool {
+	return CheckDualIntersect(
+		float64(me.GetTileWidth())*float64(terrainBlock.X),
+		float64(me.GetTileWidth())*float64(terrainBlock.X+terrainBlock.Width),
+		me.CameraX,
+		me.CameraX+me.ViewWidth,
+	)
+}
+
+func (me *TerrainMan) GetBlocks() []*TerrainBlock {
+	return me.blocks
+}
+
+func (me *TerrainMan) getOngoingCountOfSameLocationBlocks() (count int) {
+	for i := len(me.blocks) - 1; i >= 0; i-- {
+		if me.blocks[i].Location == me.GetLastBlock().Location {
+			count++
+		} else {
+			break
+		}
+	}
+	return
+}
+
+func (me *TerrainMan) drawWater(screen *ebiten.Image) {
 	for x := -float64(RoundFloat64ToInt(me.CameraX)%me.GetTileWidth()) - float64(me.GetTileWidth()); x < me.ViewWidth; x += float64(me.GetTileWidth()) {
 		var drawOptions ebiten.DrawImageOptions
 		if int(me.waterBlockAnimationTime) == 1 {
@@ -115,6 +148,9 @@ func (me *TerrainMan) Draw(screen *ebiten.Image) {
 			screen.DrawImage(me.waterBlockImage, &drawOptions)
 		}
 	}
+}
+
+func (me *TerrainMan) drawBlocks(screen *ebiten.Image) {
 	for _, block := range me.blocks {
 		if me.CheckBlockVisible(block) {
 			var drawOptions ebiten.DrawImageOptions
@@ -144,17 +180,4 @@ func (me *TerrainMan) Draw(screen *ebiten.Image) {
 			}
 		}
 	}
-}
-
-func (me *TerrainMan) CheckBlockVisible(terrainBlock *TerrainBlock) bool {
-	return CheckDualIntersect(
-		float64(me.GetTileWidth())*float64(terrainBlock.X),
-		float64(me.GetTileWidth())*float64(terrainBlock.X+terrainBlock.Width),
-		me.CameraX,
-		me.CameraX+me.ViewWidth,
-	)
-}
-
-func (me *TerrainMan) GetBlocks() []*TerrainBlock {
-	return me.blocks
 }
