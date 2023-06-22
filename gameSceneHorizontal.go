@@ -6,16 +6,16 @@ import (
 
 type GameSceneHorizontal struct {
 	// Initialization input parameter
-	ViewHeight float64
-	// Initialization input parameter
 	ViewWidth float64
+	// Initialization input parameter
+	ViewHeight float64
 	// Input parameter for every update
 	JustPressedKeys []ebiten.Key
 	// Input parameter for every update
 	PressedKeys []ebiten.Key
 
 	terrainMan              TerrainMan
-	catEntity               CatEntity
+	catEntity               CatEntityHorizontal
 	dustMan                 DustMan
 	cameraX                 float64
 	cameraY                 float64
