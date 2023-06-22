@@ -30,3 +30,6 @@ func (me *GameSceneVertical) Initialize() {
 func (me *GameSceneVertical) Draw(screen *ebiten.Image) {
 	me.catEntity.Draw(screen)
 }
+
+func (me *GameSceneVertical) Update(deltaTime float64) {
+}

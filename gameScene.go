@@ -6,6 +6,7 @@ type GameSceneStatus int
 
 const (
 	GAME_SCENE_STATUS_HORIZONTAL GameSceneStatus = iota
+	GAME_SCENE_STATUS_VERTICAL
 )
 
 type GameScene struct {
@@ -30,18 +31,27 @@ func (me *GameScene) Initialize() {
 	me.gameSceneVertical.ViewWidth = me.ViewWidth
 	me.gameSceneVertical.ViewHeight = me.ViewHeight
 	me.gameSceneVertical.Initialize()
+	me.Status = GAME_SCENE_STATUS_VERTICAL
 }
 
 func (me *GameScene) Update(deltaTime float64) {
-	if me.Status == GAME_SCENE_STATUS_HORIZONTAL {
+	switch me.Status {
+	case GAME_SCENE_STATUS_HORIZONTAL:
 		me.gameSceneHorizontal.JustPressedKeys = me.JustPressedKeys
 		me.gameSceneHorizontal.PressedKeys = me.PressedKeys
 		me.gameSceneHorizontal.Update(deltaTime)
+	case GAME_SCENE_STATUS_VERTICAL:
+		me.gameSceneVertical.JustPressedKeys = me.JustPressedKeys
+		me.gameSceneVertical.PressedKeys = me.PressedKeys
+		me.gameSceneVertical.Update(deltaTime)
 	}
 }
 
 func (me *GameScene) Draw(screen *ebiten.Image) {
-	if me.Status == GAME_SCENE_STATUS_HORIZONTAL {
+	switch me.Status {
+	case GAME_SCENE_STATUS_HORIZONTAL:
 		me.gameSceneHorizontal.Draw(screen)
+	case GAME_SCENE_STATUS_VERTICAL:
+		me.gameSceneVertical.Draw(screen)
 	}
 }

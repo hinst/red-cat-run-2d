@@ -193,11 +193,11 @@ func (me *CatEntityHorizontal) Draw(screen *ebiten.Image) {
 		me.Status == CAT_ENTITY_STATUS_JUMP_FORWARD
 	if isRunDrawMode {
 		var spriteShiftX = float64(int(me.runFrame)) * CAT_RUN_ANIMATION_FRAME_WIDTH
-		var rect = GetShiftedRectangle(spriteShiftX, CAT_RUN_ANIMATION_FRAME_WIDTH)
+		var rect = GetShiftedRectangle(spriteShiftX, CAT_RUN_ANIMATION_FRAME_WIDTH, float64(me.runImage.Bounds().Dy()))
 		screen.DrawImage(me.runImage.SubImage(rect).(*ebiten.Image), &drawOptions)
 	} else if me.Status == CAT_ENTITY_STATUS_DEAD {
 		var spriteShiftX = float64(int(me.dieFrame)) * CAT_RUN_ANIMATION_FRAME_WIDTH
-		var rect = GetShiftedRectangle(spriteShiftX, CAT_RUN_ANIMATION_FRAME_WIDTH)
+		var rect = GetShiftedRectangle(spriteShiftX, CAT_RUN_ANIMATION_FRAME_WIDTH, float64(me.dieImage.Bounds().Dy()))
 		screen.DrawImage(me.dieImage.SubImage(rect).(*ebiten.Image), &drawOptions)
 	}
 }

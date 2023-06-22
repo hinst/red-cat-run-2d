@@ -173,7 +173,7 @@ func (me *Game) drawCatAnimationBottom(screen *ebiten.Image) {
 	drawOptions.GeoM.Translate(285, 229)
 
 	var spriteShiftX = float64(int(me.catRunFrame)) * CAT_RUN_ANIMATION_FRAME_WIDTH
-	var rect = GetShiftedRectangle(spriteShiftX, CAT_RUN_ANIMATION_FRAME_WIDTH)
+	var rect = GetShiftedRectangle(spriteShiftX, CAT_RUN_ANIMATION_FRAME_WIDTH, float64(me.catWalkImage.Bounds().Dy()))
 	screen.DrawImage(me.catWalkImage.SubImage(rect).(*ebiten.Image), &drawOptions)
 }
 
@@ -183,7 +183,7 @@ func (me *Game) drawCatAnimationTop(screen *ebiten.Image) {
 	drawOptions.GeoM.Translate(320, 25)
 
 	var spriteShiftX = float64(int(me.catRunFrame)) * CAT_RUN_ANIMATION_FRAME_WIDTH
-	var rect = GetShiftedRectangle(spriteShiftX, CAT_RUN_ANIMATION_FRAME_WIDTH)
+	var rect = GetShiftedRectangle(spriteShiftX, CAT_RUN_ANIMATION_FRAME_WIDTH, float64(me.catWalkImage.Bounds().Dy()))
 	screen.DrawImage(me.catWalkImage.SubImage(rect).(*ebiten.Image), &drawOptions)
 }
 

@@ -23,4 +23,6 @@ var (
 	WATER_BLOCK_IMAGE_BYTES []byte
 	//go:embed data/fish.png
 	FISH_IMAGE_BYTES []byte
+	//go:embed data/catFlyDown.png
+	CAT_FLY_DOWN_IMAGE_BYTES []byte
 )

@@ -14,9 +14,9 @@ func ScaleCentered(drawOptions *ebiten.DrawImageOptions, width float64, height f
 	drawOptions.GeoM.Translate(halfWidth, halfHeight)
 }
 
-func GetShiftedRectangle(shiftX float64, frameWidth float64) image.Rectangle {
+func GetShiftedRectangle(shiftX float64, frameWidth float64, frameHeight float64) image.Rectangle {
 	return image.Rect(
 		RoundFloat64ToInt(shiftX), 0,
-		RoundFloat64ToInt(shiftX+frameWidth), RoundFloat64ToInt(frameWidth),
+		RoundFloat64ToInt(shiftX+frameWidth), RoundFloat64ToInt(frameHeight),
 	)
 }
