@@ -17,7 +17,8 @@ func (me *GameInfoScene) Draw(screen *ebiten.Image) {
 		"\n" +
 		"GAME INFO:\n" +
 		"Game RED CAT RUN 2D produced for Ebitengine Game Jam 2023\n" +
-		"Author username: hinst on GitHub, alexsharp on Discord\n"
+		"Author username: hinst on GitHub, alexsharp on Discord\n" +
+		"Some images were sourced from craftpix.net"
 	var x = 4
 	var y = 4
 	ebitenutil.DebugPrintAt(screen, text, x, y)
