@@ -1,6 +1,10 @@
 package main
 
-import "github.com/hajimehoshi/ebiten/v2"
+import (
+	"log"
+
+	"github.com/hajimehoshi/ebiten/v2"
+)
 
 type GameSceneVertical struct {
 	// Initialization input parameter
@@ -16,4 +20,13 @@ type GameSceneVertical struct {
 }
 
 func (me *GameSceneVertical) Initialize() {
+	if me.ViewHeight == 0 || me.ViewWidth == 0 {
+		log.Println("Warning: view size is missing")
+	}
+	me.catEntity.Initialize()
+	me.catEntity.X = me.ViewWidth/2 - me.catEntity.Width/2
+}
+
+func (me *GameSceneVertical) Draw(screen *ebiten.Image) {
+	me.catEntity.Draw(screen)
 }
