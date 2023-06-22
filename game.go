@@ -24,7 +24,7 @@ type Game struct {
 	justPressedKeys []ebiten.Key
 	pressedKeys     []ebiten.Key
 	menu            MenuUserInterface
-	gameScene       GameScene
+	gameScene       *GameScene
 	gameInfoScene   GameInfoScene
 	isExiting       bool
 	mode            GameMode
@@ -74,14 +74,17 @@ func (me *Game) Initialize() {
 			},
 		},
 	}
-	me.gameScene = GameScene{}
-	me.gameScene.ViewWidth = me.viewWidth
-	me.gameScene.ViewHeight = me.viewHeight
-	me.gameScene.Initialize()
 
 	var catWalkImage, _, catImageError = image.Decode(bytes.NewReader(CAT_RUN_IMAGE_BYTES))
 	AssertError(catImageError)
 	me.catWalkImage = ebiten.NewImageFromImage(catWalkImage)
+}
+
+func (me *Game) initializeGameScene() {
+	me.gameScene = &GameScene{}
+	me.gameScene.ViewWidth = me.viewWidth
+	me.gameScene.ViewHeight = me.viewHeight
+	me.gameScene.Initialize()
 }
 
 func (me *Game) Update() error {
@@ -136,6 +139,7 @@ func (me *Game) updateMenu(deltaTime float64) {
 	me.menu.Update(deltaTime)
 	if me.menu.PressedItemId == GAME_MENU_ITEM_ID_NEW_GAME {
 		me.mode = GAME_MODE_GAME
+		me.initializeGameScene()
 	} else if me.menu.PressedItemId == GAME_MENU_ITEM_ID_TOGGLE_FULL_SCREEN {
 		ebiten.SetFullscreen(!ebiten.IsFullscreen())
 	} else if me.menu.PressedItemId == GAME_MENU_ITEM_ID_INFORMATION {
