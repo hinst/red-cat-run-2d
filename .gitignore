@@ -1,2 +1,5 @@
 /red-cat-run-2d.exe
 *.png~
+*.kra~
+/red-cat-run-2d.js
+/red-cat-run-2d.wasm
