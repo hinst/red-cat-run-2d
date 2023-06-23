@@ -63,7 +63,9 @@ func (me *CatEntityHorizontal) Update(deltaTime float64) {
 	} else if me.Status == CAT_ENTITY_STATUS_DEAD {
 		me.updateDead(deltaTime)
 	}
-	me.X += deltaTime * me.GetSpeedX() * me.getSpeedDirection()
+	if -me.Height < me.Y && me.Y < me.ViewHeight {
+		me.X += deltaTime * me.GetSpeedX() * me.getSpeedDirection()
+	}
 	me.aimLineAnimationTime += deltaTime * math.Pi
 	for me.aimLineAnimationTime > math.Pi {
 		me.aimLineAnimationTime -= math.Pi
