@@ -25,4 +25,6 @@ var (
 	FISH_IMAGE_BYTES []byte
 	//go:embed data/catFlyDown.png
 	CAT_FLY_DOWN_IMAGE_BYTES []byte
+	//go:embed data/torch.png
+	TORCH_IMAGE_BYTES []byte
 )

@@ -82,12 +82,14 @@ func (me *GameSceneHorizontal) Draw(screen *ebiten.Image) {
 	me.dustMan.Draw(screen)
 	me.drawFish(screen)
 
+	me.terrainMan.CameraX = me.cameraX
+	me.terrainMan.CameraY = me.cameraY
+	me.terrainMan.DrawLowerLayer(screen)
+
 	me.catEntity.CameraX = me.cameraX
 	me.catEntity.CameraY = me.cameraY
 	me.catEntity.Draw(screen)
 
-	me.terrainMan.CameraX = me.cameraX
-	me.terrainMan.CameraY = me.cameraY
 	me.terrainMan.Draw(screen)
 }
 

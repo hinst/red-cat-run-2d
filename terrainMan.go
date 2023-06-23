@@ -28,6 +28,7 @@ type TerrainMan struct {
 	waterBlockImageTop      *ebiten.Image
 	waterBlockImage         *ebiten.Image
 	waterBlockAnimationTime float64
+	torchImage              *ebiten.Image
 }
 
 func (me *TerrainMan) GetMinBlockWidth() int {
@@ -66,6 +67,7 @@ func (me *TerrainMan) Initialize() {
 	me.dirtBlockImage = LoadImage(DIRT_BLOCK_IMAGE_BYTES)
 	me.waterBlockImageTop = LoadImage(WATER_BLOCK_TOP_IMAGE_BYTES)
 	me.waterBlockImage = LoadImage(WATER_BLOCK_IMAGE_BYTES)
+	me.torchImage = LoadImage(TORCH_IMAGE_BYTES)
 	for me.GetLastBlock() == nil || me.GetLastBlock().X+me.GetLastBlock().Width < me.AreaWidth {
 		var block = &TerrainBlock{}
 		if me.GetLastBlock() == nil {
@@ -108,6 +110,16 @@ func (me *TerrainMan) Update(deltaTime float64) {
 func (me *TerrainMan) Draw(screen *ebiten.Image) {
 	me.drawWater(screen)
 	me.drawBlocks(screen)
+}
+
+func (me *TerrainMan) DrawLowerLayer(screen *ebiten.Image) {
+	for index, block := range me.blocks {
+		var isLastBlock = index == len(me.blocks)-1
+		if !isLastBlock {
+			var nextBlock = me.blocks[index+1]
+			me.drawTorch(screen, block, nextBlock)
+		}
+	}
 }
 
 func (me *TerrainMan) CheckBlockVisible(terrainBlock *TerrainBlock) bool {
@@ -190,4 +202,13 @@ func (me *TerrainMan) Shuffle() {
 			me.blocks[i].Location = TerrainLocation(rand.Intn(2))
 		}
 	}
+}
+
+func (me *TerrainMan) drawTorch(screen *ebiten.Image, leftBlock *TerrainBlock, rightBlock *TerrainBlock) {
+	var x = float64((leftBlock.X+leftBlock.Width+rightBlock.X))*float64(me.GetTileWidth())/2 - float64(me.torchImage.Bounds().Dx()/2) - me.CameraX
+	var y = me.CeilingY/2 - float64(me.torchImage.Bounds().Dy()/2) - me.CameraY
+	var drawOptions ebiten.DrawImageOptions
+	ScaleCentered(&drawOptions, float64(me.torchImage.Bounds().Dx()), float64(me.torchImage.Bounds().Dy()), 0.5, 0.5)
+	drawOptions.GeoM.Translate(x, y)
+	screen.DrawImage(me.torchImage, &drawOptions)
 }
