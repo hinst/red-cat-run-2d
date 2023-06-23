@@ -2,6 +2,7 @@ package main
 
 import (
 	"math/rand"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -205,10 +206,22 @@ func (me *TerrainMan) Shuffle() {
 }
 
 func (me *TerrainMan) drawTorch(screen *ebiten.Image, leftBlock *TerrainBlock, rightBlock *TerrainBlock) {
-	var x = float64((leftBlock.X+leftBlock.Width+rightBlock.X))*float64(me.GetTileWidth())/2 - float64(me.torchImage.Bounds().Dx()/2) - me.CameraX
-	var y = me.CeilingY/2 - float64(me.torchImage.Bounds().Dy()/2) - me.CameraY
+	const SCALE = 0.5
+	var imageWidth = me.torchImage.Bounds().Dx()
+	var imageHeight = me.torchImage.Bounds().Dy()
 	var drawOptions ebiten.DrawImageOptions
-	ScaleCentered(&drawOptions, float64(me.torchImage.Bounds().Dx()), float64(me.torchImage.Bounds().Dy()), 0.5, 0.5)
-	drawOptions.GeoM.Translate(x, y)
-	screen.DrawImage(me.torchImage, &drawOptions)
+	var xScaleMultiplier float64 = 1
+	if time.Now().Second()%2 == 0 {
+		xScaleMultiplier = -1
+	}
+	ScaleCentered(&drawOptions, float64(imageWidth), float64(imageHeight), SCALE*xScaleMultiplier, SCALE)
+	var x = float64((leftBlock.X+leftBlock.Width+rightBlock.X))*float64(me.GetTileWidth())/2 -
+		float64(me.torchImage.Bounds().Dx()/2)*SCALE
+	var y = me.CeilingY/2 - float64(me.torchImage.Bounds().Dy()/2)*SCALE
+	var visible = me.CameraX-float64(imageWidth)*SCALE <= x &&
+		x <= me.CameraX+me.ViewWidth+float64(imageWidth)*SCALE
+	if visible {
+		drawOptions.GeoM.Translate(x-me.CameraX, y-me.CameraY)
+		screen.DrawImage(me.torchImage, &drawOptions)
+	}
 }
