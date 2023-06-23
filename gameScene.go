@@ -31,7 +31,7 @@ func (me *GameScene) Initialize() {
 	me.gameSceneVertical.ViewWidth = me.ViewWidth
 	me.gameSceneVertical.ViewHeight = me.ViewHeight
 	me.gameSceneVertical.Initialize()
-	me.Status = GAME_SCENE_STATUS_HORIZONTAL
+	me.Status = GAME_SCENE_STATUS_VERTICAL
 }
 
 func (me *GameScene) Update(deltaTime float64) {

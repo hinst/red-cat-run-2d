@@ -26,6 +26,7 @@ func (me *CatEntityVertical) Update(deltaTime float64) {
 		me.flyAnimationFrame = 1
 		me.flyAnimationDirection = 1
 	}
+	me.Y += me.GetSpeedY() * deltaTime
 }
 
 func (me *CatEntityVertical) Draw(screen *ebiten.Image) {
@@ -34,4 +35,9 @@ func (me *CatEntityVertical) Draw(screen *ebiten.Image) {
 	var spriteShiftX = float64(int(me.flyAnimationFrame)) * CAT_FLY_ANIMATION_FRAME_WIDTH
 	var rectangle = GetShiftedRectangle(spriteShiftX, me.Width, me.Height)
 	screen.DrawImage(me.flyImage.SubImage(rectangle).(*ebiten.Image), &drawOptions)
+}
+
+// Measurement unit: pixels per second
+func (me *CatEntityVertical) GetSpeedY() float64 {
+	return 25
 }

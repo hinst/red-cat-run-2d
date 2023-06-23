@@ -27,4 +27,6 @@ var (
 	CAT_FLY_DOWN_IMAGE_BYTES []byte
 	//go:embed data/torch.png
 	TORCH_IMAGE_BYTES []byte
+	//go:embed data/obstacle.png
+	OBSTACLE_IMAGE_BYTES []byte
 )
