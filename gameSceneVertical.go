@@ -32,4 +32,5 @@ func (me *GameSceneVertical) Draw(screen *ebiten.Image) {
 }
 
 func (me *GameSceneVertical) Update(deltaTime float64) {
+	me.catEntity.Update(deltaTime)
 }
