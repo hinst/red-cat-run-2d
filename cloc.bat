@@ -1,0 +1,1 @@
+C:\App\cloc-1.94.exe --exclude-list-file=exclude-list-cloc.txt .
