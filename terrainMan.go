@@ -1,10 +1,12 @@
 package main
 
 import (
+	"image/color"
 	"math/rand"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 type TerrainMan struct {
@@ -215,13 +217,16 @@ func (me *TerrainMan) drawTorch(screen *ebiten.Image, leftBlock *TerrainBlock, r
 		xScaleMultiplier = -1
 	}
 	ScaleCentered(&drawOptions, float64(imageWidth), float64(imageHeight), SCALE*xScaleMultiplier, SCALE)
-	var x = float64((leftBlock.X+leftBlock.Width+rightBlock.X))*float64(me.GetTileWidth())/2 -
-		float64(me.torchImage.Bounds().Dx()/2)*SCALE
-	var y = me.CeilingY/2 - float64(me.torchImage.Bounds().Dy()/2)*SCALE
-	var visible = me.CameraX-float64(imageWidth)*SCALE <= x &&
-		x <= me.CameraX+me.ViewWidth+float64(imageWidth)*SCALE
+	var centerX = float64((leftBlock.X + leftBlock.Width + rightBlock.X)) * float64(me.GetTileWidth()) / 2
+	var x = centerX - float64(me.torchImage.Bounds().Dx()/2)
+	var centerY = (me.CeilingY + me.FloorY) / 2
+	var y = centerY - float64(me.torchImage.Bounds().Dy()/2)
+	var visible = me.CameraX-float64(imageWidth) <= x &&
+		x <= me.CameraX+me.ViewWidth+float64(imageWidth)
 	if visible {
 		drawOptions.GeoM.Translate(x-me.CameraX, y-me.CameraY)
+		drawOptions.ColorScale.Scale(0.9, 0.9, 0.9, 0.9)
+		vector.DrawFilledCircle(screen, float32(centerX-me.CameraX), float32(centerY-me.CameraY), 16, color.NRGBA{R: 255, G: 244, B: 188, A: 15}, false)
 		screen.DrawImage(me.torchImage, &drawOptions)
 	}
 }
