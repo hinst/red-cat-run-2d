@@ -79,5 +79,7 @@ func (me *FallObstacleMan) drawObstacle(screen *ebiten.Image, index int, obstacl
 }
 
 func (me *FallObstacleMan) drawShaftArea(screen *ebiten.Image) {
-	vector.DrawFilledRect(screen, float32(me.getShaftLeft()), 0, float32(me.AreaWidth), float32(me.ViewHeight), color.NRGBA{R: 255, G: 255, B: 255, A: 1}, false)
+	vector.DrawFilledRect(screen,
+		float32(me.getShaftLeft()), 0, float32(me.AreaWidth), float32(me.ViewHeight),
+		color.NRGBA{R: 255, G: 255, B: 255, A: 1}, false)
 }
