@@ -65,10 +65,6 @@ func (me *FallObstacleMan) getShaftLeft() float64 {
 	return me.ViewWidth/2 - me.AreaWidth/2
 }
 
-func (me *FallObstacleMan) getShaftRight() float64 {
-	return me.ViewWidth/2 + me.AreaWidth/2
-}
-
 func (me *FallObstacleMan) drawObstacle(screen *ebiten.Image, index int, obstacle FloatPoint) {
 	var drawOptions ebiten.DrawImageOptions
 	RotateCentered(&drawOptions,
