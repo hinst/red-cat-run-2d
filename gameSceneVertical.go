@@ -1,10 +1,12 @@
 package main
 
 import (
+	"image/color"
 	"log"
 	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 type GameSceneVertical struct {
@@ -90,20 +92,28 @@ func (me *GameSceneVertical) drawDecorations(screen *ebiten.Image) {
 
 func (me *GameSceneVertical) drawTorch(screen *ebiten.Image, y float64) {
 	var torchScale = me.getTorchScale()
-	var drawOptionsLeft = ebiten.DrawImageOptions{}
-	drawOptionsLeft.GeoM.Scale(torchScale, torchScale)
-	drawOptionsLeft.GeoM.Translate(
-		me.getPaddingWidth()/2-float64(me.torchImage.Bounds().Dx())/2*torchScale,
-		y-float64(me.torchImage.Bounds().Dy())/2*torchScale,
-	)
-	screen.DrawImage(me.torchImage, &drawOptionsLeft)
-	var drawOptionsRight = ebiten.DrawImageOptions{}
-	drawOptionsRight.GeoM.Scale(torchScale, torchScale)
-	drawOptionsRight.GeoM.Translate(
-		me.ViewWidth-me.getPaddingWidth()/2-float64(me.torchImage.Bounds().Dx())/2*torchScale,
-		y-float64(me.torchImage.Bounds().Dy())/2*torchScale,
-	)
-	screen.DrawImage(me.torchImage, &drawOptionsRight)
+	{
+		var drawOptions = ebiten.DrawImageOptions{}
+		drawOptions.GeoM.Scale(torchScale, torchScale)
+		var x = me.getPaddingWidth() / 2
+		vector.DrawFilledCircle(screen, float32(x), float32(y), 16, color.NRGBA{R: 255, G: 244, B: 188, A: 15}, false)
+		drawOptions.GeoM.Translate(
+			x-float64(me.torchImage.Bounds().Dx())/2*torchScale,
+			y-float64(me.torchImage.Bounds().Dy())/2*torchScale,
+		)
+		screen.DrawImage(me.torchImage, &drawOptions)
+	}
+	{
+		var drawOptions = ebiten.DrawImageOptions{}
+		drawOptions.GeoM.Scale(torchScale, torchScale)
+		var x = me.ViewWidth - me.getPaddingWidth()/2
+		vector.DrawFilledCircle(screen, float32(x), float32(y), 16, color.NRGBA{R: 255, G: 244, B: 188, A: 15}, false)
+		drawOptions.GeoM.Translate(
+			x-float64(me.torchImage.Bounds().Dx())/2*torchScale,
+			y-float64(me.torchImage.Bounds().Dy())/2*torchScale,
+		)
+		screen.DrawImage(me.torchImage, &drawOptions)
+	}
 }
 
 func (me *GameSceneVertical) drawFloors(screen *ebiten.Image, y float64) {
