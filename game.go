@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
@@ -31,16 +32,17 @@ type Game struct {
 	viewWidth       float64
 	viewHeight      float64
 
-	titleImage             *ebiten.Image
-	ebitengineReverseImage *ebiten.Image
-	catWalkImage           *ebiten.Image
-	catRunFrame            float64
+	titleImage                     *ebiten.Image
+	ebitengineReverseImage         *ebiten.Image
+	catWalkImage                   *ebiten.Image
+	catRunFrame                    float64
+	initialInformationAcknowledged bool
 }
 
 const (
 	GAME_MENU_ITEM_ID_NEW_GAME = iota
 	GAME_MENU_ITEM_ID_TOGGLE_FULL_SCREEN
-	GAME_MENU_ITEM_ID_INFORMATION
+	GAME_MENU_ITEM_ID_GENERAL_INFORMATION
 	GAME_MENU_ITEM_ID_EXIT
 )
 
@@ -66,7 +68,7 @@ func (me *Game) Initialize() {
 			},
 			{
 				Title: "Information",
-				Id:    GAME_MENU_ITEM_ID_INFORMATION,
+				Id:    GAME_MENU_ITEM_ID_GENERAL_INFORMATION,
 			},
 			{
 				Title: "Exit",
@@ -111,7 +113,11 @@ func (me *Game) update(deltaTime float64) {
 	if me.mode == GAME_MODE_MENU {
 		me.updateMenu(deltaTime)
 	} else if me.mode == GAME_MODE_GAME {
-		me.updateGameScene(deltaTime)
+		if me.initialInformationAcknowledged {
+			me.updateGameScene(deltaTime)
+		} else if len(me.justPressedKeys) > 0 {
+			me.initialInformationAcknowledged = true
+		}
 	} else if me.mode == GAME_MODE_INFORMATION {
 		if len(me.justPressedKeys) > 0 {
 			me.mode = GAME_MODE_MENU
@@ -129,6 +135,9 @@ func (me *Game) draw(screen *ebiten.Image) {
 		me.menu.Draw(screen)
 	} else if me.mode == GAME_MODE_GAME {
 		me.gameScene.Draw(screen)
+		if !me.initialInformationAcknowledged {
+			ebitenutil.DebugPrintAt(screen, GAME_INFO_SCENE_TEXT_CONTROLS, 50, 100)
+		}
 	} else if me.mode == GAME_MODE_INFORMATION {
 		me.gameInfoScene.Draw(screen)
 	}
@@ -142,7 +151,8 @@ func (me *Game) updateMenu(deltaTime float64) {
 		me.initializeGameScene()
 	} else if me.menu.PressedItemId == GAME_MENU_ITEM_ID_TOGGLE_FULL_SCREEN {
 		ebiten.SetFullscreen(!ebiten.IsFullscreen())
-	} else if me.menu.PressedItemId == GAME_MENU_ITEM_ID_INFORMATION {
+	} else if me.menu.PressedItemId == GAME_MENU_ITEM_ID_GENERAL_INFORMATION {
+		me.gameInfoScene.Text = GAME_INFO_SCENE_TEXT_GENERAL
 		me.mode = GAME_MODE_INFORMATION
 	} else if me.menu.PressedItemId == GAME_MENU_ITEM_ID_EXIT {
 		me.isExiting = true
