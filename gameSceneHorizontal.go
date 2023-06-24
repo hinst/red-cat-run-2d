@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 type GameSceneHorizontal struct {
@@ -28,7 +29,7 @@ const GAME_SCENE_TRANSITION_TIME = 2
 func (me *GameSceneHorizontal) Initialize() {
 	me.terrainMan.ViewWidth = me.ViewWidth
 	me.terrainMan.ViewHeight = me.ViewHeight
-	me.terrainMan.AreaWidth = 100
+	me.terrainMan.AreaWidth = 200
 	me.terrainMan.FloorY = me.GetFloorY()
 	me.terrainMan.CeilingY = me.GetCeilingY()
 	me.terrainMan.Initialize()
@@ -82,6 +83,7 @@ func (me *GameSceneHorizontal) Draw(screen *ebiten.Image) {
 	me.dustMan.Draw(screen)
 	me.drawFish(screen)
 
+	me.drawShaftBackground(screen)
 	me.terrainMan.CameraX = me.cameraX
 	me.terrainMan.CameraY = me.cameraY
 	me.terrainMan.DrawLowerLayer(screen)
@@ -161,4 +163,9 @@ func (me *GameSceneHorizontal) drawFish(screen *ebiten.Image) {
 		drawOptions.GeoM.Translate(x-me.cameraX, y)
 		screen.DrawImage(me.fishImage, &drawOptions)
 	}
+}
+
+func (me *GameSceneHorizontal) drawShaftBackground(screen *ebiten.Image) {
+	vector.DrawFilledRect(screen, 0, 0, float32(me.ViewWidth), float32(me.GetCeilingY()), SHAFT_COLOR, false)
+	vector.DrawFilledRect(screen, 0, float32(me.GetFloorY()), float32(me.ViewWidth), float32(me.ViewHeight), SHAFT_COLOR, false)
 }
