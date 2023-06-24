@@ -1,12 +1,10 @@
 package main
 
 import (
-	"image/color"
 	"log"
 	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 type GameSceneVertical struct {
@@ -96,7 +94,7 @@ func (me *GameSceneVertical) drawTorch(screen *ebiten.Image, y float64) {
 		var drawOptions = ebiten.DrawImageOptions{}
 		drawOptions.GeoM.Scale(torchScale, torchScale)
 		var x = me.getPaddingWidth() / 2
-		vector.DrawFilledCircle(screen, float32(x), float32(y), 16, color.NRGBA{R: 255, G: 244, B: 188, A: 15}, false)
+		DrawTorchLight(screen, float32(x), float32(y))
 		drawOptions.GeoM.Translate(
 			x-float64(me.torchImage.Bounds().Dx())/2*torchScale,
 			y-float64(me.torchImage.Bounds().Dy())/2*torchScale,
@@ -107,7 +105,7 @@ func (me *GameSceneVertical) drawTorch(screen *ebiten.Image, y float64) {
 		var drawOptions = ebiten.DrawImageOptions{}
 		drawOptions.GeoM.Scale(torchScale, torchScale)
 		var x = me.ViewWidth - me.getPaddingWidth()/2
-		vector.DrawFilledCircle(screen, float32(x), float32(y), 16, color.NRGBA{R: 255, G: 244, B: 188, A: 15}, false)
+		DrawTorchLight(screen, float32(x), float32(y))
 		drawOptions.GeoM.Translate(
 			x-float64(me.torchImage.Bounds().Dx())/2*torchScale,
 			y-float64(me.torchImage.Bounds().Dy())/2*torchScale,
