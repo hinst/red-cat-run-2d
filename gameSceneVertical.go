@@ -5,6 +5,7 @@ import (
 	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 type GameSceneVertical struct {
@@ -82,6 +83,7 @@ func (me *GameSceneVertical) getTorchScale() float64 {
 }
 
 func (me *GameSceneVertical) drawDecorations(screen *ebiten.Image) {
+	me.drawShaftBackground(screen)
 	for y := me.torchY - me.getTorchGapY(); y < me.ViewHeight+me.getTorchGapY(); y += me.getTorchGapY() {
 		me.drawTorch(screen, y)
 		me.drawFloors(screen, y)
@@ -133,4 +135,10 @@ func (me *GameSceneVertical) drawFloorPart(screen *ebiten.Image, baseX float64, 
 		drawOptions.GeoM.Translate(baseX, y)
 		screen.DrawImage(me.dirtImage, &drawOptions)
 	}
+}
+
+func (me *GameSceneVertical) drawShaftBackground(screen *ebiten.Image) {
+	var width = (int(me.getPaddingWidth())/me.brickImage.Bounds().Dx() - 1) * me.brickImage.Bounds().Dx()
+	vector.DrawFilledRect(screen, 0, 0, float32(width), float32(me.ViewHeight), SHAFT_COLOR, false)
+	vector.DrawFilledRect(screen, float32(me.ViewWidth)-float32(width), 0, float32(width), float32(me.ViewHeight), SHAFT_COLOR, false)
 }

@@ -27,7 +27,7 @@ type FallObstacleMan struct {
 
 func (me *FallObstacleMan) Initialize() {
 	me.obstacleImage = LoadImage(OBSTACLE_IMAGE_BYTES)
-	me.ObstacleWidth = float64(me.obstacleImage.Bounds().Dx())
+	me.ObstacleWidth = float64(me.obstacleImage.Bounds().Dx()) * 2
 	for y := me.ViewHeight; y < me.AreaHeight-me.ViewHeight; y += me.getDistanceBetweenObstacles() {
 		var obstacle = FloatPoint{
 			X: me.getShaftLeft() + me.ObstacleWidth/2 + rand.Float64()*(me.AreaWidth-me.ObstacleWidth),
@@ -74,6 +74,9 @@ func (me *FallObstacleMan) drawObstacle(screen *ebiten.Image, index int, obstacl
 	RotateCentered(&drawOptions,
 		float64(me.obstacleImage.Bounds().Dx()), float64(me.obstacleImage.Bounds().Dy()),
 		UnwindAngle(me.animationAngle+float64(index)))
+	drawOptions.GeoM.Scale(
+		me.ObstacleWidth/float64(me.obstacleImage.Bounds().Dx()),
+		me.ObstacleWidth/float64(me.obstacleImage.Bounds().Dy()))
 	drawOptions.GeoM.Translate(obstacle.X-me.ObstacleWidth/2, obstacle.Y-me.CameraY-me.ObstacleWidth/2)
 	screen.DrawImage(me.obstacleImage, &drawOptions)
 }
