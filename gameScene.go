@@ -40,6 +40,9 @@ func (me *GameScene) Update(deltaTime float64) {
 		me.gameSceneHorizontal.JustPressedKeys = me.JustPressedKeys
 		me.gameSceneHorizontal.PressedKeys = me.PressedKeys
 		me.gameSceneHorizontal.Update(deltaTime)
+		if me.gameSceneHorizontal.Completed {
+			me.Status = GAME_SCENE_STATUS_VERTICAL
+		}
 	case GAME_SCENE_STATUS_VERTICAL:
 		me.gameSceneVertical.JustPressedKeys = me.JustPressedKeys
 		me.gameSceneVertical.PressedKeys = me.PressedKeys

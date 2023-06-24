@@ -22,6 +22,9 @@ type GameSceneHorizontal struct {
 	cameraY                 float64
 	transitionTimeRemaining float64
 	fishImage               *ebiten.Image
+
+	// Output parameter after each update
+	Completed bool
 }
 
 const GAME_SCENE_TRANSITION_TIME = 2
@@ -67,6 +70,9 @@ func (me *GameSceneHorizontal) Update(deltaTime float64) {
 		}
 		if me.CheckCatAtRightEndOfTerrain() && me.catEntity.Direction == DIRECTION_RIGHT {
 			me.switchDirection()
+		}
+		if me.CheckCatAtLeftEndOfTerrain() && me.catEntity.Direction == DIRECTION_LEFT {
+			me.Completed = true
 		}
 	} else {
 		me.transitionTimeRemaining -= deltaTime
@@ -128,6 +134,10 @@ func (me *GameSceneHorizontal) CheckCatHold() bool {
 func (me *GameSceneHorizontal) CheckCatAtRightEndOfTerrain() bool {
 	var catRight = me.catEntity.X + me.catEntity.Width
 	return catRight >= me.GetAreaWidth()
+}
+
+func (me *GameSceneHorizontal) CheckCatAtLeftEndOfTerrain() bool {
+	return me.catEntity.X <= 0
 }
 
 // Measurement unit: pixels
