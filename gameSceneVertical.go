@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"math"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
@@ -85,35 +86,35 @@ func (me *GameSceneVertical) getTorchScale() float64 {
 func (me *GameSceneVertical) drawDecorations(screen *ebiten.Image) {
 	me.drawShaftBackground(screen)
 	for y := me.torchY - me.getTorchGapY(); y < me.ViewHeight+me.getTorchGapY(); y += me.getTorchGapY() {
-		me.drawTorch(screen, y)
+		me.drawTorchPair(screen, y)
 		me.drawFloors(screen, y)
 	}
 }
 
-func (me *GameSceneVertical) drawTorch(screen *ebiten.Image, y float64) {
+func (me *GameSceneVertical) drawTorchPair(screen *ebiten.Image, y float64) {
+	var x = me.getPaddingWidth() / 2
+	me.drawTorch(screen, x, y)
+	x = me.ViewWidth - me.getPaddingWidth()/2
+	me.drawTorch(screen, x, y)
+}
+
+func (me *GameSceneVertical) drawTorch(screen *ebiten.Image, x float64, y float64) {
 	var torchScale = me.getTorchScale()
-	{
-		var drawOptions = ebiten.DrawImageOptions{}
-		drawOptions.GeoM.Scale(torchScale, torchScale)
-		var x = me.getPaddingWidth() / 2
-		DrawTorchLight(screen, float32(x), float32(y))
-		drawOptions.GeoM.Translate(
-			x-float64(me.torchImage.Bounds().Dx())/2*torchScale,
-			y-float64(me.torchImage.Bounds().Dy())/2*torchScale,
-		)
-		screen.DrawImage(me.torchImage, &drawOptions)
+	var imageWidth = float64(me.torchImage.Bounds().Dx())
+	var imageHeight = float64(me.torchImage.Bounds().Dy())
+	var drawOptions = ebiten.DrawImageOptions{}
+	var xScaleMultiplier float64 = 1
+	if time.Now().Nanosecond() < 1000_000_000/2 {
+		xScaleMultiplier = -1
 	}
-	{
-		var drawOptions = ebiten.DrawImageOptions{}
-		drawOptions.GeoM.Scale(torchScale, torchScale)
-		var x = me.ViewWidth - me.getPaddingWidth()/2
-		DrawTorchLight(screen, float32(x), float32(y))
-		drawOptions.GeoM.Translate(
-			x-float64(me.torchImage.Bounds().Dx())/2*torchScale,
-			y-float64(me.torchImage.Bounds().Dy())/2*torchScale,
-		)
-		screen.DrawImage(me.torchImage, &drawOptions)
-	}
+	ScaleCentered(&drawOptions, imageWidth, imageHeight, xScaleMultiplier, 1)
+	drawOptions.GeoM.Scale(torchScale, torchScale)
+	DrawTorchLight(screen, float32(x), float32(y))
+	drawOptions.GeoM.Translate(
+		x-imageWidth/2*torchScale,
+		y-imageHeight/2*torchScale,
+	)
+	screen.DrawImage(me.torchImage, &drawOptions)
 }
 
 func (me *GameSceneVertical) drawFloors(screen *ebiten.Image, y float64) {

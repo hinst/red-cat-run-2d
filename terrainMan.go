@@ -1,12 +1,10 @@
 package main
 
 import (
-	"image/color"
 	"math/rand"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 type TerrainMan struct {
@@ -226,7 +224,7 @@ func (me *TerrainMan) drawTorch(screen *ebiten.Image, leftBlock *TerrainBlock, r
 	if visible {
 		drawOptions.GeoM.Translate(x-me.CameraX, y-me.CameraY)
 		drawOptions.ColorScale.Scale(0.9, 0.9, 0.9, 0.9)
-		vector.DrawFilledCircle(screen, float32(centerX-me.CameraX), float32(centerY-me.CameraY), 16, color.NRGBA{R: 255, G: 244, B: 188, A: 16}, false)
+		DrawTorchLight(screen, float32(centerX-me.CameraX), float32(centerY-me.CameraY))
 		screen.DrawImage(me.torchImage, &drawOptions)
 	}
 }
