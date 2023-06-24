@@ -217,7 +217,7 @@ func (me *TerrainMan) drawTorch(screen *ebiten.Image, leftBlock *TerrainBlock, r
 	ScaleCentered(&drawOptions, float64(imageWidth), float64(imageHeight), SCALE*xScaleMultiplier, SCALE)
 	var centerX = float64((leftBlock.X + leftBlock.Width + rightBlock.X)) * float64(me.GetTileWidth()) / 2
 	var x = centerX - float64(me.torchImage.Bounds().Dx()/2)
-	var centerY = (me.CeilingY + me.FloorY) / 2
+	var centerY = (me.CeilingY) / 2
 	var y = centerY - float64(me.torchImage.Bounds().Dy()/2)
 	var visible = me.CameraX-float64(imageWidth) <= x &&
 		x <= me.CameraX+me.ViewWidth+float64(imageWidth)
