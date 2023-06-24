@@ -28,9 +28,10 @@ func (me *GameSceneVertical) Initialize() {
 	me.catEntity.Initialize()
 	me.cameraY = me.catEntity.Y - 10
 	me.catEntity.X = me.ViewWidth/2 - me.catEntity.Width/2
+	me.fallObstacleMan.AreaWidth = me.GetAreaWidth()
+	me.fallObstacleMan.AreaHeight = me.ViewHeight * 10
 	me.fallObstacleMan.ViewWidth = me.ViewWidth
 	me.fallObstacleMan.ViewHeight = me.ViewHeight
-	me.fallObstacleMan.AreaHeight = me.ViewHeight * 10
 	me.fallObstacleMan.Initialize()
 }
 
@@ -45,4 +46,8 @@ func (me *GameSceneVertical) Update(deltaTime float64) {
 	me.fallObstacleMan.CameraY = me.cameraY
 	me.fallObstacleMan.Update(deltaTime)
 	me.cameraY = me.catEntity.Y - 10
+}
+
+func (me *GameSceneVertical) GetAreaWidth() float64 {
+	return 220
 }

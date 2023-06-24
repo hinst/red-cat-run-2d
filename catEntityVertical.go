@@ -7,6 +7,8 @@ type CatEntityVertical struct {
 	flyImage              *ebiten.Image
 	flyAnimationDirection float64
 	flyAnimationFrame     float64
+	// Input parameter for every update
+	CameraY float64
 }
 
 func (me *CatEntityVertical) Initialize() {
@@ -31,7 +33,7 @@ func (me *CatEntityVertical) Update(deltaTime float64) {
 
 func (me *CatEntityVertical) Draw(screen *ebiten.Image) {
 	var drawOptions ebiten.DrawImageOptions
-	drawOptions.GeoM.Translate(me.X, me.Y)
+	drawOptions.GeoM.Translate(me.X, me.Y-me.CameraY)
 	var spriteShiftX = float64(int(me.flyAnimationFrame)) * CAT_FLY_ANIMATION_FRAME_WIDTH
 	var rectangle = GetShiftedRectangle(spriteShiftX, me.Width, me.Height)
 	screen.DrawImage(me.flyImage.SubImage(rectangle).(*ebiten.Image), &drawOptions)
