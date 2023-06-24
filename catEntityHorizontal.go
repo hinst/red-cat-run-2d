@@ -208,12 +208,16 @@ func (me *CatEntityHorizontal) drawAimLine(screen *ebiten.Image) {
 	for _, key := range me.PressedKeys {
 		if me.isAimUp(key) {
 			me.drawVerticalAimLine(screen, true)
+			break
 		} else if me.isAimForwardFromFloor(key) {
 			me.drawHorizontalAimLine(screen, true)
+			break
 		} else if me.isAimDown(key) {
 			me.drawVerticalAimLine(screen, false)
+			break
 		} else if me.isAimForwardFromCeiling(key) {
 			me.drawHorizontalAimLine(screen, false)
+			break
 		}
 	}
 }
