@@ -32,27 +32,29 @@ func (me *FallObstacleMan) Initialize() {
 	me.ObstacleWidth = float64(me.obstacleImage.Bounds().Dx()) * 2
 	var previousX float64
 	for y := me.ViewHeight; y < me.AreaHeight-me.ViewHeight; y += me.getDistanceBetweenObstacles() {
-		var width = me.AreaWidth - me.ObstacleWidth - me.getPadding()*2
-		var findX = func() float64 {
-			return me.getShaftLeft() + me.getPadding() +
-				me.ObstacleWidth/2 + rand.Float64()*width
-		}
-		var x = findX()
-		for i := 0; i < 3; i++ {
-			if math.Abs(x-previousX) < me.AreaWidth/3 {
-				x = findX()
-			} else {
-				break
+		for i := 0; i < 2; i++ {
+			var width = me.AreaWidth - me.ObstacleWidth - me.getPadding()*2
+			var findX = func() float64 {
+				return me.getShaftLeft() + me.getPadding() +
+					me.ObstacleWidth/2 + rand.Float64()*width
 			}
+			var x = findX()
+			for i := 0; i < 4; i++ {
+				if math.Abs(x-previousX) < me.ObstacleWidth*1.5 {
+					x = findX()
+				} else {
+					break
+				}
+			}
+			var obstacle = FloatPoint{
+				X: x,
+				Y: y + (rand.Float64()-0.5)*me.getFluctuationY(),
+			}
+			me.obstacles = append(me.obstacles, obstacle)
+			previousX = x
 		}
-		var obstacle = FloatPoint{
-			X: x,
-			Y: y + (rand.Float64()-0.5)*me.getFluctuationY(),
-		}
-		me.obstacles = append(me.obstacles, obstacle)
-		previousX = x
 	}
-	me.DebugModeEnabled = true
+	me.DebugModeEnabled = false
 }
 
 func (me *FallObstacleMan) Update(deltaTime float64) {
@@ -121,4 +123,13 @@ func (me *FallObstacleMan) GetCollisionRectangle(obstacle FloatPoint) (result Re
 	result.B.X = result.A.X + me.ObstacleWidth
 	result.B.Y = result.A.Y + me.ObstacleWidth
 	return result.Shrink(5)
+}
+
+func (me *FallObstacleMan) CheckCollided(rectangle Rectangle) bool {
+	for _, obstacle := range me.obstacles {
+		if me.GetCollisionRectangle(obstacle).CheckCollides(rectangle) {
+			return true
+		}
+	}
+	return false
 }

@@ -9,12 +9,16 @@ import (
 
 type CatEntityVertical struct {
 	CatEntity
+	// Input parameter for every update
+	CameraY float64
+	// Input parameter for every update
+	Collided              bool
 	flyImage              *ebiten.Image
 	flyAnimationDirection float64
 	flyAnimationFrame     float64
-	// Input parameter for every update
-	CameraY          float64
-	DebugModeEnabled bool
+	DebugModeEnabled      bool
+	angle                 float64
+	collidedY             float64
 }
 
 func (me *CatEntityVertical) Initialize() {
@@ -35,8 +39,13 @@ func (me *CatEntityVertical) Update(deltaTime float64) {
 		me.flyAnimationFrame = 1
 		me.flyAnimationDirection = 1
 	}
-	me.Y += me.GetSpeedY() * deltaTime
-	me.updateSteer(deltaTime)
+	if me.Collided {
+		me.collidedY += deltaTime * me.getCollidedSpeedY()
+		me.angle = UnwindAngle(me.angle + deltaTime*me.getCollidedRotationSpeed())
+	} else {
+		me.updateSteer(deltaTime)
+		me.Y += me.GetSpeedY() * deltaTime
+	}
 }
 
 func (me *CatEntityVertical) updateSteer(deltaTime float64) {
@@ -52,7 +61,8 @@ func (me *CatEntityVertical) updateSteer(deltaTime float64) {
 
 func (me *CatEntityVertical) Draw(screen *ebiten.Image) {
 	var drawOptions ebiten.DrawImageOptions
-	drawOptions.GeoM.Translate(me.X, me.Y-me.CameraY)
+	RotateCentered(&drawOptions, CAT_FLY_ANIMATION_FRAME_WIDTH, float64(me.flyImage.Bounds().Dy()), me.angle)
+	drawOptions.GeoM.Translate(me.X, me.Y-me.CameraY+me.collidedY)
 	var spriteShiftX = float64(int(me.flyAnimationFrame)) * CAT_FLY_ANIMATION_FRAME_WIDTH
 	var rectangle = GetShiftedRectangle(spriteShiftX, me.Width, me.Height)
 	if me.DebugModeEnabled {
@@ -83,4 +93,12 @@ func (me *CatEntityVertical) GetHitBox() Rectangle {
 	rect.B.X = rect.A.X + me.Width
 	rect.B.Y = rect.A.Y + me.Height
 	return rect.Shrink(1)
+}
+
+func (me *CatEntityVertical) getCollidedSpeedY() float64 {
+	return -50
+}
+
+func (me *CatEntityVertical) getCollidedRotationSpeed() float64 {
+	return 7
 }

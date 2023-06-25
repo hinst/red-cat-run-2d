@@ -17,14 +17,15 @@ type GameSceneVertical struct {
 	// Input parameter for every update
 	PressedKeys []ebiten.Key
 
-	catEntity       CatEntityVertical
-	fallObstacleMan FallObstacleMan
-	cameraY         float64
-	TorchY          float64
-	torchImage      *ebiten.Image
-	brickImage      *ebiten.Image
-	dirtImage       *ebiten.Image
-	wallAlpha       float64
+	catEntity   CatEntityVertical
+	obstacleMan FallObstacleMan
+	cameraY     float64
+	TorchY      float64
+	torchImage  *ebiten.Image
+	brickImage  *ebiten.Image
+	dirtImage   *ebiten.Image
+	wallAlpha   float64
+	collided    bool
 }
 
 func (me *GameSceneVertical) Initialize() {
@@ -35,11 +36,11 @@ func (me *GameSceneVertical) Initialize() {
 	me.cameraY = me.catEntity.Y - 10
 	me.catEntity.CameraY = me.cameraY
 	me.catEntity.X = me.ViewWidth/2 - me.catEntity.Width/2
-	me.fallObstacleMan.AreaWidth = me.GetAreaWidth()
-	me.fallObstacleMan.AreaHeight = me.ViewHeight * 6
-	me.fallObstacleMan.ViewWidth = me.ViewWidth
-	me.fallObstacleMan.ViewHeight = me.ViewHeight
-	me.fallObstacleMan.Initialize()
+	me.obstacleMan.AreaWidth = me.GetAreaWidth()
+	me.obstacleMan.AreaHeight = me.ViewHeight * 6
+	me.obstacleMan.ViewWidth = me.ViewWidth
+	me.obstacleMan.ViewHeight = me.ViewHeight
+	me.obstacleMan.Initialize()
 	me.torchImage = LoadImage(TORCH_IMAGE_BYTES)
 	me.brickImage = LoadImage(BRICK_BLOCK_IMAGE_BYTES)
 	me.dirtImage = LoadImage(DIRT_BLOCK_IMAGE_BYTES)
@@ -48,8 +49,8 @@ func (me *GameSceneVertical) Initialize() {
 func (me *GameSceneVertical) Update(deltaTime float64) {
 	me.updateCatEntity(deltaTime)
 	me.cameraY = me.catEntity.Y - me.GetCatViewY()
-	me.fallObstacleMan.CameraY = me.cameraY
-	me.fallObstacleMan.Update(deltaTime)
+	me.obstacleMan.CameraY = me.cameraY
+	me.obstacleMan.Update(deltaTime)
 	me.TorchY -= deltaTime * me.GetTorchSpeedY()
 	for me.TorchY < -me.GetTorchGapY() {
 		me.TorchY += me.GetTorchGapY()
@@ -58,6 +59,13 @@ func (me *GameSceneVertical) Update(deltaTime float64) {
 		me.wallAlpha += deltaTime * me.getWallAlphaSpeed()
 		if me.wallAlpha >= 1 {
 			me.wallAlpha = 1
+		}
+	}
+	if !me.collided {
+		if me.checkCollided() {
+			me.collided = true
+			me.catEntity.Collided = true
+			PlaySound(EXPLOSION_SOUND_BYTES, 0.33)
 		}
 	}
 }
@@ -78,7 +86,7 @@ func (me *GameSceneVertical) updateCatEntity(deltaTime float64) {
 func (me *GameSceneVertical) Draw(screen *ebiten.Image) {
 	me.drawDecorations(screen)
 	me.catEntity.Draw(screen)
-	me.fallObstacleMan.Draw(screen)
+	me.obstacleMan.Draw(screen)
 }
 
 func (me *GameSceneVertical) GetAreaWidth() float64 {
@@ -156,4 +164,8 @@ func (me *GameSceneVertical) drawShaftBackground(screen *ebiten.Image) {
 
 func (me *GameSceneVertical) getWallAlphaSpeed() float64 {
 	return 0.3
+}
+
+func (me *GameSceneVertical) checkCollided() bool {
+	return me.obstacleMan.CheckCollided(me.catEntity.GetHitBox())
 }
