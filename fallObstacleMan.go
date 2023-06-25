@@ -29,6 +29,12 @@ type FallObstacleMan struct {
 func (me *FallObstacleMan) Initialize() {
 	me.obstacleImage = LoadImage(OBSTACLE_IMAGE_BYTES)
 	me.ObstacleWidth = float64(me.obstacleImage.Bounds().Dx()) * 2
+	me.CreateObstacles()
+	me.DebugModeEnabled = false
+}
+
+func (me *FallObstacleMan) CreateObstacles() {
+	me.obstacles = me.obstacles[:0]
 	var previousX float64
 	var previousType int
 	for y := me.ViewHeight; y < me.AreaHeight-me.ViewHeight; y += me.getDistanceBetweenObstacles() {
@@ -75,7 +81,6 @@ func (me *FallObstacleMan) Initialize() {
 			previousX = x
 		}
 	}
-	me.DebugModeEnabled = false
 }
 
 func (me *FallObstacleMan) Update(deltaTime float64) {
@@ -113,7 +118,7 @@ func (me *FallObstacleMan) getShaftRight() float64 {
 func (me *FallObstacleMan) drawObstacle(screen *ebiten.Image, index int, obstacle FloatPoint) {
 	var x = obstacle.X - me.ObstacleWidth/2
 	var y = obstacle.Y - me.CameraY - me.ObstacleWidth/2
-	var isVisible = -me.ObstacleWidth < y && y < me.ViewWidth
+	var isVisible = -me.ObstacleWidth*1.6 < y && y < me.ViewHeight+me.ObstacleWidth
 	if !isVisible {
 		return
 	}

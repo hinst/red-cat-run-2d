@@ -106,6 +106,7 @@ func (me *GameSceneVertical) Update(deltaTime float64) {
 		if me.checkFishReached() {
 			PlaySound(REVERSE_SOUND_BYTES, 0.20)
 			me.catEntity.Direction = DIRECTION_TOP
+			me.obstacleMan.CreateObstacles()
 		} else {
 			me.dead = true
 		}
