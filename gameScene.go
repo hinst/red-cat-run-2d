@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
@@ -25,12 +26,14 @@ type GameScene struct {
 	// Output parameter
 	Completed bool
 
-	Status          GameSceneStatus
-	sceneHorizontal GameSceneHorizontal
-	sceneTransition GameSceneTransition
-	sceneVertical   GameSceneVertical
-	timeAfterDeath  float64
-	dead            bool
+	Status                    GameSceneStatus
+	sceneHorizontal           GameSceneHorizontal
+	sceneTransition           GameSceneTransition
+	sceneVertical             GameSceneVertical
+	timeAfterDeath            float64
+	dead                      bool
+	timeBeforeBackgroundMusic float64
+	backgroundMusic           *audio.Player
 }
 
 func (me *GameScene) Initialize() {
@@ -52,6 +55,7 @@ func (me *GameScene) Initialize() {
 	me.sceneTransition.CatViewY = me.sceneVertical.GetCatViewY()
 	me.sceneTransition.Initialize()
 	me.Status = GAME_SCENE_STATUS_HORIZONTAL
+	me.timeBeforeBackgroundMusic = 3
 }
 
 func (me *GameScene) Update(deltaTime float64) {
@@ -86,6 +90,14 @@ func (me *GameScene) Update(deltaTime float64) {
 	}
 	if len(me.JustPressedKeys) > 0 && me.dead {
 		me.Completed = true
+	}
+	if me.timeBeforeBackgroundMusic > 0 {
+		me.timeBeforeBackgroundMusic -= deltaTime
+	} else if me.backgroundMusic == nil {
+		me.backgroundMusic = PlaySound(ACHIEVEMENT_SOUND_BYTES, 0.2)
+	} else if !me.backgroundMusic.IsPlaying() {
+		me.backgroundMusic.Seek(0)
+		me.backgroundMusic.Play()
 	}
 }
 

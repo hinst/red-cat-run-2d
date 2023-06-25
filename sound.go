@@ -32,6 +32,7 @@ func InitializeSound() {
 	REVERSE_SOUND_BYTES = DecodeVorbis(REVERSE_SOUND_BYTES)
 	EXPLOSION_SOUND_BYTES = DecodeVorbis(EXPLOSION_SOUND_BYTES)
 	ASCENDED_SOUND_BYTES = DecodeVorbis(ASCENDED_SOUND_BYTES)
+	VIBIN_SOUND_BYTES = DecodeVorbis(VIBIN_SOUND_BYTES)
 }
 
 func PlaySound(data []byte, volume float64) *audio.Player {
