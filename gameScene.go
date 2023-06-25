@@ -80,6 +80,9 @@ func (me *GameScene) Update(deltaTime float64) {
 		me.sceneVertical.JustPressedKeys = me.JustPressedKeys
 		me.sceneVertical.PressedKeys = me.PressedKeys
 		me.sceneVertical.Update(deltaTime)
+		if me.sceneVertical.Completed {
+			me.Completed = true
+		}
 	}
 	if len(me.JustPressedKeys) > 0 && me.dead {
 		me.Completed = true

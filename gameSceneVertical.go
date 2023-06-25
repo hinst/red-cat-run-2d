@@ -1,9 +1,12 @@
 package main
 
 import (
+	"image/color"
 	"log"
+	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
@@ -17,16 +20,19 @@ type GameSceneVertical struct {
 	// Input parameter for every update
 	PressedKeys []ebiten.Key
 
-	catEntity   CatEntityVertical
-	obstacleMan FallObstacleMan
-	cameraY     float64
-	TorchY      float64
-	torchImage  *ebiten.Image
-	brickImage  *ebiten.Image
-	dirtImage   *ebiten.Image
-	wallAlpha   float64
-	collided    bool
-	fishImage   *ebiten.Image
+	catEntity        CatEntityVertical
+	obstacleMan      FallObstacleMan
+	cameraY          float64
+	TorchY           float64
+	torchImage       *ebiten.Image
+	brickImage       *ebiten.Image
+	dirtImage        *ebiten.Image
+	wallAlpha        float64
+	dead             bool
+	deadMessageDelay float64
+	fishImage        *ebiten.Image
+	// Output parameter
+	Completed bool
 }
 
 func (me *GameSceneVertical) Initialize() {
@@ -67,11 +73,25 @@ func (me *GameSceneVertical) Update(deltaTime float64) {
 			me.wallAlpha = 1
 		}
 	}
-	if !me.collided {
+	if me.dead && len(me.JustPressedKeys) > 0 && me.deadMessageDelay <= 0 {
+		me.Completed = true
+	}
+	if me.deadMessageDelay > 0 {
+		me.deadMessageDelay -= deltaTime
+	}
+	if !me.dead {
 		if me.checkCollided() {
-			me.collided = true
+			me.dead = true
+			me.deadMessageDelay = 2
 			me.catEntity.Collided = true
-			PlaySound(EXPLOSION_SOUND_BYTES, 0.33)
+			PlaySound(EXPLOSION_SOUND_BYTES, 0.25)
+		}
+	}
+	if me.checkBottomReached() {
+		if me.checkFishReached() {
+			PlaySound(ACHIEVEMENT_SOUND_BYTES, 0.5)
+		} else {
+			me.dead = true
 		}
 	}
 }
@@ -94,6 +114,10 @@ func (me *GameSceneVertical) Draw(screen *ebiten.Image) {
 	me.catEntity.Draw(screen)
 	me.obstacleMan.Draw(screen)
 	me.drawFish(screen)
+	if me.dead && me.deadMessageDelay <= 0 {
+		vector.DrawFilledRect(screen, 0, 0, float32(me.ViewWidth), float32(me.ViewHeight), color.NRGBA{R: 0, G: 0, B: 0, A: 128}, false)
+		ebitenutil.DebugPrintAt(screen, "YOU DIED\n"+"press any key", 180, 100)
+	}
 }
 
 func (me *GameSceneVertical) GetAreaWidth() float64 {
@@ -177,7 +201,7 @@ func (me *GameSceneVertical) checkCollided() bool {
 	return me.obstacleMan.CheckCollided(me.catEntity.GetHitBox())
 }
 
-func (me GameSceneVertical) drawFish(screen *ebiten.Image) {
+func (me *GameSceneVertical) drawFish(screen *ebiten.Image) {
 	var drawOptions = ebiten.DrawImageOptions{}
 	drawOptions.GeoM.Translate(
 		me.ViewWidth/2-float64(me.fishImage.Bounds().Dx())/2,
@@ -185,6 +209,14 @@ func (me GameSceneVertical) drawFish(screen *ebiten.Image) {
 	screen.DrawImage(me.fishImage, &drawOptions)
 }
 
-func (me GameSceneVertical) GetAreaHeight() float64 {
+func (me *GameSceneVertical) GetAreaHeight() float64 {
 	return me.ViewHeight * 9
+}
+
+func (me *GameSceneVertical) checkBottomReached() bool {
+	return me.catEntity.Y+me.catEntity.Height >= me.GetAreaHeight()
+}
+
+func (me *GameSceneVertical) checkFishReached() bool {
+	return math.Abs(me.catEntity.X+me.catEntity.Width/2-me.ViewWidth/2) < float64(me.fishImage.Bounds().Dx())*2
 }
