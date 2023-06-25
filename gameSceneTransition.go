@@ -4,6 +4,7 @@ import (
 	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
 type GameSceneTransition struct {
@@ -103,6 +104,7 @@ func (me *GameSceneTransition) Draw(screen *ebiten.Image) {
 	} else {
 		me.drawCatFly(screen)
 		me.drawTorches(screen)
+		ebitenutil.DebugPrintAt(screen, "<- steer -> with arrow keys", 120, 150)
 	}
 }
 
