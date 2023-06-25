@@ -19,6 +19,7 @@ type CatEntityVertical struct {
 	DebugModeEnabled      bool
 	angle                 float64
 	collidedY             float64
+	lastSteerDirection    Direction
 }
 
 func (me *CatEntityVertical) Initialize() {
@@ -26,7 +27,7 @@ func (me *CatEntityVertical) Initialize() {
 	me.Height = 48
 	me.flyImage = LoadImage(CAT_FLY_DOWN_IMAGE_BYTES)
 	me.flyAnimationDirection = 1
-	me.DebugModeEnabled = true
+	me.DebugModeEnabled = false
 }
 
 func (me *CatEntityVertical) Update(deltaTime float64) {
@@ -52,8 +53,10 @@ func (me *CatEntityVertical) updateSteer(deltaTime float64) {
 	for _, key := range me.PressedKeys {
 		if key == ebiten.KeyLeft {
 			me.X -= deltaTime * me.GetSteerSpeed()
+			me.lastSteerDirection = DIRECTION_LEFT
 			break
 		} else if key == ebiten.KeyRight {
+			me.lastSteerDirection = DIRECTION_RIGHT
 			me.X += deltaTime * me.GetSteerSpeed()
 		}
 	}
@@ -61,6 +64,9 @@ func (me *CatEntityVertical) updateSteer(deltaTime float64) {
 
 func (me *CatEntityVertical) Draw(screen *ebiten.Image) {
 	var drawOptions ebiten.DrawImageOptions
+	if me.lastSteerDirection == DIRECTION_LEFT {
+		ScaleCentered(&drawOptions, CAT_FLY_ANIMATION_FRAME_WIDTH, float64(me.flyImage.Bounds().Dy()), -1, 1)
+	}
 	RotateCentered(&drawOptions, CAT_FLY_ANIMATION_FRAME_WIDTH, float64(me.flyImage.Bounds().Dy()), me.angle)
 	drawOptions.GeoM.Translate(me.X, me.Y-me.CameraY+me.collidedY)
 	var spriteShiftX = float64(int(me.flyAnimationFrame)) * CAT_FLY_ANIMATION_FRAME_WIDTH
