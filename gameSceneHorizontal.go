@@ -74,6 +74,7 @@ func (me *GameSceneHorizontal) Update(deltaTime float64) {
 		}
 		if me.CheckCatAtLeftEndOfTerrain() && me.CatEntity.Direction == DIRECTION_LEFT {
 			me.Completed = true
+			PlaySound(REVERSE_SOUND_BYTES, 0.20)
 		}
 	} else {
 		me.transitionTimeRemaining -= deltaTime
@@ -165,12 +166,18 @@ func (me *GameSceneHorizontal) drawFish(screen *ebiten.Image) {
 		var drawOptions ebiten.DrawImageOptions
 		var y float64
 		if me.terrainMan.GetLastBlock().Location == TERRAIN_LOCATION_FLOOR {
-			y = me.GetFloorY() - float64(me.fishImage.Bounds().Dy())
+			y = me.GetFloorY() - float64(me.fishImage.Bounds().Dy()) - 1
 		} else if me.terrainMan.GetLastBlock().Location == TERRAIN_LOCATION_CEILING {
 			ScaleCentered(&drawOptions, float64(me.fishImage.Bounds().Dx()), float64(me.fishImage.Bounds().Dy()), 1, -1)
-			y = me.GetCeilingY()
+			y = me.GetCeilingY() + 1
 		}
-		var x = me.GetAreaWidth() - float64(me.fishImage.Bounds().Dx()) + 10
+		var x = me.GetAreaWidth() - float64(me.fishImage.Bounds().Dx())
+		drawOptions.GeoM.Translate(x-me.cameraX, y)
+		screen.DrawImage(me.fishImage, &drawOptions)
+	} else if me.CatEntity.Direction == DIRECTION_LEFT {
+		var drawOptions ebiten.DrawImageOptions
+		var y = me.GetFloorY() - float64(me.fishImage.Bounds().Dy()) - 1
+		var x float64 = 0
 		drawOptions.GeoM.Translate(x-me.cameraX, y)
 		screen.DrawImage(me.fishImage, &drawOptions)
 	}

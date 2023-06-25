@@ -2,6 +2,7 @@ package main
 
 import (
 	"image/color"
+	"math"
 	"math/rand"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -29,8 +30,11 @@ func (me *FallObstacleMan) Initialize() {
 	me.obstacleImage = LoadImage(OBSTACLE_IMAGE_BYTES)
 	me.ObstacleWidth = float64(me.obstacleImage.Bounds().Dx()) * 2
 	for y := me.ViewHeight; y < me.AreaHeight-me.ViewHeight; y += me.getDistanceBetweenObstacles() {
+		var width = me.AreaWidth - me.ObstacleWidth - me.getPadding()*2
+		var x = me.getShaftLeft() + me.getPadding() +
+			me.ObstacleWidth/2 + math.Round(rand.Float64())*width
 		var obstacle = FloatPoint{
-			X: me.getShaftLeft() + me.ObstacleWidth/2 + rand.Float64()*(me.AreaWidth-me.ObstacleWidth),
+			X: x,
 			Y: y + (rand.Float64()-0.5)*me.getFluctuationY(),
 		}
 		me.obstacles = append(me.obstacles, obstacle)
@@ -63,6 +67,10 @@ func (me *FallObstacleMan) getAnimationAngleSpeed() float64 {
 
 func (me *FallObstacleMan) getShaftLeft() float64 {
 	return me.ViewWidth/2 - me.AreaWidth/2
+}
+
+func (me *FallObstacleMan) getPadding() float64 {
+	return 10
 }
 
 func (me *FallObstacleMan) drawObstacle(screen *ebiten.Image, index int, obstacle FloatPoint) {

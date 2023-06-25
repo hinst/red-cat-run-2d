@@ -122,7 +122,7 @@ func (me *GameSceneVertical) drawTorch(screen *ebiten.Image, x float64, y float6
 
 func (me *GameSceneVertical) drawFloors(screen *ebiten.Image, y float64) {
 	var brickImageWidth = float64(me.brickImage.Bounds().Dx())
-	for x := float64(0); x < me.GetPaddingWidth()-brickImageWidth; x += brickImageWidth {
+	for x := float64(0); x <= me.GetPaddingWidth()-brickImageWidth; x += brickImageWidth {
 		me.drawFloorPart(screen, x, y)
 		me.drawFloorPart(screen, me.ViewWidth-x-brickImageWidth, y)
 	}
@@ -145,7 +145,7 @@ func (me *GameSceneVertical) drawFloorPart(screen *ebiten.Image, baseX float64, 
 
 func (me *GameSceneVertical) drawShaftBackground(screen *ebiten.Image) {
 	var color = MultiplyColor(SHAFT_COLOR, me.wallAlpha)
-	var width = (int(me.GetPaddingWidth())/me.brickImage.Bounds().Dx() - 1) * me.brickImage.Bounds().Dx()
+	var width = me.GetPaddingWidth()
 	vector.DrawFilledRect(screen, 0, 0, float32(width), float32(me.ViewHeight), color, false)
 	vector.DrawFilledRect(screen, float32(me.ViewWidth)-float32(width), 0, float32(width), float32(me.ViewHeight), color, false)
 }
