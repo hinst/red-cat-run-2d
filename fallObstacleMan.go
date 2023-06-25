@@ -29,8 +29,10 @@ type FallObstacleMan struct {
 
 func (me *FallObstacleMan) Initialize() {
 	me.obstacleImage = LoadImage(OBSTACLE_IMAGE_BYTES)
-	me.ObstacleWidth = float64(me.obstacleImage.Bounds().Dx()) * 2
+	me.ObstacleWidth = float64(me.obstacleImage.Bounds().Dx()) * 2.2
 	var previousX float64
+	var previousX0 float64
+	var previousX1 float64
 	for y := me.ViewHeight; y < me.AreaHeight-me.ViewHeight; y += me.getDistanceBetweenObstacles() {
 		for xIndex := 0; xIndex < 2; xIndex++ {
 			var width = me.AreaWidth - me.ObstacleWidth - me.getPadding()*2
@@ -42,22 +44,29 @@ func (me *FallObstacleMan) Initialize() {
 				}
 				x = findX()
 				for i := 0; i < 5; i++ {
-					if math.Abs(x-previousX) < me.ViewWidth/2 {
+					if y != me.ViewHeight && math.Abs(x-previousX0) < me.AreaWidth/6 || math.Abs(x-previousX1) < me.AreaWidth/6 {
+						println("searching")
 						x = findX()
 					} else {
+						println("found", y)
 						break
 					}
 				}
+				previousX0 = x
 			} else {
 				if previousX < me.ViewWidth/2 {
 					x = previousX + me.ObstacleWidth*1.5
 				} else {
 					x = previousX - me.ObstacleWidth*1.5
 				}
+				previousX1 = x
 			}
 			var obstacle = FloatPoint{
 				X: x,
-				Y: y + (rand.Float64()-0.5)*me.getFluctuationY(),
+				Y: y,
+			}
+			if xIndex == 1 {
+				obstacle.Y += me.getFluctuationY()*0.5 + rand.Float64()*me.getFluctuationY()
 			}
 			me.obstacles = append(me.obstacles, obstacle)
 			previousX = x
@@ -79,7 +88,7 @@ func (me *FallObstacleMan) Draw(screen *ebiten.Image) {
 }
 
 func (me *FallObstacleMan) getDistanceBetweenObstacles() float64 {
-	return 130
+	return 150
 }
 
 func (me *FallObstacleMan) getFluctuationY() float64 {
