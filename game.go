@@ -5,6 +5,7 @@ import (
 	"errors"
 	"image"
 	"math"
+	"strconv"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -43,6 +44,7 @@ const (
 	GAME_MENU_ITEM_ID_NEW_GAME = iota
 	GAME_MENU_ITEM_ID_TOGGLE_FULL_SCREEN
 	GAME_MENU_ITEM_ID_GENERAL_INFORMATION
+	GAME_MENU_ITEM_ID_TOGGLE_VSYNC
 	GAME_MENU_ITEM_ID_EXIT
 )
 
@@ -68,12 +70,16 @@ func (me *Game) Initialize() {
 				Id:    GAME_MENU_ITEM_ID_NEW_GAME,
 			},
 			{
+				Title: "Information",
+				Id:    GAME_MENU_ITEM_ID_GENERAL_INFORMATION,
+			},
+			{
 				Title: "Toggle Full Screen",
 				Id:    GAME_MENU_ITEM_ID_TOGGLE_FULL_SCREEN,
 			},
 			{
-				Title: "Information",
-				Id:    GAME_MENU_ITEM_ID_GENERAL_INFORMATION,
+				Title: "Toggle Vsync: " + strconv.FormatBool(ebiten.IsVsyncEnabled()),
+				Id:    GAME_MENU_ITEM_ID_TOGGLE_VSYNC,
 			},
 			{
 				Title: "Exit",
@@ -151,15 +157,23 @@ func (me *Game) draw(screen *ebiten.Image) {
 func (me *Game) updateMenu(deltaTime float64) {
 	me.menu.JustPressedKeys = me.justPressedKeys
 	me.menu.Update(deltaTime)
-	if me.menu.PressedItemId == GAME_MENU_ITEM_ID_NEW_GAME {
+	switch me.menu.PressedItemId {
+	case GAME_MENU_ITEM_ID_NEW_GAME:
 		me.mode = GAME_MODE_GAME
 		me.initializeGameScene()
-	} else if me.menu.PressedItemId == GAME_MENU_ITEM_ID_TOGGLE_FULL_SCREEN {
+	case GAME_MENU_ITEM_ID_TOGGLE_FULL_SCREEN:
 		ebiten.SetFullscreen(!ebiten.IsFullscreen())
-	} else if me.menu.PressedItemId == GAME_MENU_ITEM_ID_GENERAL_INFORMATION {
+	case GAME_MENU_ITEM_ID_GENERAL_INFORMATION:
 		me.gameInfoScene.Text = GAME_INFO_SCENE_TEXT_GENERAL
 		me.mode = GAME_MODE_INFORMATION
-	} else if me.menu.PressedItemId == GAME_MENU_ITEM_ID_EXIT {
+	case GAME_MENU_ITEM_ID_TOGGLE_VSYNC:
+		ebiten.SetVsyncEnabled(!ebiten.IsVsyncEnabled())
+		for i := 0; i < len(me.menu.Items); i++ {
+			if me.menu.Items[i].Id == GAME_MENU_ITEM_ID_TOGGLE_VSYNC {
+				me.menu.Items[i].Title = "Toggle Vsync: " + strconv.FormatBool(ebiten.IsVsyncEnabled())
+			}
+		}
+	case GAME_MENU_ITEM_ID_EXIT:
 		me.isExiting = true
 	}
 	me.catRunFrame += deltaTime * CAT_RUN_ANIMATION_FRAME_PER_SECOND
