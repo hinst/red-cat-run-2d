@@ -23,13 +23,15 @@ type GameSceneTransition struct {
 	// Input parameter for initialization
 	TorchGapY float64
 	// Input parameter for initialization
-	TorchSpeedY        float64
+	TorchSpeedY float64
+	// Input parameter for initialization
+	CatViewY           float64
 	catRunImage        *ebiten.Image
 	angle              float64
 	catSpeedY          float64
 	catX               float64
 	catY               float64
-	torchY             float64
+	TorchY             float64
 	torchImage         *ebiten.Image
 	secondPhaseEnabled bool
 	Complete           bool
@@ -40,7 +42,7 @@ func (me *GameSceneTransition) Initialize() {
 	me.catX = me.ViewWidth - CAT_RUN_ANIMATION_FRAME_WIDTH - me.CatViewX
 	me.catY = me.FloorY - float64(me.catRunImage.Bounds().Dy())
 	me.torchImage = LoadImage(TORCH_IMAGE_BYTES)
-	me.torchY = me.ViewHeight
+	me.TorchY = me.ViewHeight
 }
 
 func (me *GameSceneTransition) Update(deltaTime float64) {
@@ -62,9 +64,13 @@ func (me *GameSceneTransition) Update(deltaTime float64) {
 			me.catSpeedY = -100
 		}
 	} else {
-		me.torchY -= me.TorchSpeedY * deltaTime
-		me.torchY += me.catSpeedY * deltaTime
+		me.TorchY -= me.TorchSpeedY * deltaTime
+		me.TorchY += me.catSpeedY * deltaTime
 		me.catY += me.catSpeedY * deltaTime
+		if me.catY <= me.CatViewY {
+			me.Complete = true
+			me.catY = me.CatViewY
+		}
 	}
 }
 
@@ -91,7 +97,7 @@ func (me *GameSceneTransition) drawCatRun(screen *ebiten.Image) {
 }
 
 func (me *GameSceneTransition) drawTorches(screen *ebiten.Image) {
-	for y := me.torchY; y < me.ViewHeight+float64(me.torchImage.Bounds().Dy()); y += me.PaddingWidth {
+	for y := me.TorchY; y < me.ViewHeight+float64(me.torchImage.Bounds().Dy()); y += me.TorchGapY {
 		var x = me.PaddingWidth / 2
 		DrawTorch(screen, me.torchImage, x, y)
 		x = me.ViewWidth - me.PaddingWidth/2

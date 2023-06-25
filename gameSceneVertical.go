@@ -22,7 +22,7 @@ type GameSceneVertical struct {
 	catEntity       CatEntityVertical
 	fallObstacleMan FallObstacleMan
 	cameraY         float64
-	torchY          float64
+	TorchY          float64
 	torchImage      *ebiten.Image
 	brickImage      *ebiten.Image
 	dirtImage       *ebiten.Image
@@ -50,10 +50,10 @@ func (me *GameSceneVertical) Update(deltaTime float64) {
 	me.catEntity.Update(deltaTime)
 	me.fallObstacleMan.CameraY = me.cameraY
 	me.fallObstacleMan.Update(deltaTime)
-	me.cameraY = me.catEntity.Y - 10
-	me.torchY -= math.Round(deltaTime * me.GetTorchSpeedY())
-	for me.torchY < -me.getTorchGapY() {
-		me.torchY += me.getTorchGapY()
+	me.cameraY = me.catEntity.Y - me.GetCatViewY()
+	me.TorchY -= math.Round(deltaTime * me.GetTorchSpeedY())
+	for me.TorchY < -me.GetTorchGapY() {
+		me.TorchY += me.GetTorchGapY()
 	}
 }
 
@@ -71,7 +71,7 @@ func (me *GameSceneVertical) GetTorchSpeedY() float64 {
 	return 100
 }
 
-func (me *GameSceneVertical) getTorchGapY() float64 {
+func (me *GameSceneVertical) GetTorchGapY() float64 {
 	return 200
 }
 
@@ -83,9 +83,13 @@ func (me *GameSceneVertical) getTorchScale() float64 {
 	return 0.5
 }
 
+func (me *GameSceneVertical) GetCatViewY() float64 {
+	return 10
+}
+
 func (me *GameSceneVertical) drawDecorations(screen *ebiten.Image) {
 	me.drawShaftBackground(screen)
-	for y := me.torchY - me.getTorchGapY(); y < me.ViewHeight+me.getTorchGapY(); y += me.getTorchGapY() {
+	for y := me.TorchY - me.GetTorchGapY(); y < me.ViewHeight+me.GetTorchGapY(); y += me.GetTorchGapY() {
 		me.drawTorchPair(screen, y)
 		me.drawFloors(screen, y)
 	}

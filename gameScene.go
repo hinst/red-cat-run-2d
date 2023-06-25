@@ -39,7 +39,9 @@ func (me *GameScene) Initialize() {
 	me.sceneTransition.CatViewX = me.sceneHorizontal.GetCatViewX()
 	me.sceneTransition.FloorY = me.sceneHorizontal.GetFloorY()
 	me.sceneTransition.PaddingWidth = me.sceneVertical.GetPaddingWidth()
+	me.sceneTransition.TorchGapY = me.sceneVertical.GetTorchGapY()
 	me.sceneTransition.TorchSpeedY = me.sceneVertical.GetTorchSpeedY()
+	me.sceneTransition.CatViewY = me.sceneVertical.GetCatViewY()
 	me.sceneTransition.Initialize()
 	me.Status = GAME_SCENE_STATUS_TRANSITION
 }
@@ -56,6 +58,10 @@ func (me *GameScene) Update(deltaTime float64) {
 		}
 	case GAME_SCENE_STATUS_TRANSITION:
 		me.sceneTransition.Update(deltaTime)
+		if me.sceneTransition.Complete {
+			me.Status = GAME_SCENE_STATUS_VERTICAL
+			me.sceneVertical.TorchY = me.sceneTransition.TorchY
+		}
 	case GAME_SCENE_STATUS_VERTICAL:
 		me.sceneVertical.JustPressedKeys = me.JustPressedKeys
 		me.sceneVertical.PressedKeys = me.PressedKeys
