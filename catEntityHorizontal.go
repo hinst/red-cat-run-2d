@@ -82,27 +82,38 @@ func (me *CatEntityHorizontal) updateRun(deltaTime float64) {
 		me.runFrame -= CAT_RUN_ANIMATION_FRAME_COUNT
 	}
 	for _, key := range me.JustPressedKeys {
-		if key == ebiten.KeySpace && me.CheckJumpAllowed() {
+		if key == ebiten.KeySpace && me.Status == CAT_ENTITY_STATUS_RUN && me.CheckJumpAllowed() {
 			for _, key := range me.PressedKeys {
-				if key == ebiten.KeyUp && me.Status == CAT_ENTITY_STATUS_RUN && me.Location == TERRAIN_LOCATION_FLOOR {
-					me.Status = CAT_ENTITY_STATUS_JUMP_SWITCH
-					PlaySound(JUMP_SOUND_BYTES, 0.25)
+				var checkJumpForward = func() bool {
+					return key == ebiten.KeyRight && me.Direction == DIRECTION_RIGHT ||
+						key == ebiten.KeyLeft && me.Direction == DIRECTION_LEFT
 				}
-				if key == ebiten.KeyDown && me.Status == CAT_ENTITY_STATUS_RUN && me.Location == TERRAIN_LOCATION_CEILING {
+				if key == ebiten.KeyUp && me.Location == TERRAIN_LOCATION_FLOOR {
 					me.Status = CAT_ENTITY_STATUS_JUMP_SWITCH
-					PlaySound(JUMP_SOUND_BYTES, 0.25)
-				}
-				var isJumpForward = me.Status == CAT_ENTITY_STATUS_RUN &&
-					(key == ebiten.KeyRight && me.Direction == DIRECTION_RIGHT ||
-						key == ebiten.KeyLeft && me.Direction == DIRECTION_LEFT)
-				if isJumpForward {
+					me.playJumpSound()
+					break
+				} else if key == ebiten.KeyDown && me.Location == TERRAIN_LOCATION_CEILING {
+					me.Status = CAT_ENTITY_STATUS_JUMP_SWITCH
+					me.playJumpSound()
+					break
+				} else if checkJumpForward() {
 					me.Status = CAT_ENTITY_STATUS_JUMP_FORWARD
 					me.horizontalJumpTimeRemaining = CAT_ENTITY_HORIZONTAL_JUMP_TIME
-					PlaySound(JUMP_SOUND_BYTES, 0.25)
+					me.playJumpSound()
+					break
+				} else {
+					me.Status = CAT_ENTITY_STATUS_JUMP_FORWARD
+					me.horizontalJumpTimeRemaining = CAT_ENTITY_HORIZONTAL_JUMP_TIME
+					me.playJumpSound()
+					break
 				}
 			}
 		}
 	}
+}
+
+func (me *CatEntityHorizontal) playJumpSound() {
+	PlaySound(JUMP_SOUND_BYTES, 0.25)
 }
 
 func (me *CatEntityHorizontal) updateJumpSwitch(deltaTime float64) {

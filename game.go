@@ -135,7 +135,7 @@ func (me *Game) Update() error {
 
 func (me *Game) Draw(screen *ebiten.Image) {
 	if !me.initialized {
-		ebitenutil.DebugPrint(screen, "Initialization...")
+		ebitenutil.DebugPrint(screen, "Waiting for initialization...")
 		return
 	}
 	var updateTime = time.Now()
