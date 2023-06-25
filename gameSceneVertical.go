@@ -170,7 +170,7 @@ func (me *GameSceneVertical) drawShaftBackground(screen *ebiten.Image) {
 }
 
 func (me *GameSceneVertical) getWallAlphaSpeed() float64 {
-	return 0.3
+	return 0.5
 }
 
 func (me *GameSceneVertical) checkCollided() bool {
@@ -186,5 +186,5 @@ func (me GameSceneVertical) drawFish(screen *ebiten.Image) {
 }
 
 func (me GameSceneVertical) GetAreaHeight() float64 {
-	return me.ViewHeight * 6
+	return me.ViewHeight * 9
 }

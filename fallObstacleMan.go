@@ -2,7 +2,6 @@ package main
 
 import (
 	"image/color"
-	"math"
 	"math/rand"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -29,37 +28,40 @@ type FallObstacleMan struct {
 
 func (me *FallObstacleMan) Initialize() {
 	me.obstacleImage = LoadImage(OBSTACLE_IMAGE_BYTES)
-	me.ObstacleWidth = float64(me.obstacleImage.Bounds().Dx()) * 2.2
+	me.ObstacleWidth = float64(me.obstacleImage.Bounds().Dx()) * 2
 	var previousX float64
-	var previousX0 float64
-	var previousX1 float64
+	var previousType int
 	for y := me.ViewHeight; y < me.AreaHeight-me.ViewHeight; y += me.getDistanceBetweenObstacles() {
 		for xIndex := 0; xIndex < 2; xIndex++ {
-			var width = me.AreaWidth - me.ObstacleWidth - me.getPadding()*2
 			var x float64
 			if xIndex == 0 {
-				var findX = func() float64 {
-					return me.getShaftLeft() + me.getPadding() +
-						me.ObstacleWidth/2 + rand.Float64()*width
+				var placementType = rand.Intn(3)
+				for i := 0; i < 4 && placementType == previousType; i++ {
+					placementType = rand.Intn(3)
 				}
-				x = findX()
-				for i := 0; i < 5; i++ {
-					if y != me.ViewHeight && math.Abs(x-previousX0) < me.AreaWidth/6 || math.Abs(x-previousX1) < me.AreaWidth/6 {
-						println("searching")
-						x = findX()
+				println(placementType)
+				switch placementType {
+				case 0:
+					x = me.getShaftLeft() + me.ObstacleWidth*0.77
+				case 1:
+					x = me.ViewWidth / 2
+					if previousType == 0 {
+						x += -1 - rand.Float64()
+					} else if previousType == 2 {
+						x += +1 + rand.Float64()
 					} else {
-						println("found", y)
-						break
+						x += 0.5 + rand.Float64()
 					}
+				case 2:
+					x = me.getShaftRight() - me.ObstacleWidth*0.77
 				}
-				previousX0 = x
+				previousType = placementType
 			} else {
 				if previousX < me.ViewWidth/2 {
 					x = previousX + me.ObstacleWidth*1.5
 				} else {
 					x = previousX - me.ObstacleWidth*1.5
 				}
-				previousX1 = x
 			}
 			var obstacle = FloatPoint{
 				X: x,
@@ -68,7 +70,9 @@ func (me *FallObstacleMan) Initialize() {
 			if xIndex == 1 {
 				obstacle.Y += me.getFluctuationY()*0.5 + rand.Float64()*me.getFluctuationY()
 			}
-			me.obstacles = append(me.obstacles, obstacle)
+			if xIndex == 0 || rand.Intn(3) != 0 {
+				me.obstacles = append(me.obstacles, obstacle)
+			}
 			previousX = x
 		}
 	}
@@ -92,7 +96,7 @@ func (me *FallObstacleMan) getDistanceBetweenObstacles() float64 {
 }
 
 func (me *FallObstacleMan) getFluctuationY() float64 {
-	return 30
+	return 0
 }
 
 func (me *FallObstacleMan) getAnimationAngleSpeed() float64 {
@@ -101,6 +105,10 @@ func (me *FallObstacleMan) getAnimationAngleSpeed() float64 {
 
 func (me *FallObstacleMan) getShaftLeft() float64 {
 	return me.ViewWidth/2 - me.AreaWidth/2
+}
+
+func (me *FallObstacleMan) getShaftRight() float64 {
+	return me.ViewWidth/2 + me.AreaWidth/2
 }
 
 func (me *FallObstacleMan) getPadding() float64 {
