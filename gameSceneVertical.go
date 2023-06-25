@@ -2,8 +2,6 @@ package main
 
 import (
 	"log"
-	"math"
-	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
@@ -53,7 +51,7 @@ func (me *GameSceneVertical) Update(deltaTime float64) {
 	me.fallObstacleMan.CameraY = me.cameraY
 	me.fallObstacleMan.Update(deltaTime)
 	me.cameraY = me.catEntity.Y - me.GetCatViewY()
-	me.TorchY -= math.Round(deltaTime * me.GetTorchSpeedY())
+	me.TorchY -= deltaTime * me.GetTorchSpeedY()
 	for me.TorchY < -me.GetTorchGapY() {
 		me.TorchY += me.GetTorchGapY()
 	}
@@ -111,22 +109,7 @@ func (me *GameSceneVertical) drawTorchPair(screen *ebiten.Image, y float64) {
 }
 
 func (me *GameSceneVertical) drawTorch(screen *ebiten.Image, x float64, y float64) {
-	var torchScale = me.getTorchScale()
-	var imageWidth = float64(me.torchImage.Bounds().Dx())
-	var imageHeight = float64(me.torchImage.Bounds().Dy())
-	var xScaleMultiplier float64 = 1
-	if time.Now().Nanosecond() < 1000_000_000/2 {
-		xScaleMultiplier = -1
-	}
-	var drawOptions = ebiten.DrawImageOptions{}
-	ScaleCentered(&drawOptions, imageWidth, imageHeight, xScaleMultiplier, 1)
-	drawOptions.GeoM.Scale(torchScale, torchScale)
-	DrawTorchLight(screen, float32(x), float32(y))
-	drawOptions.GeoM.Translate(
-		x-imageWidth/2*torchScale,
-		y-imageHeight/2*torchScale,
-	)
-	screen.DrawImage(me.torchImage, &drawOptions)
+	DrawTorch(screen, me.torchImage, x, y)
 }
 
 func (me *GameSceneVertical) drawFloors(screen *ebiten.Image, y float64) {
@@ -138,7 +121,7 @@ func (me *GameSceneVertical) drawFloors(screen *ebiten.Image, y float64) {
 }
 
 func (me *GameSceneVertical) drawFloorPart(screen *ebiten.Image, baseX float64, baseY float64) {
-	var y = baseY + float64(me.brickImage.Bounds().Dy()) + float64(me.torchImage.Bounds().Dy())*me.getTorchScale()
+	var y = baseY + float64(me.brickImage.Bounds().Dy())*3 + float64(me.torchImage.Bounds().Dy())*me.getTorchScale()
 	var drawOptions ebiten.DrawImageOptions
 	drawOptions.GeoM.Translate(baseX, y)
 	drawOptions.ColorScale.Scale(float32(me.wallAlpha), float32(me.wallAlpha), float32(me.wallAlpha), float32(me.wallAlpha))
