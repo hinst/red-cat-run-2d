@@ -143,7 +143,9 @@ func (me *GameSceneVertical) Draw(screen *ebiten.Image) {
 	me.drawDecorations(screen)
 	me.catEntity.Draw(screen)
 	me.obstacleMan.Draw(screen)
-	me.drawFish(screen)
+	if me.catEntity.Direction == DIRECTION_BOTTOM {
+		me.drawFish(screen)
+	}
 	if me.dead && me.deadMessageDelay <= 0 {
 		vector.DrawFilledRect(screen, 0, 0, float32(me.ViewWidth), float32(me.ViewHeight), color.NRGBA{R: 0, G: 0, B: 0, A: 128}, false)
 		ebitenutil.DebugPrintAt(screen, "YOU DIED\n"+"press any key", 180, 100)
