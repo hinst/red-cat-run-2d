@@ -46,6 +46,11 @@ const (
 	GAME_MENU_ITEM_ID_EXIT
 )
 
+const GAME_TEXT_CONTROLS = "Hold arrow keys to aim\n" +
+	"Press [arrow key]+[space] to jump\n" +
+	"\n" +
+	"press any key to start..."
+
 func (me *Game) Initialize() {
 	var titleImage, _, titleImageError = image.Decode(bytes.NewReader(TITLE_IMAGE_BYTES))
 	AssertError(titleImageError)
@@ -136,7 +141,7 @@ func (me *Game) draw(screen *ebiten.Image) {
 	} else if me.mode == GAME_MODE_GAME {
 		me.gameScene.Draw(screen)
 		if !me.initialInformationAcknowledged {
-			ebitenutil.DebugPrintAt(screen, GAME_INFO_SCENE_TEXT_CONTROLS, 50, 100)
+			ebitenutil.DebugPrintAt(screen, GAME_TEXT_CONTROLS, 80, 80)
 		}
 	} else if me.mode == GAME_MODE_INFORMATION {
 		me.gameInfoScene.Draw(screen)
@@ -167,6 +172,9 @@ func (me *Game) updateGameScene(deltaTime float64) {
 	me.gameScene.PressedKeys = me.pressedKeys
 	me.gameScene.JustPressedKeys = me.justPressedKeys
 	me.gameScene.Update(deltaTime)
+	if me.gameScene.Completed {
+		me.mode = GAME_MODE_MENU
+	}
 }
 
 func (me *Game) drawEbitenReverse(screen *ebiten.Image) {

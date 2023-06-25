@@ -1,6 +1,9 @@
 package main
 
-import "github.com/hajimehoshi/ebiten/v2"
+import (
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+)
 
 type GameSceneStatus int
 
@@ -19,11 +22,15 @@ type GameScene struct {
 	JustPressedKeys []ebiten.Key
 	// Input parameter for every update
 	PressedKeys []ebiten.Key
+	// Output parameter
+	Completed bool
 
 	Status          GameSceneStatus
 	sceneHorizontal GameSceneHorizontal
 	sceneTransition GameSceneTransition
 	sceneVertical   GameSceneVertical
+	timeAfterDeath  float64
+	dead            bool
 }
 
 func (me *GameScene) Initialize() {
@@ -44,7 +51,7 @@ func (me *GameScene) Initialize() {
 	me.sceneTransition.TorchSpeedY = me.sceneVertical.GetTorchSpeedY()
 	me.sceneTransition.CatViewY = me.sceneVertical.GetCatViewY()
 	me.sceneTransition.Initialize()
-	me.Status = GAME_SCENE_STATUS_VERTICAL
+	me.Status = GAME_SCENE_STATUS_HORIZONTAL
 }
 
 func (me *GameScene) Update(deltaTime float64) {
@@ -57,6 +64,12 @@ func (me *GameScene) Update(deltaTime float64) {
 			me.Status = GAME_SCENE_STATUS_TRANSITION
 			me.sceneTransition.CatRunFrame = me.sceneHorizontal.CatEntity.runFrame
 		}
+		if me.sceneHorizontal.CatEntity.Status == CAT_ENTITY_STATUS_DEAD {
+			me.timeAfterDeath += deltaTime
+			if me.timeAfterDeath >= me.GetTimeToDie() {
+				me.dead = true
+			}
+		}
 	case GAME_SCENE_STATUS_TRANSITION:
 		me.sceneTransition.Update(deltaTime)
 		if me.sceneTransition.Complete {
@@ -67,6 +80,9 @@ func (me *GameScene) Update(deltaTime float64) {
 		me.sceneVertical.JustPressedKeys = me.JustPressedKeys
 		me.sceneVertical.PressedKeys = me.PressedKeys
 		me.sceneVertical.Update(deltaTime)
+	}
+	if len(me.JustPressedKeys) > 0 && me.dead {
+		me.Completed = true
 	}
 }
 
@@ -79,4 +95,11 @@ func (me *GameScene) Draw(screen *ebiten.Image) {
 	case GAME_SCENE_STATUS_VERTICAL:
 		me.sceneVertical.Draw(screen)
 	}
+	if me.dead {
+		ebitenutil.DebugPrintAt(screen, "YOU DIED\n"+"press any key", 150, 100)
+	}
+}
+
+func (me *GameScene) GetTimeToDie() float64 {
+	return 2
 }

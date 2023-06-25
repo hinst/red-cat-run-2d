@@ -32,7 +32,7 @@ const GAME_SCENE_TRANSITION_TIME = 2
 func (me *GameSceneHorizontal) Initialize() {
 	me.terrainMan.ViewWidth = me.ViewWidth
 	me.terrainMan.ViewHeight = me.ViewHeight
-	me.terrainMan.AreaWidth = 200
+	me.terrainMan.AreaWidth = 150
 	me.terrainMan.FloorY = me.GetFloorY()
 	me.terrainMan.CeilingY = me.GetCeilingY()
 	me.terrainMan.Initialize()
@@ -168,7 +168,6 @@ func (me *GameSceneHorizontal) drawFish(screen *ebiten.Image) {
 		if me.terrainMan.GetLastBlock().Location == TERRAIN_LOCATION_FLOOR {
 			y = me.GetFloorY() - float64(me.fishImage.Bounds().Dy()) - 1
 		} else if me.terrainMan.GetLastBlock().Location == TERRAIN_LOCATION_CEILING {
-			ScaleCentered(&drawOptions, float64(me.fishImage.Bounds().Dx()), float64(me.fishImage.Bounds().Dy()), 1, -1)
 			y = me.GetCeilingY() + 1
 		}
 		var x = me.GetAreaWidth() - float64(me.fishImage.Bounds().Dx())

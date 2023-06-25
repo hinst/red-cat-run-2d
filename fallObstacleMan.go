@@ -2,7 +2,6 @@ package main
 
 import (
 	"image/color"
-	"math"
 	"math/rand"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -32,7 +31,7 @@ func (me *FallObstacleMan) Initialize() {
 	for y := me.ViewHeight; y < me.AreaHeight-me.ViewHeight; y += me.getDistanceBetweenObstacles() {
 		var width = me.AreaWidth - me.ObstacleWidth - me.getPadding()*2
 		var x = me.getShaftLeft() + me.getPadding() +
-			me.ObstacleWidth/2 + math.Round(rand.Float64())*width
+			me.ObstacleWidth/2 + rand.Float64()*width
 		var obstacle = FloatPoint{
 			X: x,
 			Y: y + (rand.Float64()-0.5)*me.getFluctuationY(),
