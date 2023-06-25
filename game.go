@@ -53,7 +53,7 @@ const (
 const GAME_TEXT_CONTROLS = "Hold arrow keys to aim\n" +
 	"Press [arrow key]+[space] to jump\n" +
 	"\n" +
-	"press any key to start..."
+	"press any key to start"
 
 func (me *Game) Initialize() {
 	var titleImage, _, titleImageError = image.Decode(bytes.NewReader(TITLE_IMAGE_BYTES))

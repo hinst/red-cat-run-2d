@@ -186,5 +186,5 @@ func (me GameSceneVertical) drawFish(screen *ebiten.Image) {
 }
 
 func (me GameSceneVertical) GetAreaHeight() float64 {
-	return me.ViewHeight * 3
+	return me.ViewHeight * 6
 }
