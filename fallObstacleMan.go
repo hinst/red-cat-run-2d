@@ -39,7 +39,6 @@ func (me *FallObstacleMan) Initialize() {
 				for i := 0; i < 4 && placementType == previousType; i++ {
 					placementType = rand.Intn(3)
 				}
-				println(placementType)
 				switch placementType {
 				case 0:
 					x = me.getShaftLeft() + me.ObstacleWidth*0.77
@@ -109,10 +108,6 @@ func (me *FallObstacleMan) getShaftLeft() float64 {
 
 func (me *FallObstacleMan) getShaftRight() float64 {
 	return me.ViewWidth/2 + me.AreaWidth/2
-}
-
-func (me *FallObstacleMan) getPadding() float64 {
-	return 10
 }
 
 func (me *FallObstacleMan) drawObstacle(screen *ebiten.Image, index int, obstacle FloatPoint) {
