@@ -140,9 +140,9 @@ func (me *GameSceneTransition) drawTorches(screen *ebiten.Image) {
 }
 
 func (me *GameSceneTransition) getInitialCatFallScaleY() float64 {
-	return 2
+	return 1.66
 }
 
 func (me *GameSceneTransition) getInitialTorchFallScaleY() float64 {
-	return 2
+	return 1.66
 }
