@@ -184,17 +184,6 @@ func (me *Game) drawEbitenReverse(screen *ebiten.Image) {
 	screen.DrawImage(me.ebitengineReverseImage, &drawOptions)
 }
 
-func (me *Game) drawCatAnimationBottom(screen *ebiten.Image) {
-	var drawOptions = ebiten.DrawImageOptions{}
-	drawOptions.GeoM.Scale(-1, 1)
-	drawOptions.GeoM.Rotate(math.Pi)
-	drawOptions.GeoM.Translate(285, 229)
-
-	var spriteShiftX = float64(int(me.catRunFrame)) * CAT_RUN_ANIMATION_FRAME_WIDTH
-	var rect = GetShiftedRectangle(spriteShiftX, CAT_RUN_ANIMATION_FRAME_WIDTH, float64(me.catWalkImage.Bounds().Dy()))
-	screen.DrawImage(me.catWalkImage.SubImage(rect).(*ebiten.Image), &drawOptions)
-}
-
 func (me *Game) drawCatAnimationTop(screen *ebiten.Image) {
 	var drawOptions = ebiten.DrawImageOptions{}
 	drawOptions.GeoM.Scale(-1, 1)
