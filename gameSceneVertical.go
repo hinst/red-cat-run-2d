@@ -26,6 +26,7 @@ type GameSceneVertical struct {
 	torchImage      *ebiten.Image
 	brickImage      *ebiten.Image
 	dirtImage       *ebiten.Image
+	wallAlpha       float64
 }
 
 func (me *GameSceneVertical) Initialize() {
@@ -34,6 +35,7 @@ func (me *GameSceneVertical) Initialize() {
 	}
 	me.catEntity.Initialize()
 	me.cameraY = me.catEntity.Y - 10
+	me.catEntity.CameraY = me.cameraY
 	me.catEntity.X = me.ViewWidth/2 - me.catEntity.Width/2
 	me.fallObstacleMan.AreaWidth = me.GetAreaWidth()
 	me.fallObstacleMan.AreaHeight = me.ViewHeight * 10
