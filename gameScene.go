@@ -27,6 +27,7 @@ type GameScene struct {
 }
 
 func (me *GameScene) Initialize() {
+	PlaySound(ACHIEVEMENT_SOUND_BYTES, 0.5)
 	me.sceneHorizontal.ViewWidth = me.ViewWidth
 	me.sceneHorizontal.ViewHeight = me.ViewHeight
 	me.sceneHorizontal.Initialize()
@@ -43,7 +44,7 @@ func (me *GameScene) Initialize() {
 	me.sceneTransition.TorchSpeedY = me.sceneVertical.GetTorchSpeedY()
 	me.sceneTransition.CatViewY = me.sceneVertical.GetCatViewY()
 	me.sceneTransition.Initialize()
-	me.Status = GAME_SCENE_STATUS_TRANSITION
+	me.Status = GAME_SCENE_STATUS_HORIZONTAL
 }
 
 func (me *GameScene) Update(deltaTime float64) {

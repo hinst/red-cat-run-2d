@@ -86,9 +86,11 @@ func (me *CatEntityHorizontal) updateRun(deltaTime float64) {
 			for _, key := range me.PressedKeys {
 				if key == ebiten.KeyUp && me.Status == CAT_ENTITY_STATUS_RUN && me.Location == TERRAIN_LOCATION_FLOOR {
 					me.Status = CAT_ENTITY_STATUS_JUMP_SWITCH
+					PlaySound(JUMP_SOUND_BYTES, 0.25)
 				}
 				if key == ebiten.KeyDown && me.Status == CAT_ENTITY_STATUS_RUN && me.Location == TERRAIN_LOCATION_CEILING {
 					me.Status = CAT_ENTITY_STATUS_JUMP_SWITCH
+					PlaySound(JUMP_SOUND_BYTES, 0.25)
 				}
 				var isJumpForward = me.Status == CAT_ENTITY_STATUS_RUN &&
 					(key == ebiten.KeyRight && me.Direction == DIRECTION_RIGHT ||
@@ -96,6 +98,7 @@ func (me *CatEntityHorizontal) updateRun(deltaTime float64) {
 				if isJumpForward {
 					me.Status = CAT_ENTITY_STATUS_JUMP_FORWARD
 					me.horizontalJumpTimeRemaining = CAT_ENTITY_HORIZONTAL_JUMP_TIME
+					PlaySound(JUMP_SOUND_BYTES, 0.25)
 				}
 			}
 		}

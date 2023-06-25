@@ -18,7 +18,8 @@ const GAME_INFO_SCENE_TEXT_GENERAL = "RED CAT RUN 2D\n" +
 	"GAME INFO:\n" +
 	"Game RED CAT RUN 2D produced for Ebitengine Game Jam 2023\n" +
 	"Author username: hinst on GitHub, alexsharp on Discord\n" +
-	"Some images were sourced from craftpix.net"
+	"Some images were sourced from craftpix.net: free\n" +
+	"Sound sourced from freesound.org: LittleRobotSoundFactory"
 
 const GAME_INFO_SCENE_TEXT_CONTROLS = "Hold arrow keys to aim\n" +
 	"Press [space] to jump while holding an arrow key"
