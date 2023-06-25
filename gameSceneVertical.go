@@ -45,29 +45,29 @@ func (me *GameSceneVertical) Initialize() {
 	me.dirtImage = LoadImage(DIRT_BLOCK_IMAGE_BYTES)
 }
 
-func (me *GameSceneVertical) Draw(screen *ebiten.Image) {
-	me.drawDecorations(screen)
-	me.catEntity.Draw(screen)
-	me.fallObstacleMan.Draw(screen)
-}
-
 func (me *GameSceneVertical) Update(deltaTime float64) {
 	me.catEntity.CameraY = me.cameraY
 	me.catEntity.Update(deltaTime)
 	me.fallObstacleMan.CameraY = me.cameraY
 	me.fallObstacleMan.Update(deltaTime)
 	me.cameraY = me.catEntity.Y - 10
-	me.torchY -= math.Round(deltaTime * me.getTorchSpeed())
+	me.torchY -= math.Round(deltaTime * me.GetTorchSpeedY())
 	for me.torchY < -me.getTorchGapY() {
 		me.torchY += me.getTorchGapY()
 	}
+}
+
+func (me *GameSceneVertical) Draw(screen *ebiten.Image) {
+	me.drawDecorations(screen)
+	me.catEntity.Draw(screen)
+	me.fallObstacleMan.Draw(screen)
 }
 
 func (me *GameSceneVertical) GetAreaWidth() float64 {
 	return 220
 }
 
-func (me *GameSceneVertical) getTorchSpeed() float64 {
+func (me *GameSceneVertical) GetTorchSpeedY() float64 {
 	return 100
 }
 
@@ -75,7 +75,7 @@ func (me *GameSceneVertical) getTorchGapY() float64 {
 	return 200
 }
 
-func (me *GameSceneVertical) getPaddingWidth() float64 {
+func (me *GameSceneVertical) GetPaddingWidth() float64 {
 	return (me.ViewWidth - me.GetAreaWidth()) / 2
 }
 
@@ -92,9 +92,9 @@ func (me *GameSceneVertical) drawDecorations(screen *ebiten.Image) {
 }
 
 func (me *GameSceneVertical) drawTorchPair(screen *ebiten.Image, y float64) {
-	var x = me.getPaddingWidth() / 2
+	var x = me.GetPaddingWidth() / 2
 	me.drawTorch(screen, x, y)
-	x = me.ViewWidth - me.getPaddingWidth()/2
+	x = me.ViewWidth - me.GetPaddingWidth()/2
 	me.drawTorch(screen, x, y)
 }
 
@@ -102,11 +102,11 @@ func (me *GameSceneVertical) drawTorch(screen *ebiten.Image, x float64, y float6
 	var torchScale = me.getTorchScale()
 	var imageWidth = float64(me.torchImage.Bounds().Dx())
 	var imageHeight = float64(me.torchImage.Bounds().Dy())
-	var drawOptions = ebiten.DrawImageOptions{}
 	var xScaleMultiplier float64 = 1
 	if time.Now().Nanosecond() < 1000_000_000/2 {
 		xScaleMultiplier = -1
 	}
+	var drawOptions = ebiten.DrawImageOptions{}
 	ScaleCentered(&drawOptions, imageWidth, imageHeight, xScaleMultiplier, 1)
 	drawOptions.GeoM.Scale(torchScale, torchScale)
 	DrawTorchLight(screen, float32(x), float32(y))
@@ -119,7 +119,7 @@ func (me *GameSceneVertical) drawTorch(screen *ebiten.Image, x float64, y float6
 
 func (me *GameSceneVertical) drawFloors(screen *ebiten.Image, y float64) {
 	var brickImageWidth = float64(me.brickImage.Bounds().Dx())
-	for x := float64(0); x < me.getPaddingWidth()-brickImageWidth; x += brickImageWidth {
+	for x := float64(0); x < me.GetPaddingWidth()-brickImageWidth; x += brickImageWidth {
 		me.drawFloorPart(screen, x, y)
 		me.drawFloorPart(screen, me.ViewWidth-x-brickImageWidth, y)
 	}
@@ -139,7 +139,7 @@ func (me *GameSceneVertical) drawFloorPart(screen *ebiten.Image, baseX float64, 
 }
 
 func (me *GameSceneVertical) drawShaftBackground(screen *ebiten.Image) {
-	var width = (int(me.getPaddingWidth())/me.brickImage.Bounds().Dx() - 1) * me.brickImage.Bounds().Dx()
+	var width = (int(me.GetPaddingWidth())/me.brickImage.Bounds().Dx() - 1) * me.brickImage.Bounds().Dx()
 	vector.DrawFilledRect(screen, 0, 0, float32(width), float32(me.ViewHeight), SHAFT_COLOR, false)
 	vector.DrawFilledRect(screen, float32(me.ViewWidth)-float32(width), 0, float32(width), float32(me.ViewHeight), SHAFT_COLOR, false)
 }

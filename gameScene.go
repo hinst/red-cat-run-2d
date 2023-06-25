@@ -30,14 +30,18 @@ func (me *GameScene) Initialize() {
 	me.sceneHorizontal.ViewWidth = me.ViewWidth
 	me.sceneHorizontal.ViewHeight = me.ViewHeight
 	me.sceneHorizontal.Initialize()
-	me.sceneTransition.ViewWidth = me.ViewWidth
-	me.sceneTransition.CatViewX = me.sceneHorizontal.GetCatViewX()
-	me.sceneTransition.FloorY = me.sceneHorizontal.GetFloorY()
-	me.sceneTransition.Initialize()
 	me.sceneVertical.ViewWidth = me.ViewWidth
 	me.sceneVertical.ViewHeight = me.ViewHeight
 	me.sceneVertical.Initialize()
-	me.Status = GAME_SCENE_STATUS_HORIZONTAL
+	me.sceneTransition.ViewWidth = me.ViewWidth
+	me.sceneTransition.ViewHeight = me.ViewHeight
+	me.sceneTransition.CatSpeedX = me.sceneHorizontal.CatEntity.GetSpeedX()
+	me.sceneTransition.CatViewX = me.sceneHorizontal.GetCatViewX()
+	me.sceneTransition.FloorY = me.sceneHorizontal.GetFloorY()
+	me.sceneTransition.PaddingWidth = me.sceneVertical.GetPaddingWidth()
+	me.sceneTransition.TorchSpeedY = me.sceneVertical.GetTorchSpeedY()
+	me.sceneTransition.Initialize()
+	me.Status = GAME_SCENE_STATUS_TRANSITION
 }
 
 func (me *GameScene) Update(deltaTime float64) {
@@ -48,7 +52,7 @@ func (me *GameScene) Update(deltaTime float64) {
 		me.sceneHorizontal.Update(deltaTime)
 		if me.sceneHorizontal.Completed {
 			me.Status = GAME_SCENE_STATUS_TRANSITION
-			me.sceneTransition.CatRunFrame = me.sceneHorizontal.catEntity.runFrame
+			me.sceneTransition.CatRunFrame = me.sceneHorizontal.CatEntity.runFrame
 		}
 	case GAME_SCENE_STATUS_TRANSITION:
 		me.sceneTransition.Update(deltaTime)
