@@ -70,7 +70,7 @@ func (me *FallObstacleMan) Draw(screen *ebiten.Image) {
 }
 
 func (me *FallObstacleMan) getDistanceBetweenObstacles() float64 {
-	return 90
+	return 130
 }
 
 func (me *FallObstacleMan) getFluctuationY() float64 {
@@ -90,6 +90,12 @@ func (me *FallObstacleMan) getPadding() float64 {
 }
 
 func (me *FallObstacleMan) drawObstacle(screen *ebiten.Image, index int, obstacle FloatPoint) {
+	var x = obstacle.X - me.ObstacleWidth/2
+	var y = obstacle.Y - me.CameraY - me.ObstacleWidth/2
+	var isVisible = -me.ObstacleWidth < y && y < me.ViewWidth
+	if !isVisible {
+		return
+	}
 	var drawOptions ebiten.DrawImageOptions
 	RotateCentered(&drawOptions,
 		float64(me.obstacleImage.Bounds().Dx()), float64(me.obstacleImage.Bounds().Dy()),
@@ -97,7 +103,7 @@ func (me *FallObstacleMan) drawObstacle(screen *ebiten.Image, index int, obstacl
 	drawOptions.GeoM.Scale(
 		me.ObstacleWidth/float64(me.obstacleImage.Bounds().Dx()),
 		me.ObstacleWidth/float64(me.obstacleImage.Bounds().Dy()))
-	drawOptions.GeoM.Translate(obstacle.X-me.ObstacleWidth/2, obstacle.Y-me.CameraY-me.ObstacleWidth/2)
+	drawOptions.GeoM.Translate(x, y)
 	screen.DrawImage(me.obstacleImage, &drawOptions)
 	if me.DebugModeEnabled {
 		var r = me.GetCollisionRectangle(obstacle)

@@ -38,6 +38,7 @@ type Game struct {
 	catWalkImage                   *ebiten.Image
 	catRunFrame                    float64
 	initialInformationAcknowledged bool
+	fpsCounterEnabled              bool
 }
 
 const (
@@ -45,6 +46,7 @@ const (
 	GAME_MENU_ITEM_ID_TOGGLE_FULL_SCREEN
 	GAME_MENU_ITEM_ID_GENERAL_INFORMATION
 	GAME_MENU_ITEM_ID_TOGGLE_VSYNC
+	GAME_MENU_ITEM_ID_TOGGLE_FPS_COUNTER
 	GAME_MENU_ITEM_ID_EXIT
 )
 
@@ -80,6 +82,10 @@ func (me *Game) Initialize() {
 			{
 				Title: "Toggle Vsync: " + strconv.FormatBool(ebiten.IsVsyncEnabled()),
 				Id:    GAME_MENU_ITEM_ID_TOGGLE_VSYNC,
+			},
+			{
+				Title: "Toggle FPS counter",
+				Id:    GAME_MENU_ITEM_ID_TOGGLE_FPS_COUNTER,
 			},
 			{
 				Title: "Exit",
@@ -152,6 +158,9 @@ func (me *Game) draw(screen *ebiten.Image) {
 	} else if me.mode == GAME_MODE_INFORMATION {
 		me.gameInfoScene.Draw(screen)
 	}
+	if me.fpsCounterEnabled {
+		ebitenutil.DebugPrint(screen, strconv.FormatFloat(ebiten.ActualFPS(), 'f', 0, 64))
+	}
 }
 
 func (me *Game) updateMenu(deltaTime float64) {
@@ -173,6 +182,8 @@ func (me *Game) updateMenu(deltaTime float64) {
 				me.menu.Items[i].Title = "Toggle Vsync: " + strconv.FormatBool(ebiten.IsVsyncEnabled())
 			}
 		}
+	case GAME_MENU_ITEM_ID_TOGGLE_FPS_COUNTER:
+		me.fpsCounterEnabled = !me.fpsCounterEnabled
 	case GAME_MENU_ITEM_ID_EXIT:
 		me.isExiting = true
 	}
