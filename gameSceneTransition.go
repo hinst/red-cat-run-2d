@@ -42,7 +42,7 @@ func (me *GameSceneTransition) Initialize() {
 	me.catX = me.ViewWidth - CAT_RUN_ANIMATION_FRAME_WIDTH - me.CatViewX
 	me.catY = me.FloorY - float64(me.catRunImage.Bounds().Dy())
 	me.torchImage = LoadImage(TORCH_IMAGE_BYTES)
-	me.TorchY = me.ViewHeight
+	me.TorchY = me.ViewHeight * me.getInitialTorchFallScaleY()
 }
 
 func (me *GameSceneTransition) Update(deltaTime float64) {
@@ -61,6 +61,7 @@ func (me *GameSceneTransition) Update(deltaTime float64) {
 		} else {
 			me.secondPhaseEnabled = true
 			me.catX = me.ViewWidth / 2
+			me.catY = me.ViewHeight * me.getInitialCatFallScaleY()
 			me.catSpeedY = -100
 		}
 	} else {
@@ -103,4 +104,12 @@ func (me *GameSceneTransition) drawTorches(screen *ebiten.Image) {
 		x = me.ViewWidth - me.PaddingWidth/2
 		DrawTorch(screen, me.torchImage, x, y)
 	}
+}
+
+func (me *GameSceneTransition) getInitialCatFallScaleY() float64 {
+	return 2.33
+}
+
+func (me *GameSceneTransition) getInitialTorchFallScaleY() float64 {
+	return 2
 }
