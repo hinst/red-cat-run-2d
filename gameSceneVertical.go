@@ -145,7 +145,7 @@ func (me *GameSceneVertical) Draw(screen *ebiten.Image) {
 		vector.DrawFilledRect(screen, 0, 0, float32(me.ViewWidth), float32(me.ViewHeight), color.NRGBA{R: 0, G: 0, B: 0, A: 128}, false)
 		ebitenutil.DebugPrintAt(screen, "YOU DIED\n"+"press any key", 180, 100)
 	}
-	if true || me.ascended {
+	if me.ascended {
 		var drawOptions ebiten.DrawImageOptions
 		RotateCentered(&drawOptions, float64(me.ascendedImage.Bounds().Dx()), float64(me.ascendedImage.Bounds().Dy()), me.ascendedAngle)
 		ScaleCentered(&drawOptions, float64(me.ascendedImage.Bounds().Dx()), float64(me.ascendedImage.Bounds().Dy()), 16, 16)
@@ -250,7 +250,7 @@ func (me *GameSceneVertical) drawFish(screen *ebiten.Image) {
 }
 
 func (me *GameSceneVertical) GetAreaHeight() float64 {
-	return me.ViewHeight * 1
+	return me.ViewHeight * 9
 }
 
 func (me *GameSceneVertical) checkBottomReached() bool {

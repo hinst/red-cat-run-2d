@@ -51,7 +51,7 @@ func (me *GameScene) Initialize() {
 	me.sceneTransition.TorchSpeedY = me.sceneVertical.GetTorchSpeedY()
 	me.sceneTransition.CatViewY = me.sceneVertical.GetCatViewY()
 	me.sceneTransition.Initialize()
-	me.Status = GAME_SCENE_STATUS_VERTICAL
+	me.Status = GAME_SCENE_STATUS_HORIZONTAL
 }
 
 func (me *GameScene) Update(deltaTime float64) {
