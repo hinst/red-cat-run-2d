@@ -56,8 +56,9 @@ func (me *CatEntityVertical) Draw(screen *ebiten.Image) {
 	var spriteShiftX = float64(int(me.flyAnimationFrame)) * CAT_FLY_ANIMATION_FRAME_WIDTH
 	var rectangle = GetShiftedRectangle(spriteShiftX, me.Width, me.Height)
 	if me.DebugModeEnabled {
+		var box = me.GetHitBox()
 		vector.DrawFilledRect(screen,
-			float32(me.X), float32(me.Y-me.CameraY), float32(me.Width), float32(me.Height),
+			float32(box.A.X), float32(box.A.Y-me.CameraY), float32(box.GetWidth()), float32(box.GetHeight()),
 			color.NRGBA{R: 255, G: 255, B: 255, A: 127}, true)
 	}
 	screen.DrawImage(me.flyImage.SubImage(rectangle).(*ebiten.Image), &drawOptions)
@@ -72,7 +73,7 @@ func (me *CatEntityVertical) GetSteerSpeed() float64 {
 	return 80
 }
 
-func (me *CatEntityHorizontal) GetHitBox() Rectangle {
+func (me *CatEntityVertical) GetHitBox() Rectangle {
 	var rect = Rectangle{
 		A: FloatPoint{
 			X: me.X,
@@ -81,5 +82,5 @@ func (me *CatEntityHorizontal) GetHitBox() Rectangle {
 	}
 	rect.B.X = rect.A.X + me.Width
 	rect.B.Y = rect.A.Y + me.Height
-	return rect
+	return rect.Shrink(1)
 }

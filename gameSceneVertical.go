@@ -46,19 +46,10 @@ func (me *GameSceneVertical) Initialize() {
 }
 
 func (me *GameSceneVertical) Update(deltaTime float64) {
-	me.catEntity.PressedKeys = me.PressedKeys
-	me.catEntity.JustPressedKeys = me.JustPressedKeys
-	me.catEntity.CameraY = me.cameraY
-	me.catEntity.Update(deltaTime)
-	if me.catEntity.X < me.GetPaddingWidth() {
-		me.catEntity.X = me.GetPaddingWidth()
-	}
-	if me.catEntity.X >= me.ViewWidth-me.GetPaddingWidth()-me.catEntity.Width {
-		me.catEntity.X = me.ViewWidth - me.GetPaddingWidth() - me.catEntity.Width
-	}
+	me.updateCatEntity(deltaTime)
+	me.cameraY = me.catEntity.Y - me.GetCatViewY()
 	me.fallObstacleMan.CameraY = me.cameraY
 	me.fallObstacleMan.Update(deltaTime)
-	me.cameraY = me.catEntity.Y - me.GetCatViewY()
 	me.TorchY -= deltaTime * me.GetTorchSpeedY()
 	for me.TorchY < -me.GetTorchGapY() {
 		me.TorchY += me.GetTorchGapY()
@@ -68,6 +59,19 @@ func (me *GameSceneVertical) Update(deltaTime float64) {
 		if me.wallAlpha >= 1 {
 			me.wallAlpha = 1
 		}
+	}
+}
+
+func (me *GameSceneVertical) updateCatEntity(deltaTime float64) {
+	me.catEntity.PressedKeys = me.PressedKeys
+	me.catEntity.JustPressedKeys = me.JustPressedKeys
+	me.catEntity.CameraY = me.cameraY
+	me.catEntity.Update(deltaTime)
+	if me.catEntity.X < me.GetPaddingWidth() {
+		me.catEntity.X = me.GetPaddingWidth()
+	}
+	if me.catEntity.X >= me.ViewWidth-me.GetPaddingWidth()-me.catEntity.Width {
+		me.catEntity.X = me.ViewWidth - me.GetPaddingWidth() - me.catEntity.Width
 	}
 }
 
