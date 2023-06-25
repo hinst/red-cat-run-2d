@@ -84,6 +84,9 @@ func (me *GameScene) Update(deltaTime float64) {
 		me.sceneVertical.JustPressedKeys = me.JustPressedKeys
 		me.sceneVertical.PressedKeys = me.PressedKeys
 		me.sceneVertical.Update(deltaTime)
+		if me.sceneVertical.Ascended && me.backgroundMusic != nil && me.backgroundMusic.IsPlaying() {
+			me.backgroundMusic.Pause()
+		}
 		if me.sceneVertical.Completed {
 			me.Completed = true
 		}
@@ -91,11 +94,15 @@ func (me *GameScene) Update(deltaTime float64) {
 	if len(me.JustPressedKeys) > 0 && me.dead {
 		me.Completed = true
 	}
+	me.updateMusic(deltaTime)
+}
+
+func (me *GameScene) updateMusic(deltaTime float64) {
 	if me.timeBeforeBackgroundMusic > 0 {
 		me.timeBeforeBackgroundMusic -= deltaTime
 	} else if me.backgroundMusic == nil {
-		me.backgroundMusic = PlaySound(ACHIEVEMENT_SOUND_BYTES, 0.2)
-	} else if !me.backgroundMusic.IsPlaying() {
+		me.backgroundMusic = PlaySound(VIBIN_SOUND_BYTES, 0.2)
+	} else if !me.backgroundMusic.IsPlaying() && !me.sceneVertical.Ascended {
 		me.backgroundMusic.Seek(0)
 		me.backgroundMusic.Play()
 	}
@@ -117,4 +124,11 @@ func (me *GameScene) Draw(screen *ebiten.Image) {
 
 func (me *GameScene) GetTimeToDie() float64 {
 	return 2
+}
+
+func (me *GameScene) Close() {
+	if me.backgroundMusic != nil {
+		me.backgroundMusic.Close()
+		me.backgroundMusic = nil
+	}
 }

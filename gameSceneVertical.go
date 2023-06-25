@@ -33,7 +33,7 @@ type GameSceneVertical struct {
 	dead             bool
 	deadMessageDelay float64
 	fishImage        *ebiten.Image
-	ascended         bool
+	Ascended         bool
 	ascendedImage    *ebiten.Image
 	ascendedAngle    float64
 	ascendedPulse    float64
@@ -88,7 +88,7 @@ func (me *GameSceneVertical) Update(deltaTime float64) {
 	if me.dead && len(me.JustPressedKeys) > 0 && me.deadMessageDelay <= 0 {
 		me.Completed = true
 	}
-	if me.ascended && len(me.JustPressedKeys) > 0 {
+	if me.Ascended && len(me.JustPressedKeys) > 0 {
 		me.Completed = true
 	}
 	if me.deadMessageDelay > 0 {
@@ -112,11 +112,11 @@ func (me *GameSceneVertical) Update(deltaTime float64) {
 			me.deadMessageDelay = 2
 		}
 	}
-	if me.catEntity.Direction == DIRECTION_TOP && me.catEntity.Y < 0 && !me.ascended {
-		me.ascended = true
+	if me.catEntity.Direction == DIRECTION_TOP && me.catEntity.Y < 0 && !me.Ascended {
+		me.Ascended = true
 		PlaySound(ASCENDED_SOUND_BYTES, 0.20)
 	}
-	if me.ascended {
+	if me.Ascended {
 		me.ascendedAngle += deltaTime
 		me.ascendedAngle = UnwindAngle(me.ascendedAngle)
 		me.ascendedPulse += deltaTime
@@ -148,7 +148,7 @@ func (me *GameSceneVertical) Draw(screen *ebiten.Image) {
 		vector.DrawFilledRect(screen, 0, 0, float32(me.ViewWidth), float32(me.ViewHeight), color.NRGBA{R: 0, G: 0, B: 0, A: 128}, false)
 		ebitenutil.DebugPrintAt(screen, "YOU DIED\n"+"press any key", 180, 100)
 	}
-	if me.ascended {
+	if me.Ascended {
 		var drawOptions ebiten.DrawImageOptions
 		RotateCentered(&drawOptions, float64(me.ascendedImage.Bounds().Dx()), float64(me.ascendedImage.Bounds().Dy()), me.ascendedAngle)
 		ScaleCentered(&drawOptions, float64(me.ascendedImage.Bounds().Dx()), float64(me.ascendedImage.Bounds().Dy()), 16, 16)

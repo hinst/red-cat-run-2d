@@ -199,6 +199,7 @@ func (me *Game) updateGameScene(deltaTime float64) {
 	me.gameScene.JustPressedKeys = me.justPressedKeys
 	me.gameScene.Update(deltaTime)
 	if me.gameScene.Completed {
+		me.gameScene.Close()
 		me.mode = GAME_MODE_MENU
 	}
 }
