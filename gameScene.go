@@ -34,6 +34,7 @@ type GameScene struct {
 	dead                      bool
 	timeBeforeBackgroundMusic float64
 	backgroundMusic           *audio.Player
+	backgroundMusicVolume     float64
 }
 
 func (me *GameScene) Initialize() {
@@ -56,6 +57,7 @@ func (me *GameScene) Initialize() {
 	me.sceneTransition.Initialize()
 	me.Status = GAME_SCENE_STATUS_HORIZONTAL
 	me.timeBeforeBackgroundMusic = 3
+	me.backgroundMusicVolume = 0.2
 }
 
 func (me *GameScene) Update(deltaTime float64) {
@@ -84,9 +86,6 @@ func (me *GameScene) Update(deltaTime float64) {
 		me.sceneVertical.JustPressedKeys = me.JustPressedKeys
 		me.sceneVertical.PressedKeys = me.PressedKeys
 		me.sceneVertical.Update(deltaTime)
-		if me.sceneVertical.Ascended && me.backgroundMusic != nil && me.backgroundMusic.IsPlaying() {
-			me.backgroundMusic.Pause()
-		}
 		if me.sceneVertical.Completed {
 			me.Completed = true
 		}
@@ -101,10 +100,22 @@ func (me *GameScene) updateMusic(deltaTime float64) {
 	if me.timeBeforeBackgroundMusic > 0 {
 		me.timeBeforeBackgroundMusic -= deltaTime
 	} else if me.backgroundMusic == nil {
-		me.backgroundMusic = PlaySound(VIBIN_SOUND_BYTES, 0.2)
+		me.backgroundMusic = PlaySound(VIBIN_SOUND_BYTES, me.backgroundMusicVolume)
 	} else if !me.backgroundMusic.IsPlaying() && !me.sceneVertical.Ascended {
 		me.backgroundMusic.Seek(0)
 		me.backgroundMusic.Play()
+	}
+
+	if me.backgroundMusic != nil {
+		if me.sceneVertical.Ascended && me.backgroundMusicVolume > 0 {
+			me.backgroundMusicVolume -= deltaTime * 0.1
+			if me.backgroundMusicVolume < 0 {
+				me.backgroundMusicVolume = 0
+			}
+		}
+		if me.backgroundMusic.Volume() != me.backgroundMusicVolume {
+			me.backgroundMusic.SetVolume(me.backgroundMusicVolume)
+		}
 	}
 }
 

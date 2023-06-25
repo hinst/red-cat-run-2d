@@ -17,9 +17,10 @@ const GAME_INFO_SCENE_TEXT_GENERAL = "RED CAT RUN 2D\n" +
 	"\n" +
 	"GAME INFO:\n" +
 	"Game RED CAT RUN 2D produced for Ebitengine Game Jam 2023\n" +
-	"Author username: hinst on GitHub, alexsharp on Discord\n" +
+	"Author username: hinst on GitHub, alexsharp on Discord (programming)\n" +
 	"Some images were sourced from craftpix.net: free\n" +
-	"Sound sourced from freesound.org: LittleRobotSoundFactory"
+	"Sound sourced from freesound.org: LittleRobotSoundFactory\n" +
+	"Music sourced from soundful.com"
 
 func (me *GameInfoScene) Draw(screen *ebiten.Image) {
 	var x = 4
