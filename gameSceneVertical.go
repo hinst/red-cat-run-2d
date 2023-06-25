@@ -99,7 +99,7 @@ func (me *GameSceneVertical) Update(deltaTime float64) {
 			me.dead = true
 			me.deadMessageDelay = 2
 			me.catEntity.Collided = true
-			PlaySound(EXPLOSION_SOUND_BYTES, 0.25)
+			PlaySound(EXPLOSION_SOUND_BYTES, 0.20)
 		}
 	}
 	if me.catEntity.Direction == DIRECTION_BOTTOM && me.checkBottomReached() {
@@ -107,12 +107,14 @@ func (me *GameSceneVertical) Update(deltaTime float64) {
 			PlaySound(REVERSE_SOUND_BYTES, 0.20)
 			me.catEntity.Direction = DIRECTION_TOP
 			me.obstacleMan.CreateObstacles()
-		} else {
+		} else if !me.dead {
 			me.dead = true
+			me.deadMessageDelay = 2
 		}
 	}
-	if me.catEntity.Direction == DIRECTION_TOP && me.catEntity.Y < 0 {
+	if me.catEntity.Direction == DIRECTION_TOP && me.catEntity.Y < 0 && !me.ascended {
 		me.ascended = true
+		PlaySound(ASCENDED_SOUND_BYTES, 0.20)
 	}
 	if me.ascended {
 		me.ascendedAngle += deltaTime

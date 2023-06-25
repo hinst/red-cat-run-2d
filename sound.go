@@ -31,10 +31,12 @@ func InitializeSound() {
 	HIT_SOUND_BYTES = DecodeVorbis(HIT_SOUND_BYTES)
 	REVERSE_SOUND_BYTES = DecodeVorbis(REVERSE_SOUND_BYTES)
 	EXPLOSION_SOUND_BYTES = DecodeVorbis(EXPLOSION_SOUND_BYTES)
+	ASCENDED_SOUND_BYTES = DecodeVorbis(ASCENDED_SOUND_BYTES)
 }
 
-func PlaySound(data []byte, volume float64) {
+func PlaySound(data []byte, volume float64) *audio.Player {
 	var player = audio.CurrentContext().NewPlayerFromBytes(data)
 	player.SetVolume(volume)
 	player.Play()
+	return player
 }

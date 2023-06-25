@@ -42,4 +42,8 @@ var (
 	REVERSE_SOUND_BYTES []byte
 	//go:embed data/270308__littlerobotsoundfactory__explosion_00.ogg
 	EXPLOSION_SOUND_BYTES []byte
+	//go:embed data/ascended.ogg
+	ASCENDED_SOUND_BYTES []byte
+	//go:embed data/vibin-low-bass.ogg
+	VIBIN_SOUND_BYTES []byte
 )
