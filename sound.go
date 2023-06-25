@@ -34,9 +34,7 @@ func InitializeSound() {
 }
 
 func PlaySound(data []byte, volume float64) {
-	go func() {
-		var player = audio.CurrentContext().NewPlayerFromBytes(data)
-		player.SetVolume(volume)
-		player.Play()
-	}()
+	var player = audio.CurrentContext().NewPlayerFromBytes(data)
+	player.SetVolume(volume)
+	player.Play()
 }

@@ -79,7 +79,6 @@ func (me *TerrainMan) Initialize() {
 			block.Location = TerrainLocation(rand.Intn(2))
 			if me.getOngoingCountOfSameLocationBlocks() >= 3 {
 				block.Location = me.GetLastBlock().Location.GetOpposite()
-				println("Switch triggered")
 			}
 			var gap = GetRandomNumberBetween(me.GetMinGapWidth(), me.GetMaxGapWidth())
 			block.X = me.GetLastBlock().X + me.GetLastBlock().Width + gap
