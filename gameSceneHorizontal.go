@@ -32,7 +32,7 @@ const GAME_SCENE_TRANSITION_TIME = 2
 func (me *GameSceneHorizontal) Initialize() {
 	me.terrainMan.ViewWidth = me.ViewWidth
 	me.terrainMan.ViewHeight = me.ViewHeight
-	me.terrainMan.AreaWidth = 150
+	me.terrainMan.AreaWidth = 10
 	me.terrainMan.FloorY = me.GetFloorY()
 	me.terrainMan.CeilingY = me.GetCeilingY()
 	me.terrainMan.Initialize()

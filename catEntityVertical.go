@@ -1,7 +1,10 @@
 package main
 
 import (
+	"image/color"
+
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 type CatEntityVertical struct {
@@ -10,7 +13,8 @@ type CatEntityVertical struct {
 	flyAnimationDirection float64
 	flyAnimationFrame     float64
 	// Input parameter for every update
-	CameraY float64
+	CameraY          float64
+	DebugModeEnabled bool
 }
 
 func (me *CatEntityVertical) Initialize() {
@@ -18,6 +22,7 @@ func (me *CatEntityVertical) Initialize() {
 	me.Height = 48
 	me.flyImage = LoadImage(CAT_FLY_DOWN_IMAGE_BYTES)
 	me.flyAnimationDirection = 1
+	me.DebugModeEnabled = true
 }
 
 func (me *CatEntityVertical) Update(deltaTime float64) {
@@ -50,6 +55,11 @@ func (me *CatEntityVertical) Draw(screen *ebiten.Image) {
 	drawOptions.GeoM.Translate(me.X, me.Y-me.CameraY)
 	var spriteShiftX = float64(int(me.flyAnimationFrame)) * CAT_FLY_ANIMATION_FRAME_WIDTH
 	var rectangle = GetShiftedRectangle(spriteShiftX, me.Width, me.Height)
+	if me.DebugModeEnabled {
+		vector.DrawFilledRect(screen,
+			float32(me.X), float32(me.Y-me.CameraY), float32(me.Width), float32(me.Height),
+			color.NRGBA{R: 255, G: 255, B: 255, A: 127}, true)
+	}
 	screen.DrawImage(me.flyImage.SubImage(rectangle).(*ebiten.Image), &drawOptions)
 }
 
@@ -60,4 +70,16 @@ func (me *CatEntityVertical) GetSpeedY() float64 {
 
 func (me *CatEntityVertical) GetSteerSpeed() float64 {
 	return 80
+}
+
+func (me *CatEntityHorizontal) GetHitBox() Rectangle {
+	var rect = Rectangle{
+		A: FloatPoint{
+			X: me.X,
+			Y: me.Y,
+		},
+	}
+	rect.B.X = rect.A.X + me.Width
+	rect.B.Y = rect.A.Y + me.Height
+	return rect
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"image/color"
+	"math"
 	"math/rand"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -18,26 +19,40 @@ type FallObstacleMan struct {
 	// Input parameter for initialization. Measurement unit: pixels
 	ViewHeight float64
 	// Input parameter for every update
-	CameraY        float64
-	ObstacleWidth  float64
-	obstacles      []FloatPoint
-	obstacleImage  *ebiten.Image
-	animationAngle float64
+	CameraY          float64
+	ObstacleWidth    float64
+	obstacles        []FloatPoint
+	obstacleImage    *ebiten.Image
+	animationAngle   float64
+	DebugModeEnabled bool
 }
 
 func (me *FallObstacleMan) Initialize() {
 	me.obstacleImage = LoadImage(OBSTACLE_IMAGE_BYTES)
 	me.ObstacleWidth = float64(me.obstacleImage.Bounds().Dx()) * 2
+	var previousX float64
 	for y := me.ViewHeight; y < me.AreaHeight-me.ViewHeight; y += me.getDistanceBetweenObstacles() {
 		var width = me.AreaWidth - me.ObstacleWidth - me.getPadding()*2
-		var x = me.getShaftLeft() + me.getPadding() +
-			me.ObstacleWidth/2 + rand.Float64()*width
+		var findX = func() float64 {
+			return me.getShaftLeft() + me.getPadding() +
+				me.ObstacleWidth/2 + rand.Float64()*width
+		}
+		var x = findX()
+		for i := 0; i < 3; i++ {
+			if math.Abs(x-previousX) < me.AreaWidth/3 {
+				x = findX()
+			} else {
+				break
+			}
+		}
 		var obstacle = FloatPoint{
 			X: x,
 			Y: y + (rand.Float64()-0.5)*me.getFluctuationY(),
 		}
 		me.obstacles = append(me.obstacles, obstacle)
+		previousX = x
 	}
+	me.DebugModeEnabled = true
 }
 
 func (me *FallObstacleMan) Update(deltaTime float64) {
@@ -82,10 +97,28 @@ func (me *FallObstacleMan) drawObstacle(screen *ebiten.Image, index int, obstacl
 		me.ObstacleWidth/float64(me.obstacleImage.Bounds().Dy()))
 	drawOptions.GeoM.Translate(obstacle.X-me.ObstacleWidth/2, obstacle.Y-me.CameraY-me.ObstacleWidth/2)
 	screen.DrawImage(me.obstacleImage, &drawOptions)
+	if me.DebugModeEnabled {
+		var r = me.GetCollisionRectangle(obstacle)
+		vector.DrawFilledRect(screen,
+			float32(r.A.X), float32(r.A.Y-me.CameraY), float32(r.GetWidth()), float32(r.GetHeight()),
+			color.White, false)
+	}
 }
 
 func (me *FallObstacleMan) drawShaftArea(screen *ebiten.Image) {
 	vector.DrawFilledRect(screen,
 		float32(me.getShaftLeft()), 0, float32(me.AreaWidth), float32(me.ViewHeight),
 		color.NRGBA{R: 255, G: 255, B: 255, A: 1}, false)
+}
+
+func (me *FallObstacleMan) GetCollisionRectangle(obstacle FloatPoint) (result Rectangle) {
+	result = Rectangle{
+		A: FloatPoint{
+			X: obstacle.X - me.ObstacleWidth/2,
+			Y: obstacle.Y - me.ObstacleWidth/2,
+		},
+	}
+	result.B.X = result.A.X + me.ObstacleWidth
+	result.B.Y = result.A.Y + me.ObstacleWidth
+	return result.Shrink(5)
 }
