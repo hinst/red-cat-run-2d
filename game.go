@@ -52,8 +52,8 @@ const (
 	GAME_MENU_ITEM_ID_EXIT
 )
 
-const GAME_TEXT_CONTROLS = "up + [space] = jump up\n" +
-	"right + [space] = jump right\n" +
+const GAME_TEXT_CONTROLS = "press [up + space] to jump up\n" +
+	"press [right + space] to jump right\n" +
 	"\n" +
 	"press any key to start"
 
