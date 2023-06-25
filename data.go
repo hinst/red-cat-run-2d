@@ -37,4 +37,6 @@ var (
 	HIT_SOUND_BYTES []byte
 	//go:embed data/270341__littlerobotsoundfactory__pickup_04.ogg
 	REVERSE_SOUND_BYTES []byte
+	//go:embed data/270308__littlerobotsoundfactory__explosion_00.ogg
+	EXPLOSION_SOUND_BYTES []byte
 )
