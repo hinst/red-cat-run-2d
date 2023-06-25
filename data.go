@@ -29,6 +29,7 @@ var (
 	TORCH_IMAGE_BYTES []byte
 	//go:embed data/obstacle.png
 	OBSTACLE_IMAGE_BYTES []byte
+
 	//go:embed data/270330__littlerobotsoundfactory__jingle_achievement_01.ogg
 	ACHIEVEMENT_SOUND_BYTES []byte
 	//go:embed data/270342__littlerobotsoundfactory__pickup_03.ogg

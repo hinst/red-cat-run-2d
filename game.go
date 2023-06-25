@@ -97,6 +97,7 @@ func (me *Game) Initialize() {
 	var catWalkImage, _, catImageError = image.Decode(bytes.NewReader(CAT_RUN_IMAGE_BYTES))
 	AssertError(catImageError)
 	me.catWalkImage = ebiten.NewImageFromImage(catWalkImage)
+	InitializeSound()
 }
 
 func (me *Game) initializeGameScene() {
