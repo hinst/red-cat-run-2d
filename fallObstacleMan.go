@@ -96,7 +96,7 @@ func (me *FallObstacleMan) Draw(screen *ebiten.Image) {
 }
 
 func (me *FallObstacleMan) getDistanceBetweenObstacles() float64 {
-	return 150
+	return 144
 }
 
 func (me *FallObstacleMan) getFluctuationY() float64 {

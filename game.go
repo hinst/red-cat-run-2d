@@ -32,6 +32,8 @@ type Game struct {
 	mode            GameMode
 	viewWidth       float64
 	viewHeight      float64
+	updatesToSkip   int
+	initialized     bool
 
 	titleImage                     *ebiten.Image
 	ebitengineReverseImage         *ebiten.Image
@@ -56,14 +58,18 @@ const GAME_TEXT_CONTROLS = "up + [space] = jump up\n" +
 	"press any key to start"
 
 func (me *Game) Initialize() {
+	me.viewWidth = 420
+	me.viewHeight = 240
+	me.updatesToSkip = 4
+}
+
+func (me *Game) initializeInternal() {
 	var titleImage, _, titleImageError = image.Decode(bytes.NewReader(TITLE_IMAGE_BYTES))
 	AssertError(titleImageError)
 	me.titleImage = ebiten.NewImageFromImage(titleImage)
 	var ebitengineReverseImage, _, ebitengineReverseImageError = image.Decode(bytes.NewReader(EBITENGINE_REVERSE_IMAGE_BYTES))
 	AssertError(ebitengineReverseImageError)
 	me.ebitengineReverseImage = ebiten.NewImageFromImage(ebitengineReverseImage)
-	me.viewWidth = 420
-	me.viewHeight = 240
 	me.updateTime = time.Now()
 	me.menu = MenuUserInterface{
 		Items: []MenuUserInterfaceItem{
@@ -98,6 +104,7 @@ func (me *Game) Initialize() {
 	AssertError(catImageError)
 	me.catWalkImage = ebiten.NewImageFromImage(catWalkImage)
 	InitializeSound()
+	me.initialized = true
 }
 
 func (me *Game) initializeGameScene() {
@@ -108,6 +115,14 @@ func (me *Game) initializeGameScene() {
 }
 
 func (me *Game) Update() error {
+	if me.updatesToSkip > 0 {
+		me.updatesToSkip--
+		return nil
+	}
+	if !me.initialized {
+		me.initializeInternal()
+		return nil
+	}
 	me.justPressedKeys = me.justPressedKeys[:0]
 	me.justPressedKeys = inpututil.AppendJustPressedKeys(me.justPressedKeys)
 	me.pressedKeys = me.pressedKeys[:0]
@@ -119,6 +134,10 @@ func (me *Game) Update() error {
 }
 
 func (me *Game) Draw(screen *ebiten.Image) {
+	if !me.initialized {
+		ebitenutil.DebugPrint(screen, "Initialization...")
+		return
+	}
 	var updateTime = time.Now()
 	var deltaTime = math.Min(1, updateTime.Sub(me.updateTime).Seconds())
 	me.update(deltaTime)
