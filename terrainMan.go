@@ -196,7 +196,7 @@ func (me *TerrainMan) drawBlocks(screen *ebiten.Image) {
 }
 
 func (me *TerrainMan) Shuffle() {
-	for i := 0; i < len(me.blocks)-1; i++ {
+	for i := 1; i < len(me.blocks)-1; i++ {
 		if i == len(me.blocks)-2 {
 			me.blocks[i].Location = me.blocks[i].Location.GetOpposite()
 		} else {

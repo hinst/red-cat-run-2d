@@ -6,6 +6,7 @@ type GameSceneStatus int
 
 const (
 	GAME_SCENE_STATUS_HORIZONTAL GameSceneStatus = iota
+	GAME_SCENE_STATUS_TRANSITION
 	GAME_SCENE_STATUS_VERTICAL
 )
 
@@ -21,6 +22,7 @@ type GameScene struct {
 
 	Status              GameSceneStatus
 	gameSceneHorizontal GameSceneHorizontal
+	gameSceneTransition GameSceneTransition
 	gameSceneVertical   GameSceneVertical
 }
 
@@ -28,6 +30,10 @@ func (me *GameScene) Initialize() {
 	me.gameSceneHorizontal.ViewWidth = me.ViewWidth
 	me.gameSceneHorizontal.ViewHeight = me.ViewHeight
 	me.gameSceneHorizontal.Initialize()
+	me.gameSceneTransition.ViewWidth = me.ViewWidth
+	me.gameSceneTransition.CatViewX = me.gameSceneHorizontal.GetCatViewX()
+	me.gameSceneTransition.FloorY = me.gameSceneHorizontal.GetFloorY()
+	me.gameSceneTransition.Initialize()
 	me.gameSceneVertical.ViewWidth = me.ViewWidth
 	me.gameSceneVertical.ViewHeight = me.ViewHeight
 	me.gameSceneVertical.Initialize()
@@ -41,8 +47,11 @@ func (me *GameScene) Update(deltaTime float64) {
 		me.gameSceneHorizontal.PressedKeys = me.PressedKeys
 		me.gameSceneHorizontal.Update(deltaTime)
 		if me.gameSceneHorizontal.Completed {
-			me.Status = GAME_SCENE_STATUS_VERTICAL
+			me.Status = GAME_SCENE_STATUS_TRANSITION
+			me.gameSceneTransition.CatRunFrame = me.gameSceneHorizontal.catEntity.runFrame
 		}
+	case GAME_SCENE_STATUS_TRANSITION:
+		me.gameSceneTransition.Update(deltaTime)
 	case GAME_SCENE_STATUS_VERTICAL:
 		me.gameSceneVertical.JustPressedKeys = me.JustPressedKeys
 		me.gameSceneVertical.PressedKeys = me.PressedKeys
@@ -54,6 +63,8 @@ func (me *GameScene) Draw(screen *ebiten.Image) {
 	switch me.Status {
 	case GAME_SCENE_STATUS_HORIZONTAL:
 		me.gameSceneHorizontal.Draw(screen)
+	case GAME_SCENE_STATUS_TRANSITION:
+		me.gameSceneTransition.Draw(screen)
 	case GAME_SCENE_STATUS_VERTICAL:
 		me.gameSceneVertical.Draw(screen)
 	}

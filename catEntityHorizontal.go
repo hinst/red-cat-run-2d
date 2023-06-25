@@ -1,8 +1,6 @@
 package main
 
 import (
-	"bytes"
-	"image"
 	"image/color"
 	"math"
 
@@ -38,13 +36,8 @@ type CatEntityHorizontal struct {
 }
 
 func (me *CatEntityHorizontal) Initialize() {
-	var catWalkImage, _, catWalkImageError = image.Decode(bytes.NewReader(CAT_RUN_IMAGE_BYTES))
-	AssertError(catWalkImageError)
-	me.runImage = ebiten.NewImageFromImage(catWalkImage)
-
-	var catDieImage, _, catDieImageError = image.Decode(bytes.NewReader(CAT_DIE_IMAGE_BYTES))
-	AssertError(catDieImageError)
-	me.dieImage = ebiten.NewImageFromImage(catDieImage)
+	me.runImage = LoadImage(CAT_RUN_IMAGE_BYTES)
+	me.dieImage = LoadImage(CAT_DIE_IMAGE_BYTES)
 
 	me.Width = 40
 	me.Height = 25
@@ -195,12 +188,14 @@ func (me *CatEntityHorizontal) Draw(screen *ebiten.Image) {
 		me.Status == CAT_ENTITY_STATUS_JUMP_FORWARD
 	if isRunDrawMode {
 		var spriteShiftX = float64(int(me.runFrame)) * CAT_RUN_ANIMATION_FRAME_WIDTH
-		var rect = GetShiftedRectangle(spriteShiftX, CAT_RUN_ANIMATION_FRAME_WIDTH, float64(me.runImage.Bounds().Dy()))
-		screen.DrawImage(me.runImage.SubImage(rect).(*ebiten.Image), &drawOptions)
+		var animationFrameRectangle = GetShiftedRectangle(spriteShiftX,
+			CAT_RUN_ANIMATION_FRAME_WIDTH, float64(me.runImage.Bounds().Dy()))
+		screen.DrawImage(me.runImage.SubImage(animationFrameRectangle).(*ebiten.Image), &drawOptions)
 	} else if me.Status == CAT_ENTITY_STATUS_DEAD {
 		var spriteShiftX = float64(int(me.dieFrame)) * CAT_RUN_ANIMATION_FRAME_WIDTH
-		var rect = GetShiftedRectangle(spriteShiftX, CAT_RUN_ANIMATION_FRAME_WIDTH, float64(me.dieImage.Bounds().Dy()))
-		screen.DrawImage(me.dieImage.SubImage(rect).(*ebiten.Image), &drawOptions)
+		var animationFrameRectangle = GetShiftedRectangle(spriteShiftX,
+			CAT_RUN_ANIMATION_FRAME_WIDTH, float64(me.dieImage.Bounds().Dy()))
+		screen.DrawImage(me.dieImage.SubImage(animationFrameRectangle).(*ebiten.Image), &drawOptions)
 	}
 }
 
