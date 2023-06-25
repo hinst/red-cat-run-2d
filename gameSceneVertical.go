@@ -19,6 +19,8 @@ type GameSceneVertical struct {
 	JustPressedKeys []ebiten.Key
 	// Input parameter for every update
 	PressedKeys []ebiten.Key
+	// Output parameter
+	Completed bool
 
 	catEntity        CatEntityVertical
 	obstacleMan      FallObstacleMan
@@ -31,8 +33,10 @@ type GameSceneVertical struct {
 	dead             bool
 	deadMessageDelay float64
 	fishImage        *ebiten.Image
-	// Output parameter
-	Completed bool
+	ascended         bool
+	ascendedImage    *ebiten.Image
+	ascendedAngle    float64
+	ascendedPulse    float64
 }
 
 func (me *GameSceneVertical) Initialize() {
@@ -52,11 +56,16 @@ func (me *GameSceneVertical) Initialize() {
 	me.brickImage = LoadImage(BRICK_BLOCK_IMAGE_BYTES)
 	me.dirtImage = LoadImage(DIRT_BLOCK_IMAGE_BYTES)
 	me.fishImage = LoadImage(FISH_IMAGE_BYTES)
+	me.ascendedImage = LoadImage(ASCENDED_IMAGE_BYTES)
 }
 
 func (me *GameSceneVertical) Update(deltaTime float64) {
 	me.updateCatEntity(deltaTime)
-	me.cameraY = me.catEntity.Y - me.GetCatViewY()
+	if me.catEntity.Direction == DIRECTION_BOTTOM {
+		me.cameraY = me.catEntity.Y - me.GetCatViewY()
+	} else if me.catEntity.Direction == DIRECTION_TOP {
+		me.cameraY = me.catEntity.Y - me.ViewHeight + me.catEntity.Height + me.GetCatViewY()
+	}
 	if me.cameraY < me.GetAreaHeight()-me.ViewHeight {
 		me.TorchY -= deltaTime * me.GetTorchSpeedY()
 	} else {
@@ -67,6 +76,9 @@ func (me *GameSceneVertical) Update(deltaTime float64) {
 	for me.TorchY < -me.GetTorchGapY() {
 		me.TorchY += me.GetTorchGapY()
 	}
+	for me.TorchY > me.GetTorchGapY() {
+		me.TorchY -= me.GetTorchGapY()
+	}
 	if me.wallAlpha < 1 {
 		me.wallAlpha += deltaTime * me.getWallAlphaSpeed()
 		if me.wallAlpha >= 1 {
@@ -74,6 +86,9 @@ func (me *GameSceneVertical) Update(deltaTime float64) {
 		}
 	}
 	if me.dead && len(me.JustPressedKeys) > 0 && me.deadMessageDelay <= 0 {
+		me.Completed = true
+	}
+	if me.ascended && len(me.JustPressedKeys) > 0 {
 		me.Completed = true
 	}
 	if me.deadMessageDelay > 0 {
@@ -87,11 +102,23 @@ func (me *GameSceneVertical) Update(deltaTime float64) {
 			PlaySound(EXPLOSION_SOUND_BYTES, 0.25)
 		}
 	}
-	if me.checkBottomReached() {
+	if me.catEntity.Direction == DIRECTION_BOTTOM && me.checkBottomReached() {
 		if me.checkFishReached() {
-			PlaySound(ACHIEVEMENT_SOUND_BYTES, 0.5)
+			PlaySound(REVERSE_SOUND_BYTES, 0.20)
+			me.catEntity.Direction = DIRECTION_TOP
 		} else {
 			me.dead = true
+		}
+	}
+	if me.catEntity.Direction == DIRECTION_TOP && me.catEntity.Y < 0 {
+		me.ascended = true
+	}
+	if me.ascended {
+		me.ascendedAngle += deltaTime
+		me.ascendedAngle = UnwindAngle(me.ascendedAngle)
+		me.ascendedPulse += deltaTime
+		if me.ascendedPulse >= math.Pi {
+			me.ascendedPulse = 0
 		}
 	}
 }
@@ -118,14 +145,27 @@ func (me *GameSceneVertical) Draw(screen *ebiten.Image) {
 		vector.DrawFilledRect(screen, 0, 0, float32(me.ViewWidth), float32(me.ViewHeight), color.NRGBA{R: 0, G: 0, B: 0, A: 128}, false)
 		ebitenutil.DebugPrintAt(screen, "YOU DIED\n"+"press any key", 180, 100)
 	}
+	if true || me.ascended {
+		var drawOptions ebiten.DrawImageOptions
+		RotateCentered(&drawOptions, float64(me.ascendedImage.Bounds().Dx()), float64(me.ascendedImage.Bounds().Dy()), me.ascendedAngle)
+		ScaleCentered(&drawOptions, float64(me.ascendedImage.Bounds().Dx()), float64(me.ascendedImage.Bounds().Dy()), 16, 16)
+		drawOptions.GeoM.Translate(me.ViewWidth/2-float64(me.ascendedImage.Bounds().Dx())/2, me.ViewHeight)
+		drawOptions.ColorScale.Scale(float32(math.Sin(me.ascendedPulse)), float32(math.Sin(me.ascendedPulse)), float32(math.Sin(me.ascendedPulse)), float32(math.Sin(me.ascendedPulse)))
+		screen.DrawImage(me.ascendedImage, &drawOptions)
+		ebitenutil.DebugPrintAt(screen, "YOU HAVE ASCENDED\n"+"  press any key", 160, 50)
+	}
 }
 
 func (me *GameSceneVertical) GetAreaWidth() float64 {
 	return 220
 }
 
-func (me *GameSceneVertical) GetTorchSpeedY() float64 {
-	return 120
+func (me *GameSceneVertical) GetTorchSpeedY() (result float64) {
+	result = 120
+	if me.catEntity.Direction == DIRECTION_TOP {
+		result = -result
+	}
+	return
 }
 
 func (me *GameSceneVertical) GetTorchGapY() float64 {
@@ -210,7 +250,7 @@ func (me *GameSceneVertical) drawFish(screen *ebiten.Image) {
 }
 
 func (me *GameSceneVertical) GetAreaHeight() float64 {
-	return me.ViewHeight * 9
+	return me.ViewHeight * 1
 }
 
 func (me *GameSceneVertical) checkBottomReached() bool {
@@ -218,5 +258,5 @@ func (me *GameSceneVertical) checkBottomReached() bool {
 }
 
 func (me *GameSceneVertical) checkFishReached() bool {
-	return math.Abs(me.catEntity.X+me.catEntity.Width/2-me.ViewWidth/2) < float64(me.fishImage.Bounds().Dx())*2
+	return math.Abs(me.catEntity.X+me.catEntity.Width/2-me.ViewWidth/2) < float64(me.fishImage.Bounds().Dx())/2+me.catEntity.Width/2
 }

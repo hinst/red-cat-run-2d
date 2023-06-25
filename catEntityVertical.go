@@ -20,6 +20,7 @@ type CatEntityVertical struct {
 	angle                 float64
 	collidedY             float64
 	lastSteerDirection    Direction
+	Direction             Direction
 }
 
 func (me *CatEntityVertical) Initialize() {
@@ -27,6 +28,7 @@ func (me *CatEntityVertical) Initialize() {
 	me.Height = 48
 	me.flyImage = LoadImage(CAT_FLY_DOWN_IMAGE_BYTES)
 	me.flyAnimationDirection = 1
+	me.Direction = DIRECTION_BOTTOM
 	me.DebugModeEnabled = false
 }
 
@@ -67,6 +69,9 @@ func (me *CatEntityVertical) Draw(screen *ebiten.Image) {
 	if me.lastSteerDirection == DIRECTION_LEFT {
 		ScaleCentered(&drawOptions, CAT_FLY_ANIMATION_FRAME_WIDTH, float64(me.flyImage.Bounds().Dy()), -1, 1)
 	}
+	if me.Direction == DIRECTION_TOP {
+		ScaleCentered(&drawOptions, CAT_FLY_ANIMATION_FRAME_WIDTH, float64(me.flyImage.Bounds().Dy()), 1, -1)
+	}
 	RotateCentered(&drawOptions, CAT_FLY_ANIMATION_FRAME_WIDTH, float64(me.flyImage.Bounds().Dy()), me.angle)
 	drawOptions.GeoM.Translate(me.X, me.Y-me.CameraY+me.collidedY)
 	var spriteShiftX = float64(int(me.flyAnimationFrame)) * CAT_FLY_ANIMATION_FRAME_WIDTH
@@ -81,8 +86,12 @@ func (me *CatEntityVertical) Draw(screen *ebiten.Image) {
 }
 
 // Measurement unit: pixels per second
-func (me *CatEntityVertical) GetSpeedY() float64 {
-	return 50
+func (me *CatEntityVertical) GetSpeedY() (result float64) {
+	result = 50
+	if me.Direction == DIRECTION_TOP {
+		result = -result
+	}
+	return
 }
 
 func (me *CatEntityVertical) GetSteerSpeed() float64 {
