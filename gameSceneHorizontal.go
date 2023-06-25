@@ -70,6 +70,7 @@ func (me *GameSceneHorizontal) Update(deltaTime float64) {
 		}
 		if me.CheckCatAtRightEndOfTerrain() && me.CatEntity.Direction == DIRECTION_RIGHT {
 			me.switchDirection()
+			PlaySound(REVERSE_SOUND_BYTES, 0.20)
 		}
 		if me.CheckCatAtLeftEndOfTerrain() && me.CatEntity.Direction == DIRECTION_LEFT {
 			me.Completed = true

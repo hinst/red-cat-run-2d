@@ -33,4 +33,8 @@ var (
 	ACHIEVEMENT_SOUND_BYTES []byte
 	//go:embed data/270342__littlerobotsoundfactory__pickup_03.ogg
 	JUMP_SOUND_BYTES []byte
+	//go:embed data/270326__littlerobotsoundfactory__hit_01.ogg
+	HIT_SOUND_BYTES []byte
+	//go:embed data/270341__littlerobotsoundfactory__pickup_04.ogg
+	REVERSE_SOUND_BYTES []byte
 )

@@ -116,6 +116,7 @@ func (me *CatEntityHorizontal) updateJumpSwitch(deltaTime float64) {
 			me.Status = CAT_ENTITY_STATUS_RUN
 			me.Location = TERRAIN_LOCATION_CEILING
 			me.Y = me.CeilingY
+			PlaySound(HIT_SOUND_BYTES, 0.20)
 		}
 	} else if me.Location == TERRAIN_LOCATION_CEILING {
 		me.Y += deltaTime * me.GetSwitchJumpSpeedY()
@@ -123,6 +124,7 @@ func (me *CatEntityHorizontal) updateJumpSwitch(deltaTime float64) {
 			me.Status = CAT_ENTITY_STATUS_RUN
 			me.Location = TERRAIN_LOCATION_FLOOR
 			me.Y = me.FloorY - me.Height
+			PlaySound(HIT_SOUND_BYTES, 0.25)
 		}
 	}
 }
@@ -152,6 +154,7 @@ func (me *CatEntityHorizontal) updateJumpForward(deltaTime float64) {
 		} else {
 			me.Y = me.CeilingY
 		}
+		PlaySound(HIT_SOUND_BYTES, 0.25)
 	}
 }
 
