@@ -4,4 +4,5 @@ Author: hinst
 Game engine: Ebitengine
 
 ## Asset sources
-* Craftpix.net
+* Craftpix.net -> free assets
+* Freesound.org -> LittleRobotSoundFactory

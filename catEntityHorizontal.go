@@ -82,7 +82,7 @@ func (me *CatEntityHorizontal) updateRun(deltaTime float64) {
 		me.runFrame -= CAT_RUN_ANIMATION_FRAME_COUNT
 	}
 	for _, key := range me.JustPressedKeys {
-		if key == ebiten.KeySpace {
+		if key == ebiten.KeySpace && me.CheckJumpAllowed() {
 			for _, key := range me.PressedKeys {
 				if key == ebiten.KeyUp && me.Status == CAT_ENTITY_STATUS_RUN && me.Location == TERRAIN_LOCATION_FLOOR {
 					me.Status = CAT_ENTITY_STATUS_JUMP_SWITCH
@@ -317,4 +317,9 @@ func (me *CatEntityHorizontal) GetRunFramePerSecond() float64 {
 
 func (me *CatEntityHorizontal) GetDieFramePerSecond() float64 {
 	return 6
+}
+
+func (me *CatEntityHorizontal) CheckJumpAllowed() bool {
+	var forbidden = me.X < 100 && me.Direction == DIRECTION_LEFT
+	return !forbidden
 }
