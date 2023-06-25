@@ -27,6 +27,7 @@ type CatEntityHorizontal struct {
 	Direction                   Direction
 	horizontalJumpTimeRemaining float64
 	aimLineAnimationTime        float64
+	scheduledHitSound           bool
 
 	runImage *ebiten.Image
 	runFrame float64
@@ -77,6 +78,10 @@ func (me *CatEntityHorizontal) getSpeedDirection() (speedDirection float64) {
 }
 
 func (me *CatEntityHorizontal) updateRun(deltaTime float64) {
+	if me.scheduledHitSound {
+		PlaySound(HIT_SOUND_BYTES, 0.25)
+		me.scheduledHitSound = false
+	}
 	me.runFrame += deltaTime * me.GetRunFramePerSecond()
 	if me.runFrame >= CAT_RUN_ANIMATION_FRAME_COUNT {
 		me.runFrame -= CAT_RUN_ANIMATION_FRAME_COUNT
@@ -127,7 +132,7 @@ func (me *CatEntityHorizontal) updateJumpSwitch(deltaTime float64) {
 			me.Status = CAT_ENTITY_STATUS_RUN
 			me.Location = TERRAIN_LOCATION_CEILING
 			me.Y = me.CeilingY
-			PlaySound(HIT_SOUND_BYTES, 0.20)
+			me.scheduledHitSound = true
 		}
 	} else if me.Location == TERRAIN_LOCATION_CEILING {
 		me.Y += deltaTime * me.GetSwitchJumpSpeedY()
@@ -135,7 +140,7 @@ func (me *CatEntityHorizontal) updateJumpSwitch(deltaTime float64) {
 			me.Status = CAT_ENTITY_STATUS_RUN
 			me.Location = TERRAIN_LOCATION_FLOOR
 			me.Y = me.FloorY - me.Height
-			PlaySound(HIT_SOUND_BYTES, 0.25)
+			me.scheduledHitSound = true
 		}
 	}
 }
@@ -165,7 +170,7 @@ func (me *CatEntityHorizontal) updateJumpForward(deltaTime float64) {
 		} else {
 			me.Y = me.CeilingY
 		}
-		PlaySound(HIT_SOUND_BYTES, 0.25)
+		me.scheduledHitSound = true
 	}
 }
 
