@@ -36,7 +36,7 @@ func (me *GameSceneVertical) Initialize() {
 	me.catEntity.CameraY = me.cameraY
 	me.catEntity.X = me.ViewWidth/2 - me.catEntity.Width/2
 	me.fallObstacleMan.AreaWidth = me.GetAreaWidth()
-	me.fallObstacleMan.AreaHeight = me.ViewHeight * 10
+	me.fallObstacleMan.AreaHeight = me.ViewHeight * 6
 	me.fallObstacleMan.ViewWidth = me.ViewWidth
 	me.fallObstacleMan.ViewHeight = me.ViewHeight
 	me.fallObstacleMan.Initialize()
@@ -82,7 +82,7 @@ func (me *GameSceneVertical) GetAreaWidth() float64 {
 }
 
 func (me *GameSceneVertical) GetTorchSpeedY() float64 {
-	return 100
+	return 120
 }
 
 func (me *GameSceneVertical) GetTorchGapY() float64 {

@@ -53,11 +53,11 @@ func (me *FallObstacleMan) Draw(screen *ebiten.Image) {
 }
 
 func (me *FallObstacleMan) getDistanceBetweenObstacles() float64 {
-	return 100
+	return 90
 }
 
 func (me *FallObstacleMan) getFluctuationY() float64 {
-	return 40
+	return 30
 }
 
 func (me *FallObstacleMan) getAnimationAngleSpeed() float64 {

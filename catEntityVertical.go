@@ -55,9 +55,9 @@ func (me *CatEntityVertical) Draw(screen *ebiten.Image) {
 
 // Measurement unit: pixels per second
 func (me *CatEntityVertical) GetSpeedY() float64 {
-	return 25
+	return 50
 }
 
 func (me *CatEntityVertical) GetSteerSpeed() float64 {
-	return 100
+	return 80
 }
