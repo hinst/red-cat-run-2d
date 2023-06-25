@@ -120,7 +120,6 @@ func (me *GameSceneTransition) drawCatRun(screen *ebiten.Image) {
 }
 
 func (me *GameSceneTransition) drawCatFly(screen *ebiten.Image) {
-	println(int(me.catX))
 	var drawOptions ebiten.DrawImageOptions
 	drawOptions.GeoM.Translate(
 		me.catX-float64(CAT_FLY_ANIMATION_FRAME_WIDTH)/2,
@@ -141,7 +140,7 @@ func (me *GameSceneTransition) drawTorches(screen *ebiten.Image) {
 }
 
 func (me *GameSceneTransition) getInitialCatFallScaleY() float64 {
-	return 2.33
+	return 2
 }
 
 func (me *GameSceneTransition) getInitialTorchFallScaleY() float64 {

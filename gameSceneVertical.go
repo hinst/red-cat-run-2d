@@ -57,6 +57,12 @@ func (me *GameSceneVertical) Update(deltaTime float64) {
 	for me.TorchY < -me.GetTorchGapY() {
 		me.TorchY += me.GetTorchGapY()
 	}
+	if me.wallAlpha < 1 {
+		me.wallAlpha += deltaTime * me.getWallAlphaSpeed()
+		if me.wallAlpha >= 1 {
+			me.wallAlpha = 1
+		}
+	}
 }
 
 func (me *GameSceneVertical) Draw(screen *ebiten.Image) {
@@ -135,17 +141,24 @@ func (me *GameSceneVertical) drawFloorPart(screen *ebiten.Image, baseX float64, 
 	var y = baseY + float64(me.brickImage.Bounds().Dy()) + float64(me.torchImage.Bounds().Dy())*me.getTorchScale()
 	var drawOptions ebiten.DrawImageOptions
 	drawOptions.GeoM.Translate(baseX, y)
+	drawOptions.ColorScale.Scale(float32(me.wallAlpha), float32(me.wallAlpha), float32(me.wallAlpha), float32(me.wallAlpha))
 	screen.DrawImage(me.brickImage, &drawOptions)
 	for dirtIndex := 0; dirtIndex < 10; dirtIndex++ {
 		y += float64(me.brickImage.Bounds().Dy())
 		var drawOptions ebiten.DrawImageOptions
 		drawOptions.GeoM.Translate(baseX, y)
+		drawOptions.ColorScale.Scale(float32(me.wallAlpha), float32(me.wallAlpha), float32(me.wallAlpha), float32(me.wallAlpha))
 		screen.DrawImage(me.dirtImage, &drawOptions)
 	}
 }
 
 func (me *GameSceneVertical) drawShaftBackground(screen *ebiten.Image) {
+	var color = MultiplyColor(SHAFT_COLOR, me.wallAlpha)
 	var width = (int(me.GetPaddingWidth())/me.brickImage.Bounds().Dx() - 1) * me.brickImage.Bounds().Dx()
-	vector.DrawFilledRect(screen, 0, 0, float32(width), float32(me.ViewHeight), SHAFT_COLOR, false)
-	vector.DrawFilledRect(screen, float32(me.ViewWidth)-float32(width), 0, float32(width), float32(me.ViewHeight), SHAFT_COLOR, false)
+	vector.DrawFilledRect(screen, 0, 0, float32(width), float32(me.ViewHeight), color, false)
+	vector.DrawFilledRect(screen, float32(me.ViewWidth)-float32(width), 0, float32(width), float32(me.ViewHeight), color, false)
+}
+
+func (me *GameSceneVertical) getWallAlphaSpeed() float64 {
+	return 0.3
 }

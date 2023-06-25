@@ -2,6 +2,7 @@ package main
 
 import (
 	"image"
+	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -27,4 +28,14 @@ func GetShiftedRectangle(shiftX float64, frameWidth float64, frameHeight float64
 		RoundFloat64ToInt(shiftX), 0,
 		RoundFloat64ToInt(shiftX+frameWidth), RoundFloat64ToInt(frameHeight),
 	)
+}
+
+func MultiplyColor(c color.RGBA, x float64) (result color.Color) {
+	result = color.RGBA{
+		R: uint8(float64(c.R) * x),
+		G: uint8(float64(c.G) * x),
+		B: uint8(float64(c.B) * x),
+		A: uint8(float64(c.A) * x),
+	}
+	return
 }
