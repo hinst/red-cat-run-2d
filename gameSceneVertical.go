@@ -46,8 +46,16 @@ func (me *GameSceneVertical) Initialize() {
 }
 
 func (me *GameSceneVertical) Update(deltaTime float64) {
+	me.catEntity.PressedKeys = me.PressedKeys
+	me.catEntity.JustPressedKeys = me.JustPressedKeys
 	me.catEntity.CameraY = me.cameraY
 	me.catEntity.Update(deltaTime)
+	if me.catEntity.X < me.GetPaddingWidth() {
+		me.catEntity.X = me.GetPaddingWidth()
+	}
+	if me.catEntity.X >= me.ViewWidth-me.GetPaddingWidth()-me.catEntity.Width {
+		me.catEntity.X = me.ViewWidth - me.GetPaddingWidth() - me.catEntity.Width
+	}
 	me.fallObstacleMan.CameraY = me.cameraY
 	me.fallObstacleMan.Update(deltaTime)
 	me.cameraY = me.catEntity.Y - me.GetCatViewY()
