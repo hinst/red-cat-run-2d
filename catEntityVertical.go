@@ -37,10 +37,10 @@ func (me *CatEntityVertical) Update(deltaTime float64) {
 func (me *CatEntityVertical) updateSteer(deltaTime float64) {
 	for _, key := range me.PressedKeys {
 		if key == ebiten.KeyLeft {
-			me.X -= deltaTime * 50
+			me.X -= deltaTime * me.GetSteerSpeed()
 			break
 		} else if key == ebiten.KeyRight {
-			me.X += deltaTime * 50
+			me.X += deltaTime * me.GetSteerSpeed()
 		}
 	}
 }
@@ -56,4 +56,8 @@ func (me *CatEntityVertical) Draw(screen *ebiten.Image) {
 // Measurement unit: pixels per second
 func (me *CatEntityVertical) GetSpeedY() float64 {
 	return 25
+}
+
+func (me *CatEntityVertical) GetSteerSpeed() float64 {
+	return 100
 }
