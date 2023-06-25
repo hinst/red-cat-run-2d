@@ -26,6 +26,7 @@ type GameSceneVertical struct {
 	dirtImage   *ebiten.Image
 	wallAlpha   float64
 	collided    bool
+	fishImage   *ebiten.Image
 }
 
 func (me *GameSceneVertical) Initialize() {
@@ -37,21 +38,26 @@ func (me *GameSceneVertical) Initialize() {
 	me.catEntity.CameraY = me.cameraY
 	me.catEntity.X = me.ViewWidth/2 - me.catEntity.Width/2
 	me.obstacleMan.AreaWidth = me.GetAreaWidth()
-	me.obstacleMan.AreaHeight = me.ViewHeight * 6
+	me.obstacleMan.AreaHeight = me.GetAreaHeight()
 	me.obstacleMan.ViewWidth = me.ViewWidth
 	me.obstacleMan.ViewHeight = me.ViewHeight
 	me.obstacleMan.Initialize()
 	me.torchImage = LoadImage(TORCH_IMAGE_BYTES)
 	me.brickImage = LoadImage(BRICK_BLOCK_IMAGE_BYTES)
 	me.dirtImage = LoadImage(DIRT_BLOCK_IMAGE_BYTES)
+	me.fishImage = LoadImage(FISH_IMAGE_BYTES)
 }
 
 func (me *GameSceneVertical) Update(deltaTime float64) {
 	me.updateCatEntity(deltaTime)
 	me.cameraY = me.catEntity.Y - me.GetCatViewY()
+	if me.cameraY < me.GetAreaHeight()-me.ViewHeight {
+		me.TorchY -= deltaTime * me.GetTorchSpeedY()
+	} else {
+		me.cameraY = me.GetAreaHeight() - me.ViewHeight
+	}
 	me.obstacleMan.CameraY = me.cameraY
 	me.obstacleMan.Update(deltaTime)
-	me.TorchY -= deltaTime * me.GetTorchSpeedY()
 	for me.TorchY < -me.GetTorchGapY() {
 		me.TorchY += me.GetTorchGapY()
 	}
@@ -87,6 +93,7 @@ func (me *GameSceneVertical) Draw(screen *ebiten.Image) {
 	me.drawDecorations(screen)
 	me.catEntity.Draw(screen)
 	me.obstacleMan.Draw(screen)
+	me.drawFish(screen)
 }
 
 func (me *GameSceneVertical) GetAreaWidth() float64 {
@@ -168,4 +175,16 @@ func (me *GameSceneVertical) getWallAlphaSpeed() float64 {
 
 func (me *GameSceneVertical) checkCollided() bool {
 	return me.obstacleMan.CheckCollided(me.catEntity.GetHitBox())
+}
+
+func (me GameSceneVertical) drawFish(screen *ebiten.Image) {
+	var drawOptions = ebiten.DrawImageOptions{}
+	drawOptions.GeoM.Translate(
+		me.ViewWidth/2-float64(me.fishImage.Bounds().Dx())/2,
+		me.obstacleMan.AreaHeight-float64(me.fishImage.Bounds().Dy())-me.cameraY)
+	screen.DrawImage(me.fishImage, &drawOptions)
+}
+
+func (me GameSceneVertical) GetAreaHeight() float64 {
+	return me.ViewHeight * 3
 }

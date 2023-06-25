@@ -32,18 +32,27 @@ func (me *FallObstacleMan) Initialize() {
 	me.ObstacleWidth = float64(me.obstacleImage.Bounds().Dx()) * 2
 	var previousX float64
 	for y := me.ViewHeight; y < me.AreaHeight-me.ViewHeight; y += me.getDistanceBetweenObstacles() {
-		for i := 0; i < 2; i++ {
+		for xIndex := 0; xIndex < 2; xIndex++ {
 			var width = me.AreaWidth - me.ObstacleWidth - me.getPadding()*2
-			var findX = func() float64 {
-				return me.getShaftLeft() + me.getPadding() +
-					me.ObstacleWidth/2 + rand.Float64()*width
-			}
-			var x = findX()
-			for i := 0; i < 4; i++ {
-				if math.Abs(x-previousX) < me.ObstacleWidth*1.5 {
-					x = findX()
+			var x float64
+			if xIndex == 0 {
+				var findX = func() float64 {
+					return me.getShaftLeft() + me.getPadding() +
+						me.ObstacleWidth/2 + rand.Float64()*width
+				}
+				x = findX()
+				for i := 0; i < 5; i++ {
+					if math.Abs(x-previousX) < me.ViewWidth/2 {
+						x = findX()
+					} else {
+						break
+					}
+				}
+			} else {
+				if previousX < me.ViewWidth/2 {
+					x = previousX + me.ObstacleWidth*1.5
 				} else {
-					break
+					x = previousX - me.ObstacleWidth*1.5
 				}
 			}
 			var obstacle = FloatPoint{
@@ -123,12 +132,12 @@ func (me *FallObstacleMan) GetCollisionRectangle(obstacle FloatPoint) (result Re
 	result = Rectangle{
 		A: FloatPoint{
 			X: obstacle.X - me.ObstacleWidth/2,
-			Y: obstacle.Y - me.ObstacleWidth/2,
+			Y: obstacle.Y - me.ObstacleWidth/4,
 		},
 	}
 	result.B.X = result.A.X + me.ObstacleWidth
-	result.B.Y = result.A.Y + me.ObstacleWidth
-	return result.Shrink(5)
+	result.B.Y = result.A.Y + me.ObstacleWidth/2
+	return result.Shrink(1)
 }
 
 func (me *FallObstacleMan) CheckCollided(rectangle Rectangle) bool {
