@@ -124,7 +124,7 @@ func (me *GameSceneVertical) Update(deltaTime float64) {
 			me.deadMessageDelay = 2
 		}
 	}
-	if me.catEntity.Direction == DIRECTION_TOP && me.catEntity.Y < 0 && !me.Ascended {
+	if me.catEntity.Direction == DIRECTION_TOP && me.catEntity.Y < 0 && !me.Ascended && !me.dead {
 		me.Ascended = true
 		PlaySound(ASCENDED_SOUND_BYTES, 0.20)
 	}
