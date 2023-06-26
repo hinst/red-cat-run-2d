@@ -25,6 +25,8 @@ type GameScene struct {
 	PressedKeys []ebiten.Key
 	// Output parameter
 	Completed bool
+	// Output parameter
+	Ascended bool
 
 	Status                    GameSceneStatus
 	sceneHorizontal           GameSceneHorizontal
@@ -87,6 +89,7 @@ func (me *GameScene) Update(deltaTime float64) {
 		me.sceneVertical.PressedKeys = me.PressedKeys
 		me.sceneVertical.Update(deltaTime)
 		if me.sceneVertical.Completed {
+			me.Ascended = me.sceneVertical.Ascended
 			me.Completed = true
 		}
 	}

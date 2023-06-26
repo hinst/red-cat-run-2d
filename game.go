@@ -74,11 +74,14 @@ func (me *Game) initializeInternal() {
 	me.isFirstUpdateAfterInitialization = true
 }
 
-func (me *Game) initializeGameScene() {
+func (me *Game) initializeGameScene(startFromVertical bool) {
 	me.gameScene = &GameScene{}
 	me.gameScene.ViewWidth = me.viewWidth
 	me.gameScene.ViewHeight = me.viewHeight
 	me.gameScene.Initialize()
+	if startFromVertical {
+		me.gameScene.Status = GAME_SCENE_STATUS_VERTICAL
+	}
 }
 
 func (me *Game) Update() error {
@@ -158,7 +161,10 @@ func (me *Game) updateMenu(deltaTime float64) {
 	switch me.menu.PressedItemId {
 	case GAME_MENU_ITEM_ID_NEW_GAME:
 		me.mode = GAME_MODE_GAME
-		me.initializeGameScene()
+		me.initializeGameScene(false)
+	case GAME_MENU_ITEM_ID_NEW_GAME_PLUS:
+		me.mode = GAME_MODE_GAME
+		me.initializeGameScene(true)
 	case GAME_MENU_ITEM_ID_TOGGLE_FULL_SCREEN:
 		ebiten.SetFullscreen(!ebiten.IsFullscreen())
 	case GAME_MENU_ITEM_ID_GENERAL_INFORMATION:
@@ -189,6 +195,11 @@ func (me *Game) updateGameScene(deltaTime float64) {
 	if me.gameScene.Completed {
 		me.gameScene.Close()
 		me.mode = GAME_MODE_MENU
+
+		if me.gameScene.Ascended {
+			me.isNewGamePlusUnlocked = true
+			me.menu.Items = me.createMenuItems()
+		}
 	}
 }
 
@@ -241,7 +252,7 @@ func (me *Game) createMenuItems() (items []MenuUserInterfaceItem) {
 		},
 	}
 	if me.isNewGamePlusUnlocked {
-		slices.Insert(items, 1, MenuUserInterfaceItem{
+		items = slices.Insert(items, 1, MenuUserInterfaceItem{
 			Title: "New Game Plus",
 			Id:    GAME_MENU_ITEM_ID_NEW_GAME_PLUS,
 		})
