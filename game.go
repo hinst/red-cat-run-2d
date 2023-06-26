@@ -22,25 +22,25 @@ const (
 )
 
 type Game struct {
-	updateTime      time.Time
-	justPressedKeys []ebiten.Key
-	pressedKeys     []ebiten.Key
-	menu            MenuUserInterface
-	gameScene       *GameScene
-	gameInfoScene   GameInfoScene
-	isExiting       bool
-	mode            GameMode
-	viewWidth       float64
-	viewHeight      float64
-	updatesToSkip   int
-	initialized     bool
-
-	titleImage                     *ebiten.Image
-	ebitengineReverseImage         *ebiten.Image
-	catWalkImage                   *ebiten.Image
-	catRunFrame                    float64
-	initialInformationAcknowledged bool
-	fpsCounterEnabled              bool
+	updateTime                       time.Time
+	justPressedKeys                  []ebiten.Key
+	pressedKeys                      []ebiten.Key
+	menu                             MenuUserInterface
+	gameScene                        *GameScene
+	gameInfoScene                    GameInfoScene
+	isExiting                        bool
+	mode                             GameMode
+	viewWidth                        float64
+	viewHeight                       float64
+	updatesToSkip                    int
+	initialized                      bool
+	titleImage                       *ebiten.Image
+	ebitengineReverseImage           *ebiten.Image
+	catWalkImage                     *ebiten.Image
+	catRunFrame                      float64
+	initialInformationAcknowledged   bool
+	fpsCounterEnabled                bool
+	isFirstUpdateAfterInitialization bool
 }
 
 const (
@@ -105,6 +105,7 @@ func (me *Game) initializeInternal() {
 	me.catWalkImage = ebiten.NewImageFromImage(catWalkImage)
 	InitializeSound()
 	me.initialized = true
+	me.isFirstUpdateAfterInitialization = true
 }
 
 func (me *Game) initializeGameScene() {
@@ -121,6 +122,11 @@ func (me *Game) Update() error {
 	}
 	if !me.initialized {
 		me.initializeInternal()
+		return nil
+	}
+	if me.isFirstUpdateAfterInitialization {
+		// Ignore keys pressed during the initialization screen by the impatient user
+		me.isFirstUpdateAfterInitialization = false
 		return nil
 	}
 	me.justPressedKeys = me.justPressedKeys[:0]
