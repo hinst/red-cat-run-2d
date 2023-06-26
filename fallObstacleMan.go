@@ -75,7 +75,7 @@ func (me *FallObstacleMan) CreateObstacles() {
 			if xIndex == 1 {
 				obstacle.Y += me.getFluctuationY()*0.5 + rand.Float64()*me.getFluctuationY()
 			}
-			if xIndex == 0 || rand.Intn(3) != 0 {
+			if xIndex == 0 || rand.Intn(4) != 0 {
 				me.obstacles = append(me.obstacles, obstacle)
 			}
 			previousX = x
