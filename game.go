@@ -60,6 +60,7 @@ const GAME_TEXT_CONTROLS = "press [up + space] to jump up\n" +
 func (me *Game) Initialize() {
 	me.viewWidth = 420
 	me.viewHeight = 240
+	// Skip the initial updates to ensure that the loading screen had enough time to be rendered
 	me.updatesToSkip = 4
 }
 
