@@ -11,6 +11,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
+	"golang.org/x/exp/slices"
 )
 
 type GameMode int
@@ -41,10 +42,12 @@ type Game struct {
 	initialInformationAcknowledged   bool
 	fpsCounterEnabled                bool
 	isFirstUpdateAfterInitialization bool
+	isNewGamePlusUnlocked            bool
 }
 
 const (
 	GAME_MENU_ITEM_ID_NEW_GAME = iota
+	GAME_MENU_ITEM_ID_NEW_GAME_PLUS
 	GAME_MENU_ITEM_ID_TOGGLE_FULL_SCREEN
 	GAME_MENU_ITEM_ID_GENERAL_INFORMATION
 	GAME_MENU_ITEM_ID_TOGGLE_VSYNC
@@ -71,35 +74,7 @@ func (me *Game) initializeInternal() {
 	AssertError(ebitengineReverseImageError)
 	me.ebitengineReverseImage = ebiten.NewImageFromImage(ebitengineReverseImage)
 	me.updateTime = time.Now()
-	me.menu = MenuUserInterface{
-		Items: []MenuUserInterfaceItem{
-			{
-				Title: "New Game",
-				Id:    GAME_MENU_ITEM_ID_NEW_GAME,
-			},
-			{
-				Title: "Information",
-				Id:    GAME_MENU_ITEM_ID_GENERAL_INFORMATION,
-			},
-			{
-				Title: "Toggle Full Screen",
-				Id:    GAME_MENU_ITEM_ID_TOGGLE_FULL_SCREEN,
-			},
-			{
-				Title: "Toggle Vsync: " + strconv.FormatBool(ebiten.IsVsyncEnabled()),
-				Id:    GAME_MENU_ITEM_ID_TOGGLE_VSYNC,
-			},
-			{
-				Title: "Toggle FPS counter",
-				Id:    GAME_MENU_ITEM_ID_TOGGLE_FPS_COUNTER,
-			},
-			{
-				Title: "Exit",
-				Id:    GAME_MENU_ITEM_ID_EXIT,
-			},
-		},
-	}
-
+	me.menu = MenuUserInterface{Items: me.createMenuItems()}
 	var catWalkImage, _, catImageError = image.Decode(bytes.NewReader(CAT_RUN_IMAGE_BYTES))
 	AssertError(catImageError)
 	me.catWalkImage = ebiten.NewImageFromImage(catWalkImage)
@@ -257,4 +232,40 @@ func (me *Game) drawTitle(screen *ebiten.Image) {
 	drawOptions.ColorScale.Scale(0.6, 0.6, 0.6, 1)
 	drawOptions.Filter = ebiten.FilterLinear
 	screen.DrawImage(me.titleImage, &drawOptions)
+}
+
+func (me *Game) createMenuItems() (items []MenuUserInterfaceItem) {
+	items = []MenuUserInterfaceItem{
+		{
+			Title: "New Game",
+			Id:    GAME_MENU_ITEM_ID_NEW_GAME,
+		},
+		{
+			Title: "Information",
+			Id:    GAME_MENU_ITEM_ID_GENERAL_INFORMATION,
+		},
+		{
+			Title: "Toggle Full Screen",
+			Id:    GAME_MENU_ITEM_ID_TOGGLE_FULL_SCREEN,
+		},
+		{
+			Title: "Toggle Vsync: " + strconv.FormatBool(ebiten.IsVsyncEnabled()),
+			Id:    GAME_MENU_ITEM_ID_TOGGLE_VSYNC,
+		},
+		{
+			Title: "Toggle FPS counter",
+			Id:    GAME_MENU_ITEM_ID_TOGGLE_FPS_COUNTER,
+		},
+		{
+			Title: "Exit",
+			Id:    GAME_MENU_ITEM_ID_EXIT,
+		},
+	}
+	if me.isNewGamePlusUnlocked {
+		slices.Insert(items, 1, MenuUserInterfaceItem{
+			Title: "New Game Plus",
+			Id:    GAME_MENU_ITEM_ID_NEW_GAME_PLUS,
+		})
+	}
+	return items
 }
