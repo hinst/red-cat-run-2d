@@ -88,8 +88,13 @@ func (me *GameSceneVertical) Update(deltaTime float64) {
 	if me.dead && len(me.JustPressedKeys) > 0 && me.deadMessageDelay <= 0 {
 		me.Completed = true
 	}
-	if me.Ascended && len(me.JustPressedKeys) > 0 {
-		me.Completed = true
+	if me.Ascended {
+		for _, key := range me.JustPressedKeys {
+			if key == ebiten.KeyEnter {
+				me.Completed = true
+				break
+			}
+		}
 	}
 	if me.deadMessageDelay > 0 {
 		me.deadMessageDelay -= deltaTime
@@ -157,7 +162,7 @@ func (me *GameSceneVertical) Draw(screen *ebiten.Image) {
 		drawOptions.GeoM.Translate(me.ViewWidth/2-float64(me.ascendedImage.Bounds().Dx())/2, me.ViewHeight)
 		drawOptions.ColorScale.Scale(float32(math.Sin(me.ascendedPulse)), float32(math.Sin(me.ascendedPulse)), float32(math.Sin(me.ascendedPulse)), float32(math.Sin(me.ascendedPulse)))
 		screen.DrawImage(me.ascendedImage, &drawOptions)
-		ebitenutil.DebugPrintAt(screen, "YOU HAVE ASCENDED\n"+"  press any key", 160, 50)
+		ebitenutil.DebugPrintAt(screen, "YOU HAVE ASCENDED\n"+"   press Enter", 160, 50)
 	}
 }
 

@@ -9,9 +9,9 @@ import (
 
 type CatEntityVertical struct {
 	CatEntity
-	// Input parameter for every update
+	// Input parameter for update
 	CameraY float64
-	// Input parameter for every update
+	// Input parameter for update
 	Collided              bool
 	flyImage              *ebiten.Image
 	flyAnimationDirection float64

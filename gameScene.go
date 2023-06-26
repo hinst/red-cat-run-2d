@@ -57,7 +57,7 @@ func (me *GameScene) Initialize() {
 	me.sceneTransition.Initialize()
 	me.Status = GAME_SCENE_STATUS_HORIZONTAL
 	me.timeBeforeBackgroundMusic = 3
-	me.backgroundMusicVolume = 0.2
+	me.backgroundMusicVolume = 0.21
 }
 
 func (me *GameScene) Update(deltaTime float64) {
