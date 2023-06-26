@@ -5,8 +5,6 @@ import (
 )
 
 var (
-	//go:embed data/title.png
-	TITLE_IMAGE_BYTES []byte
 	//go:embed data/catWalk.png
 	CAT_RUN_IMAGE_BYTES []byte
 	//go:embed data/catDie.png

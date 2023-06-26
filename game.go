@@ -1,9 +1,7 @@
 package main
 
 import (
-	"bytes"
 	"errors"
-	"image"
 	"math"
 	"strconv"
 	"time"
@@ -35,7 +33,6 @@ type Game struct {
 	viewHeight                       float64
 	updatesToSkip                    int
 	initialized                      bool
-	titleImage                       *ebiten.Image
 	ebitengineReverseImage           *ebiten.Image
 	catWalkImage                     *ebiten.Image
 	catRunFrame                      float64
@@ -67,17 +64,10 @@ func (me *Game) Initialize() {
 }
 
 func (me *Game) initializeInternal() {
-	var titleImage, _, titleImageError = image.Decode(bytes.NewReader(TITLE_IMAGE_BYTES))
-	AssertError(titleImageError)
-	me.titleImage = ebiten.NewImageFromImage(titleImage)
-	var ebitengineReverseImage, _, ebitengineReverseImageError = image.Decode(bytes.NewReader(EBITENGINE_REVERSE_IMAGE_BYTES))
-	AssertError(ebitengineReverseImageError)
-	me.ebitengineReverseImage = ebiten.NewImageFromImage(ebitengineReverseImage)
+	me.ebitengineReverseImage = LoadImage(EBITENGINE_REVERSE_IMAGE_BYTES)
 	me.updateTime = time.Now()
 	me.menu = MenuUserInterface{Items: me.createMenuItems()}
-	var catWalkImage, _, catImageError = image.Decode(bytes.NewReader(CAT_RUN_IMAGE_BYTES))
-	AssertError(catImageError)
-	me.catWalkImage = ebiten.NewImageFromImage(catWalkImage)
+	me.catWalkImage = LoadImage(CAT_RUN_IMAGE_BYTES)
 	InitializeSound()
 	me.initialized = true
 	me.isFirstUpdateAfterInitialization = true
@@ -145,9 +135,6 @@ func (me *Game) update(deltaTime float64) {
 
 func (me *Game) draw(screen *ebiten.Image) {
 	if me.mode == GAME_MODE_MENU {
-		if false {
-			me.drawTitle(screen)
-		}
 		me.drawEbitenReverse(screen)
 		me.drawCatAnimationTop(screen)
 		me.menu.Draw(screen)
@@ -223,15 +210,6 @@ func (me *Game) drawCatAnimationTop(screen *ebiten.Image) {
 
 func (me *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
 	return int(me.viewWidth), int(me.viewHeight)
-}
-
-func (me *Game) drawTitle(screen *ebiten.Image) {
-	var drawOptions = ebiten.DrawImageOptions{}
-	drawOptions.GeoM.Scale(0.6, 0.6)
-	drawOptions.GeoM.Translate(230, 210)
-	drawOptions.ColorScale.Scale(0.6, 0.6, 0.6, 1)
-	drawOptions.Filter = ebiten.FilterLinear
-	screen.DrawImage(me.titleImage, &drawOptions)
 }
 
 func (me *Game) createMenuItems() (items []MenuUserInterfaceItem) {
