@@ -24,6 +24,7 @@ type GameSceneVertical struct {
 
 	catEntity        CatEntityVertical
 	obstacleMan      FallObstacleMan
+	dustMan          DustMan
 	cameraY          float64
 	TorchY           float64
 	torchImage       *ebiten.Image
@@ -57,6 +58,12 @@ func (me *GameSceneVertical) Initialize() {
 	me.dirtImage = LoadImage(DIRT_BLOCK_IMAGE_BYTES)
 	me.fishImage = LoadImage(FISH_IMAGE_BYTES)
 	me.ascendedImage = LoadImage(ASCENDED_IMAGE_BYTES)
+	me.dustMan.ViewWidth = me.ViewWidth
+	me.dustMan.ViewHeight = me.ViewHeight
+	me.dustMan.AreaWidth = me.GetAreaWidth()
+	me.dustMan.AreaHeight = me.GetAreaHeight()
+	me.dustMan.Direction = DIRECTION_BOTTOM
+	me.dustMan.Initialize()
 }
 
 func (me *GameSceneVertical) Update(deltaTime float64) {
@@ -129,6 +136,7 @@ func (me *GameSceneVertical) Update(deltaTime float64) {
 			me.ascendedPulse = 0
 		}
 	}
+	me.dustMan.CameraY = me.cameraY / 2
 }
 
 func (me *GameSceneVertical) updateCatEntity(deltaTime float64) {
@@ -145,6 +153,7 @@ func (me *GameSceneVertical) updateCatEntity(deltaTime float64) {
 }
 
 func (me *GameSceneVertical) Draw(screen *ebiten.Image) {
+	me.dustMan.Draw(screen)
 	me.drawDecorations(screen)
 	me.catEntity.Draw(screen)
 	me.obstacleMan.Draw(screen)
