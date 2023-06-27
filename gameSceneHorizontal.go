@@ -83,7 +83,7 @@ func (me *GameSceneHorizontal) Update(deltaTime float64) {
 		}
 		me.cameraX = me.getCameraXGoingLeft() + me.transitionTimeRemaining*(me.getCameraXGoingRight()-me.getCameraXGoingLeft())/2
 	}
-	me.dustMan.CameraX = me.cameraX
+	me.dustMan.CameraX = me.cameraX / 2
 	me.dustMan.Update(deltaTime)
 }
 

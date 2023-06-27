@@ -218,15 +218,10 @@ func (me *TerrainMan) drawTorch(screen *ebiten.Image, leftBlock *TerrainBlock, r
 	}
 	ScaleCentered(&drawOptions, float64(imageWidth), float64(imageHeight), SCALE*xScaleMultiplier, SCALE)
 	var centerX = float64((leftBlock.X + leftBlock.Width + rightBlock.X)) * float64(me.GetTileWidth()) / 2
-	var x = centerX - float64(me.torchImage.Bounds().Dx()/2)
 	var centerY = (me.CeilingY) / 2
-	var y = centerY - float64(me.torchImage.Bounds().Dy()/2)
-	var visible = me.CameraX-float64(imageWidth) <= x &&
-		x <= me.CameraX+me.ViewWidth+float64(imageWidth)
+	var x = centerX - float64(imageWidth/2)
+	var visible = me.CameraX-float64(imageWidth) <= x && x <= me.CameraX+me.ViewWidth+float64(imageWidth)
 	if visible {
-		drawOptions.GeoM.Translate(x-me.CameraX, y-me.CameraY)
-		drawOptions.ColorScale.Scale(0.9, 0.9, 0.9, 0.9)
-		DrawTorchLight(screen, float32(centerX-me.CameraX), float32(centerY-me.CameraY))
-		screen.DrawImage(me.torchImage, &drawOptions)
+		DrawTorch(screen, me.torchImage, centerX-me.CameraX, centerY-me.CameraY)
 	}
 }

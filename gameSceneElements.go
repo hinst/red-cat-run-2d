@@ -22,7 +22,7 @@ func DrawTorchLight(screen *ebiten.Image, x float32, y float32) {
 }
 
 func DrawTorch(screen *ebiten.Image, torchImage *ebiten.Image, x float64, y float64) {
-	var torchScale = 0.5
+	const SCALE = 0.5
 	var imageWidth = float64(torchImage.Bounds().Dx())
 	var imageHeight = float64(torchImage.Bounds().Dy())
 	var xScaleMultiplier float64 = 1
@@ -31,11 +31,11 @@ func DrawTorch(screen *ebiten.Image, torchImage *ebiten.Image, x float64, y floa
 	}
 	var drawOptions = ebiten.DrawImageOptions{}
 	ScaleCentered(&drawOptions, imageWidth, imageHeight, xScaleMultiplier, 1)
-	drawOptions.GeoM.Scale(torchScale, torchScale)
+	drawOptions.GeoM.Scale(SCALE, SCALE)
 	DrawTorchLight(screen, float32(x), float32(y))
 	drawOptions.GeoM.Translate(
-		math.Round(x-imageWidth/2*torchScale),
-		math.Round(y-imageHeight/2*torchScale),
+		math.Round(x-imageWidth/2*SCALE),
+		math.Round(y-imageHeight/2*SCALE),
 	)
 	screen.DrawImage(torchImage, &drawOptions)
 }
