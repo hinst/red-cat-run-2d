@@ -77,7 +77,7 @@ func (me *TerrainMan) Initialize() {
 			block.Width = me.GetExtendedBlockWidth()
 		} else {
 			block.Location = TerrainLocation(rand.Intn(2))
-			if me.getOngoingCountOfSameLocationBlocks() >= 3 {
+			if me.getOngoingCountOfSameBlocks(len(me.blocks)-1) >= 3 {
 				block.Location = me.GetLastBlock().Location.GetOpposite()
 			}
 			var gap = GetRandomNumberBetween(me.GetMinGapWidth(), me.GetMaxGapWidth())
@@ -135,8 +135,8 @@ func (me *TerrainMan) GetBlocks() []*TerrainBlock {
 	return me.blocks
 }
 
-func (me *TerrainMan) getOngoingCountOfSameLocationBlocks() (count int) {
-	for i := len(me.blocks) - 1; i >= 0; i-- {
+func (me *TerrainMan) getOngoingCountOfSameBlocks(index int) (count int) {
+	for i := index; i >= 0; i-- {
 		if me.blocks[i].Location == me.GetLastBlock().Location {
 			count++
 		} else {
@@ -200,6 +200,9 @@ func (me *TerrainMan) Shuffle() {
 			me.blocks[i].Location = me.blocks[i].Location.GetOpposite()
 		} else {
 			me.blocks[i].Location = TerrainLocation(rand.Intn(2))
+			if me.getOngoingCountOfSameBlocks(i-1) >= 3 {
+				me.blocks[i].Location = me.blocks[i-1].Location.GetOpposite()
+			}
 		}
 	}
 }
