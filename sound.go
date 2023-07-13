@@ -8,7 +8,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/audio/vorbis"
 )
 
-const SAMPLE_RATE = 44000
+const SAMPLE_RATE = 44100
 
 func StreamToBytes(stream io.Reader) []byte {
 	buf := new(bytes.Buffer)
