@@ -1,6 +1,6 @@
 module github.com/hinst/red-cat-run-2d
 
-go 1.20
+go 1.26
 
 require (
 	github.com/hajimehoshi/ebiten/v2 v2.5.4
