@@ -98,7 +98,6 @@ func (me *Game) Update() error {
 		me.isFirstUpdateAfterInitialization = false
 		return nil
 	}
-	me.justPressedKeys = me.justPressedKeys[:0]
 	me.justPressedKeys = inpututil.AppendJustPressedKeys(me.justPressedKeys)
 	me.pressedKeys = me.pressedKeys[:0]
 	me.pressedKeys = inpututil.AppendPressedKeys(me.pressedKeys)
